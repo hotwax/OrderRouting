@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<entity-facade-xml type="seed">
+    <!-- operatorEnumId OOTB Enum Data -->
+    <moqui.basic.EnumerationType description="Entity Comparison Operator" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="less" enumCode="LESS" enumId="ENTCO_LESS" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="greater" enumCode="GREATER" enumId="ENTCO_GREATER" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="less-equals" enumCode="LESS_EQ" enumId="ENTCO_LESS_EQ" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="greater-equals" enumCode="GREATER_EQ" enumId="ENTCO_GREATER_EQ" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="equals" enumCode="EQUALS" enumId="ENTCO_EQUALS" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="not-equals" enumCode="NOT_EQUALS" enumId="ENTCO_NOT_EQUALS" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="in" enumCode="IN" enumId="ENTCO_IN" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="not-in" enumCode="NOT_IN" enumId="ENTCO_NOT_IN" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="between" enumCode="BETWEEN" enumId="ENTCO_BETWEEN" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="not-between" enumCode="NOT_BETWEEN" enumId="ENTCO_NOT_BETWEEN" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="like" enumCode="LIKE" enumId="ENTCO_LIKE" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="not-like" enumCode="NOT_LIKE" enumId="ENTCO_NOT_LIKE" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="is-null" enumCode="IS_NULL" enumId="ENTCO_IS_NULL" enumTypeId="ComparisonOperator"/>
+    <moqui.basic.Enumeration description="is-not-null" enumCode="IS_NOT_NULL" enumId="ENTCO_IS_NOT_NULL" enumTypeId="ComparisonOperator"/>
+
+    <moqui.basic.EnumerationType description="Filter condition type (Where/Order By)" enumTypeId="ConditionType"/>
+    <moqui.basic.Enumeration description="Order by" enumCode="ORDER_BY" enumId="ENTCO_ORDER_BY_CT" enumTypeId="ConditionType"/>
+    <moqui.basic.Enumeration description="Condition" enumCode="CONDITION" enumId="ENTCO_CONDITION_CT" enumTypeId="ConditionType"/>
+
+    <moqui.basic.EnumerationType description="Determine the input parameter or field to be considered in a condition " enumTypeId="InputParamType"/>
+    <moqui.basic.Enumeration description="Sales channel" enumCode="SALES_CHANNEL" enumId="IPT_SALES_CHANNEL" enumTypeId="InputParamType"/>
+    <moqui.basic.Enumeration description="Shipment method type" enumCode="SHIPMENT_METHOD_TYPE" enumId="IPT_SHIP_METH_TYPE" enumTypeId="InputParamType"/>
+
+    <moqui.basic.EnumerationType description="Determine the order by parameter considered in a condition" enumTypeId="OrderByParamType"/>
+    <moqui.basic.Enumeration description="Order date" enumCode="ORDER_DATE" enumId="OBP_ORDER_DATE" enumTypeId="OrderByParamType"/>
+
+    <moqui.basic.EnumerationType description="Determine the assignment type in the context of routing (single/multi)" enumTypeId="RouAssignType"/>
+    <moqui.basic.Enumeration description="Single" enumCode="SINGLE" enumId="RAT_SINGLE" enumTypeId="RouAssignType"/>
+    <moqui.basic.Enumeration description="Multiple" enumCode="MULTIPLE" enumId="RAT_MULTIPLE" enumTypeId="RouAssignType"/>
+
+    <moqui.basic.EnumerationType description="Determine the type of action to be performed in the context of routing rules" enumTypeId="RuleActionType"/>
+    <moqui.basic.Enumeration description="Broker" enumCode="Broker" enumId="ROU_BROKER" enumTypeId="RuleActionType"/>
+    <moqui.basic.Enumeration description="Add auto-cancel date" enumCode="ADD_AUTO_CANCEL_DATE" enumId="RUA_AUTO_CANCL_DATE" enumTypeId="RuleActionType"/>
+    <moqui.basic.Enumeration description="Move to next Rule" enumCode="NEXT_RULE" enumId="RUA_NEXT_RULE" enumTypeId="RuleActionType"/>
+
+    <moqui.basic.EnumerationType description="Association between a ProductStore and Routing" enumTypeId="PSRoutingAssocType"/>
+    <moqui.basic.Enumeration description="Regular routing" enumCode="REGULAR" enumId="PSRA_REG_ROUT" enumTypeId="PSRoutingAssocType"/>
+    <moqui.basic.Enumeration description="Unfilable routing" enumCode="UNF" enumId="PSRA_UNF_ROUT" enumTypeId="PSRoutingAssocType"/>
+    <moqui.basic.Enumeration description="Re-routing" enumCode="RE_ROUT" enumId="PSRA_RE_ROUT" enumTypeId="PSRoutingAssocType"/>
+
+</entity-facade-xml>
