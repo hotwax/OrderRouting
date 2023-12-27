@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<entity-engine-xml>
+
+    <!-- Demo data for OrderRoutingGroup entity -->
+    <co.hotwax.order.routing.OrderRoutingGroup routingGroupId="DEMO_GROUP" groupName="Standard Group" description="Demo routing group" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
+
+    <!-- Demo data for StoreRoutingGroupAssoc entity -->
+    <co.hotwax.order.routing.StoreRoutingGroupAssoc productStoreId="STORE" routingGroupId="DEMO_GROUP" sequenceNum="1" fromDate="2023-11-03T12:00:00" comments="Store demo routing group"/>
+
+    <!-- Demo data for OrderRouting entity -->
+    <co.hotwax.order.routing.OrderRouting orderRoutingId="DEMO_ROUTING" statusId="ROUTING_DRAFT" routingName="StandardRouting" description="Standard order routing" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
+
+    <!-- Demo data for OrderRoutingGroupAssoc entity -->
+    <co.hotwax.order.routing.OrderRoutingGroupAssoc routingGroupId="DEMO_GROUP" orderRoutingId="DEMO_ROUTING" fromDate="2023-11-03T12:00:00" comments="Routing group association"/>
+
+    <!-- Demo data for OrderFilterCondition entity -->
+    <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING" conditionSeqId="0001" conditionTypeEnumId="ENTCO_CONDITION_CT" inputParamEnumId="OIP_SALES_CHANNEL" operatorEnumId="EQUALS" condValue="WEB_SALES_CHANNEL" sequenceNum="1" createdDate="2023-11-03T12:00:00"/>
+
+    <!-- Demo data for OrderRoutingRule entity -->
+    <co.hotwax.order.routing.OrderRoutingRule routingRuleId="DEMO_RULE" ruleName="Warehouse" statusId="RULE_DRAFT" assignmentEnumId="ORA_SINGLE" fulfillEntireShipGroup="Y" createdDate="2023-11-03T12:00:00" createdByUserLogin="admin"/>
+
+    <!-- Demo data for RoutingRuleAssoc entity -->
+    <co.hotwax.order.routing.RoutingRuleAssoc orderRoutingId="DEMO_ROUTING" routingRuleId="DEMO_RULE" fromDate="2023-11-03T12:00:00" sequenceNum="1"/>
+
+    <!-- Demo data for OrderRoutingRuleInvCond entity -->
+    <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="DEMO_RULE" conditionSeqId="0001" inputParamEnumId="IIP_FACILITY_GROUP" operatorEnumId="ENTCO_EQUALS" condValue="100000" createdDate="2023-11-03T12:00:00"/>
+
+    <!-- Demo data for OrderRoutingRuleAction entity -->
+    <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="DEMO_RULE" actionSeqId="0001" actionTypeEnumId="RUA_MV_TO_QUEUE" actionValue="UNF_QUEUE" createdDate="2023-11-03T12:00:00"/>
+    <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="DEMO_RULE" actionSeqId="0002" actionTypeEnumId="ORA_AUTO_CANCEL_DATE" actionValue="10" createdDate="2023-11-03T12:00:00"/>
+
+    <!-- Demo data for OrderRoutingRun entity -->
+    <co.hotwax.order.routing.OrderRoutingRun routingRunId="RUN1" orderRoutingId="DEMO_ROUTING" createdByUserLogin="admin" hasError="N" startDate="2023-11-03T12:00:00" endDate="2023-11-03T13:00:00" routingResult="Successful run"/>
+
+</entity-engine-xml>
