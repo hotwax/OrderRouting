@@ -1,46 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <entity-facade-xml type="seed">
-    <!-- operatorEnumId OOTB Enum Data -->
-    <moqui.basic.EnumerationType description="Entity Comparison Operator" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="less" enumCode="LESS" enumId="ENTCO_LESS" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="greater" enumCode="GREATER" enumId="ENTCO_GREATER" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="less-equals" enumCode="LESS_EQ" enumId="ENTCO_LESS_EQ" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="greater-equals" enumCode="GREATER_EQ" enumId="ENTCO_GREATER_EQ" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="equals" enumCode="EQUALS" enumId="ENTCO_EQUALS" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="not-equals" enumCode="NOT_EQUALS" enumId="ENTCO_NOT_EQUALS" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="in" enumCode="IN" enumId="ENTCO_IN" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="not-in" enumCode="NOT_IN" enumId="ENTCO_NOT_IN" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="between" enumCode="BETWEEN" enumId="ENTCO_BETWEEN" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="not-between" enumCode="NOT_BETWEEN" enumId="ENTCO_NOT_BETWEEN" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="like" enumCode="LIKE" enumId="ENTCO_LIKE" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="not-like" enumCode="NOT_LIKE" enumId="ENTCO_NOT_LIKE" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="is-null" enumCode="IS_NULL" enumId="ENTCO_IS_NULL" enumTypeId="ComparisonOperator"/>
-    <moqui.basic.Enumeration description="is-not-null" enumCode="IS_NOT_NULL" enumId="ENTCO_IS_NOT_NULL" enumTypeId="ComparisonOperator"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORDER_ROUTING" description="Order routing"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="COMPARISON_OPERATOR"  description="Entity Comparison Operator" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_LESS" description="less" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="LESS"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_GREATER" description="greater" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="GREATER"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_LESS_EQ" description="less-equals" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="LESS_EQ"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_GREATER_EQ" description="greater-equals" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="GREATER_EQ"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_EQUALS" description="equals" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="EQUALS"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_EQUALS" description="not-equals" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="NOT_EQUALS"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_IN" description="in" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="IN"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_IN" description="not-in" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="NOT_IN"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_BETWEEN" description="between" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="BETWEEN"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_BETWEEN" description="not-between" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="NOT_BETWEEN"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_LIKE" description="like" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="LIKE"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_LIKE" description="not-like" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="NOT_LIKE"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_IS_NULL" description="is-null" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="IS_NULL"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_IS_NOT_NULL" description="is-not-null" sequenceNum="1" enumTypeId="COMPARISON_OPERATOR" enumCode="IS_NOT_NULL"/>
 
-    <moqui.basic.EnumerationType description="Filter condition type (Where/Order By)" enumTypeId="ConditionType"/>
-    <moqui.basic.Enumeration description="Order by" enumCode="ORDER_BY" enumId="ENTCO_ORDER_BY_CT" enumTypeId="ConditionType"/>
-    <moqui.basic.Enumeration description="Condition" enumCode="CONDITION" enumId="ENTCO_CONDITION_CT" enumTypeId="ConditionType"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="CONDITION_TYPE" description="Filter condition type (Where/Order By)" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_ORDER_BY_CT" description="Order by" sequenceNum="1" enumTypeId="CONDITION_TYPE" enumCode="ORDER_BY"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_CONDITION_CT" description="Condition" sequenceNum="1" enumTypeId="CONDITION_TYPE" enumCode="CONDITION"/>
 
-    <moqui.basic.EnumerationType description="Determine the input parameter or field to be considered in a condition " enumTypeId="InputParamType"/>
-    <moqui.basic.Enumeration description="Sales channel" enumCode="SALES_CHANNEL" enumId="IPT_SALES_CHANNEL" enumTypeId="InputParamType"/>
-    <moqui.basic.Enumeration description="Shipment method type" enumCode="SHIPMENT_METHOD_TYPE" enumId="IPT_SHIP_METH_TYPE" enumTypeId="InputParamType"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_IN_PARAM_TYPE" description="Determine the input parameter or field to be considered in order filter condition " parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SALES_CHANNEL" description="Sales channel" sequenceNum="1" enumTypeId="ORD_IN_PARAM_TYPE" enumCode="SALES_CHANNEL"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SHIP_METH_TYPE" description="Shipment method type" sequenceNum="1" enumTypeId="ORD_IN_PARAM_TYPE" enumCode="SHIPMENT_METHOD_TYPE"/>
 
-    <moqui.basic.EnumerationType description="Determine the order by parameter considered in a condition" enumTypeId="OrderByParamType"/>
-    <moqui.basic.Enumeration description="Order date" enumCode="ORDER_DATE" enumId="OBP_ORDER_DATE" enumTypeId="OrderByParamType"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_INPUT_PARAM_TYPE" description="Determine the input parameter or field to be considered in a inventory condition " parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_FACILITY_GROUP" description="Facility group" sequenceNum="1" enumTypeId="INV_INPUT_PARAM_TYPE" enumCode="FACILITY_GROUP"/>
 
-    <moqui.basic.EnumerationType description="Determine the assignment type in the context of routing (single/multi)" enumTypeId="RouAssignType"/>
-    <moqui.basic.Enumeration description="Single" enumCode="SINGLE" enumId="RAT_SINGLE" enumTypeId="RouAssignType"/>
-    <moqui.basic.Enumeration description="Multiple" enumCode="MULTIPLE" enumId="RAT_MULTIPLE" enumTypeId="RouAssignType"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_ORDER_DATE" description="Order date" sequenceNum="1" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="orderDate"/>
 
-    <moqui.basic.EnumerationType description="Determine the type of action to be performed in the context of routing rules" enumTypeId="RuleActionType"/>
-    <moqui.basic.Enumeration description="Broker" enumCode="Broker" enumId="ROU_BROKER" enumTypeId="RuleActionType"/>
-    <moqui.basic.Enumeration description="Add auto-cancel date" enumCode="ADD_AUTO_CANCEL_DATE" enumId="RUA_AUTO_CANCL_DATE" enumTypeId="RuleActionType"/>
-    <moqui.basic.Enumeration description="Move to next Rule" enumCode="NEXT_RULE" enumId="RUA_NEXT_RULE" enumTypeId="RuleActionType"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="1" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="proximity"/>
 
-    <moqui.basic.EnumerationType description="Association between a ProductStore and Routing" enumTypeId="PSRoutingAssocType"/>
-    <moqui.basic.Enumeration description="Regular routing" enumCode="REGULAR" enumId="PSRA_REG_ROUT" enumTypeId="PSRoutingAssocType"/>
-    <moqui.basic.Enumeration description="Unfilable routing" enumCode="UNF" enumId="PSRA_UNF_ROUT" enumTypeId="PSRoutingAssocType"/>
-    <moqui.basic.Enumeration description="Re-routing" enumCode="RE_ROUT" enumId="PSRA_RE_ROUT" enumTypeId="PSRoutingAssocType"/>
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_ROU_ASSIGN_TYPE" description="Determine the assignment type in the context of routing (single/multi)" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_SINGLE" description="Single" sequenceNum="1" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="SINGLE"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_MULTIPLE" description="Multiple" sequenceNum="1" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="MULTIPLE"/>
 
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORDER_RULE_ACT_TYPE" description="Determine the type of action to be performed in the context of routing rules" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ROU_BROKER" description="Broker" sequenceNum="1" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="Broker"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ADD_AUTO_CANCEL_DATE" description="Add auto-cancel date" sequenceNum="1" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="ADD_AUTO_CANCEL_DATE"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="RUA_NEXT_RULE" description="Move to next Rule" sequenceNum="1" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="NEXT_RULE"/>
+
+    <org.apache.ofbiz.common.status.StatusType statusTypeId="ORDER_ROUTING_STATUS" description="Order Routing Status" hasTable="N"/>
+    <org.apache.ofbiz.common.status.StatusItem statusId="OR_DRAFT" description="Draft" sequenceId="01" statusCode="DRAFT" statusTypeId="ORDER_ROUTING_STATUS"/>
+    <org.apache.ofbiz.common.status.StatusItem statusId="OR_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORDER_ROUTING_STATUS"/>
+    <org.apache.ofbiz.common.status.StatusItem statusId="OR_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORDER_ROUTING_STATUS"/>
+
+    <org.apache.ofbiz.common.status.StatusType statusTypeId="ORD_ROUT_RULE_STATUS" description="Order Routing Rule Status" hasTable="N"/>
+    <org.apache.ofbiz.common.status.StatusItem statusId="ORR_DRAFT" description="Draft" sequenceId="01" statusCode="DRAFT" statusTypeId="ORD_ROUT_RULE_STATUS"/>
+    <org.apache.ofbiz.common.status.StatusItem statusId="ORR_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORD_ROUT_RULE_STATUS"/>
+    <org.apache.ofbiz.common.status.StatusItem statusId="ORR_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORD_ROUT_RULE_STATUS"/>
 </entity-facade-xml>
