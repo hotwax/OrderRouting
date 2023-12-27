@@ -53,4 +53,11 @@
     <org.apache.ofbiz.common.status.StatusItem statusId="ORR_DRAFT" description="Draft" sequenceId="01" statusCode="DRAFT" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="ORR_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="ORR_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORD_ROUT_RULE_STATUS"/>
+
+
+    <artifactGroups artifactGroupId="ORDER_ROUTING_API" description="Commerce Order Routing API (via root resource)">
+        <artifacts artifactTypeEnumId="AT_REST_PATH" inheritAuthz="Y" artifactName="/order-routing"/>
+        <!-- Full permissions for the ADMIN user group -->
+        <authz artifactAuthzId="ORDER_ROUTING_API_ADMIN" userGroupId="ADMIN" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+    </artifactGroups>
 </entity-facade-xml>
