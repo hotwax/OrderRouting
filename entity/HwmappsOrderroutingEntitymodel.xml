@@ -110,7 +110,7 @@ under the License.
             <key-map field-name="routingRuleId"/>
         </relationship>
     </entity>
-    <entity entity-name="RoutingRuleInvCondition" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRoutingRuleInvCond" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Defines inventory-related conditions used in routing rules to determine order fulfillment based on inventory status.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="conditionSeqId" type="id" is-pk="true"><description>Unique identifier for the routing rule inventory condition.</description></field>
