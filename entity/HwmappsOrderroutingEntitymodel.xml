@@ -60,6 +60,20 @@ under the License.
             <key-map field-name="statusId"/>
         </relationship>
     </entity>
+    <entity entity-name="OrderRoutingGroupAssoc" package="co.hotwax.order.routing" group="ofbiz_transactional">
+        <description>Represents an association between an order routing group and a specific order routing configuration.</description>
+        <field name="routingGroupId" type="id"><description>Unique identifier for the routing group</description></field>
+        <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
+        <field name="fromDate" type="date-time"><description>Start date for the association.</description></field>
+        <field name="thruDate" type="date-time"><description>End date for the association.</description></field>
+        <field name="comments" type="text-long"><description>Additional comments or notes for the association.</description></field>
+        <relationship type="one" fk-name="ORGA_ROU_GRP" related="co.hotwax.order.routing.OrderRoutingGroup">
+            <key-map field-name="routingGroupId"/>
+        </relationship>
+        <relationship type="one" fk-name="ORGA_ORD_ROUTE" related="co.hotwax.order.routing.OrderRouting">
+            <key-map field-name="orderRoutingId"/>
+        </relationship>
+    </entity>
     <entity entity-name="OrderFilterCondition" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Defines conditions used in order routing rules to filter and route orders based on specified criteria.</description>
         <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
