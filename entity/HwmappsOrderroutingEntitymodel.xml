@@ -22,34 +22,26 @@ under the License.
     <entity entity-name="OrderRoutingGroup" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Represents a group or category used for organizing and managing order routing configurations.</description>
         <field name="routingGroupId" type="id" is-pk="true"><description>Unique identifier for the routing group</description></field>
+        <field name="productStoreId" type="id"><description>Unique identifier for the product store</description></field>
         <field name="groupName" type="text-medium"><description>Name of the routing group.</description></field>
+        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the routing group.</description></field>
         <field name="createdByUserLogin" type="id-long"><description>User login ID of the creator</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing group was created</description></field>
         <relationship type="one-nofk" fk-name="ORG_USR_LOGIN" related="org.apache.ofbiz.security.login.UserLogin">
             <key-map field-name="createdByUserLogin" related="userLoginId"/>
         </relationship>
-    </entity>
-    <entity entity-name="StoreRoutingGroupAssoc" package="co.hotwax.order.routing" group="ofbiz_transactional">
-        <description>Associates product stores with routing groups, indicating specific routing configurations for each store.</description>
-        <field name="productStoreId" type="id" is-pk="true"><description>Unique identifier for the product store</description></field>
-        <field name="routingGroupId" type="id" is-pk="true"><description>Unique identifier for the routing group.</description></field>
-        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
-        <field name="fromDate" type="date-time" is-pk="true"><description>Start date for the association.</description></field>
-        <field name="thruDate" type="date-time"><description>End date for the association.</description></field>
-        <field name="comments" type="text-long"><description>Additional comments or notes for the association.</description></field>
-        <relationship type="one" fk-name="ORSA_ROU_GRP" related="co.hotwax.order.routing.OrderRoutingGroup">
-            <key-map field-name="routingGroupId"/>
-        </relationship>
-        <relationship type="one" fk-name="ORSA_PROD_STR" related="org.apache.ofbiz.product.store.ProductStore">
-            <key-map field-name="productStoreId" related="productStoreId"/>
+        <relationship type="one-nofk" fk-name="ORG_PROD_STR" related="org.apache.ofbiz.product.store.ProductStore">
+            <key-map field-name="productStoreId"/>
         </relationship>
     </entity>
     <entity entity-name="OrderRouting" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Represents configurations for routing orders, including rules and conditions for order fulfillment.</description>
         <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
+        <field name="routingGroupId" type="id"><description>Unique identifier for the routing group</description></field>
         <field name="statusId" type="id"><description>Status identifier for the order routing.</description></field>
         <field name="routingName" type="text-medium"><description>Name or identifier for the order routing.</description></field>
+        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the order routing.</description></field>
         <field name="createdByUserLogin" type="id-long"><description>User login ID of the creator.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the order routing was created.</description></field>
@@ -59,19 +51,8 @@ under the License.
         <relationship type="one" fk-name="OR_STATUS" related="org.apache.ofbiz.common.status.StatusItem">
             <key-map field-name="statusId"/>
         </relationship>
-    </entity>
-    <entity entity-name="OrderRoutingGroupAssoc" package="co.hotwax.order.routing" group="ofbiz_transactional">
-        <description>Represents an association between an order routing group and a specific order routing configuration.</description>
-        <field name="routingGroupId" type="id"><description>Unique identifier for the routing group</description></field>
-        <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
-        <field name="fromDate" type="date-time"><description>Start date for the association.</description></field>
-        <field name="thruDate" type="date-time"><description>End date for the association.</description></field>
-        <field name="comments" type="text-long"><description>Additional comments or notes for the association.</description></field>
-        <relationship type="one" fk-name="ORGA_ROU_GRP" related="co.hotwax.order.routing.OrderRoutingGroup">
+        <relationship type="one" fk-name="OR_ROUTING_GRP" related="co.hotwax.order.routing.OrderRoutingGroup">
             <key-map field-name="routingGroupId"/>
-        </relationship>
-        <relationship type="one" fk-name="ORGA_ORD_ROUTE" related="co.hotwax.order.routing.OrderRouting">
-            <key-map field-name="orderRoutingId"/>
         </relationship>
     </entity>
     <entity entity-name="OrderFilterCondition" package="co.hotwax.order.routing" group="ofbiz_transactional">
@@ -97,8 +78,10 @@ under the License.
     <entity entity-name="OrderRoutingRule" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Represents a rule used in order routing, defining conditions, actions, and assignment logic for order fulfillment.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
+        <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
         <field name="ruleName" type="text-medium"><description>Name of the routing rule.</description></field>
         <field name="statusId" type="id"><description>Status of the routing rule.</description></field>
+        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="assignmentEnumId" type="id"><description>Type of assignment for the routing rule (single/multi).</description></field>
         <field name="fulfillEntireShipGroup" type="text-indicator"><description>Indicator for fulfilling the entire ship group.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing rule was created.</description></field>
@@ -109,19 +92,8 @@ under the License.
         <relationship type="one-nofk" fk-name="ORR_USR_LOGIN" related="org.apache.ofbiz.security.login.UserLogin">
             <key-map field-name="createdByUserLogin" related="userLoginId"/>
         </relationship>
-    </entity>
-    <entity entity-name="RoutingRuleAssoc" package="co.hotwax.order.routing" group="ofbiz_transactional">
-        <description>Associates order routing rules with order routings, specifying the rules applicable to each routing configuration.</description>
-        <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
-        <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
-        <field name="fromDate" type="date-time" is-pk="true"><description>Start date for the association.</description></field>
-        <field name="thruDate" type="date-time"><description>End date for the association.</description></field>
-        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
-        <relationship type="one" fk-name="RRA_ORD_ROUTING" related="co.hotwax.order.routing.OrderRouting">
+        <relationship type="one" fk-name="ORR_ORD_ROUTING" related="co.hotwax.order.routing.OrderRouting">
             <key-map field-name="orderRoutingId"/>
-        </relationship>
-        <relationship type="one" fk-name="RRA_RULE" related="co.hotwax.order.routing.OrderRoutingRule">
-            <key-map field-name="routingRuleId"/>
         </relationship>
     </entity>
     <entity entity-name="OrderRoutingRuleInvCond" package="co.hotwax.order.routing" group="ofbiz_transactional">
