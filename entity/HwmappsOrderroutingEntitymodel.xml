@@ -26,11 +26,8 @@ under the License.
         <field name="groupName" type="text-medium"><description>Name of the routing group.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the routing group.</description></field>
-        <field name="createdByUserLogin" type="id-long"><description>User login ID of the creator</description></field>
+        <field name="createdByUser" type="id-long"><description>User login ID of the creator</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing group was created</description></field>
-        <relationship type="one-nofk" fk-name="ORG_USR_LOGIN" related="org.apache.ofbiz.security.login.UserLogin">
-            <key-map field-name="createdByUserLogin" related="userLoginId"/>
-        </relationship>
         <relationship type="one-nofk" fk-name="ORG_PROD_STR" related="org.apache.ofbiz.product.store.ProductStore">
             <key-map field-name="productStoreId"/>
         </relationship>
@@ -43,11 +40,8 @@ under the License.
         <field name="routingName" type="text-medium"><description>Name or identifier for the order routing.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the order routing.</description></field>
-        <field name="createdByUserLogin" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the order routing was created.</description></field>
-        <relationship type="one-nofk" fk-name="OR_USR_LOGIN" related="org.apache.ofbiz.security.login.UserLogin">
-            <key-map field-name="createdByUserLogin" related="userLoginId"/>
-        </relationship>
         <relationship type="one" fk-name="OR_STATUS" related="org.apache.ofbiz.common.status.StatusItem">
             <key-map field-name="statusId"/>
         </relationship>
@@ -85,12 +79,9 @@ under the License.
         <field name="assignmentEnumId" type="id"><description>Type of assignment for the routing rule (single/multi).</description></field>
         <field name="fulfillEntireShipGroup" type="text-indicator"><description>Indicator for fulfilling the entire ship group.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing rule was created.</description></field>
-        <field name="createdByUserLogin" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
         <relationship type="one" fk-name="ORO_RULE_ASENUM" related="org.apache.ofbiz.common.enum.Enumeration">
             <key-map field-name="assignmentEnumId" related="enumId"/>
-        </relationship>
-        <relationship type="one-nofk" fk-name="ORR_USR_LOGIN" related="org.apache.ofbiz.security.login.UserLogin">
-            <key-map field-name="createdByUserLogin" related="userLoginId"/>
         </relationship>
         <relationship type="one" fk-name="ORR_ORD_ROUTING" related="co.hotwax.order.routing.OrderRouting">
             <key-map field-name="orderRoutingId"/>
@@ -131,18 +122,14 @@ under the License.
     <entity entity-name="OrderRoutingRun" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Represents the execution and results of order routing runs, including information about errors and outcomes.</description>
         <field name="routingRunId" type="id" is-pk="true"><description>Unique identifier for the routing run.</description></field>
+        <field name="routingGroupId" type="id"><description>Unique identifier for the order routing group.</description></field>
         <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
-        <field name="createdByUserLogin" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="productStoreId" type="id"><description>Unique identifier for the product store.</description></field>
+        <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
         <field name="hasError" type="text-indicator"><description>Indicator for the presence of errors.</description></field>
         <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
         <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
         <field name="routingResult" type="text-long"><description>Result or outcome of the routing run.</description></field>
-        <relationship type="one" fk-name="ORD_ROU_RUN" related="co.hotwax.order.routing.OrderRouting">
-            <key-map field-name="orderRoutingId"/>
-        </relationship>
-        <relationship type="one-nofk" fk-name="ROURUN_USR_LOGIN" related="org.apache.ofbiz.security.login.UserLogin">
-            <key-map field-name="createdByUserLogin" related="userLoginId"/>
-        </relationship>
     </entity>
 </entities>
 
