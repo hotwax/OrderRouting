@@ -15,12 +15,32 @@
         <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list"/></method>
         <id name="routingGroupId">
             <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="one"/></method>
+            <resource name="routings">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
+            </resource>
         </id>
-        <resource name="routings">
-            <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
-            <id name="orderRoutingId">
-                <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="one"/></method>
-            </id>
-        </resource>
     </resource>
+    <resource name="routings">
+        <id name="orderRoutingId">
+            <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="one"/></method>
+            <resource name="rules">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="list"/></method>
+            </resource>
+            <resource name="filter-conditions">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="list"/></method>
+            </resource>
+        </id>
+    </resource>
+    <resource name="rules">
+        <id name="routingRuleId">
+            <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="one"/></method>
+            <resource name="condition">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="list"/></method>
+            </resource>
+            <resource name="actions">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="list"/></method>
+            </resource>
+        </id>
+    </resource>
+
 </resource>
