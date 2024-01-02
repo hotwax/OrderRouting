@@ -91,10 +91,14 @@ under the License.
         <description>Defines inventory-related conditions used in routing rules to determine order fulfillment based on inventory status.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="conditionSeqId" type="id" is-pk="true"><description>Unique identifier for the routing rule inventory condition.</description></field>
+        <field name="conditionTypeEnumId" type="id"><description>Type of condition (Filter/ Order by)</description></field>
         <field name="inputParamEnumId" type="id"><description>Input parameter for the condition.</description></field>
         <field name="operatorEnumId" type="id"><description>Operator used in the condition.</description></field>
         <field name="condValue" type="text-long"><description>Value of the condition.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
+        <relationship type="one" fk-name="RULE_COND_TYPEENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration">
+            <key-map field-name="conditionTypeEnumId" related="enumId"/>
+        </relationship>
         <relationship type="one" fk-name="RULE_INV_OPENUM" title="Operator" related="org.apache.ofbiz.common.enum.Enumeration">
             <key-map field-name="operatorEnumId" related="enumId"/>
         </relationship>

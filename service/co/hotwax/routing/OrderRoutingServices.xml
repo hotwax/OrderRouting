@@ -112,19 +112,102 @@
             <parameter name="orderRoutingId" required="true"/>
         </in-parameters>
         <actions>
-            <!--
-            - Get the  order routing order filter conditions
-            - Fetch the orders
-            - call the run#orderRutingRule
-            -->
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
+            <if condition="!orderRouting">
+                <return error="true" message="No order routing found for id ${orderRoutingId}"/>
+            </if>
+            <if condition="!'ROUTING_ACTIVE'.equals(orderRouting.statusId)">
+                <return error="true" message="Order routing ${orderRouting.routingName} [${orderRoutingId}] is not active"/>
+            </if>
+            <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
+                <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                <order-by field-name="sequenceNum"/>
+            </entity-find>
+            <filter-map-list list="orderFilterConditions" to-list="filterConditions">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
+            </filter-map-list>
+            <filter-map-list list="orderFilterConditions" to-list="sortFields">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
+            </filter-map-list>
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
+                <econditions>
+                    <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                    <econdition field-name="statusId" value="RULE_ACTIVE"/>
+                </econditions>
+                <order-by field-name="sequenceNum"/>
+            </entity-find>
+            <if condition="!orderRoutingRules">
+                <return error="true" message="No routing rule setup for ${orderRoutingId}"/>
+            </if>
+            <script>
+                import org.moqui.entity.EntityListIterator
+                import org.moqui.entity.EntityFind;
+                import org.moqui.impl.entity.EntityConditionFactoryImpl
+
+                EntityFind find = ec.entity.find("co.hotwax.order.OrderItemsQueue")
+                find.condition("itemStatusId", "ITEM_APPROVED")
+                find.condition("orderItemCount", org.moqui.entity.EntityCondition.GREATER_THAN, "0")
+                try (EntityListIterator eli = find.iterator()) {
+                    while ((entityValue = eli.next()) != null) {
+                        try {
+                            ruleIterator = orderRoutingRules.iterator()
+                            while(ruleIterator.hasNext()) {
+                                routingRule = ruleIterator.next()
+                                ruleResult = ec.service.sync().name("co.hotwax.routing.OrderRoutingServices.run#OrderRoutingRule")
+                                    .requireNewTransaction(true)
+                                    .parameters([orderRoutingId: orderRouting.orderRoutingId, routingRuleId: routingRule.routingRuleId,
+                                                orderId: entityValue.orderId, shipGroupSeqId: entityValue.shipGroupSeqId])
+                                    .call()
+                            }
+                        } catch (Throwable e) {
+                            ec.logger.error("There is an issue with run#OrderRoutingRule", e)
+                        }
+                    }
+                } catch (Exception e) {
+                    ec.logger.error(e.getMessage())
+                }
+            </script>
         </actions>
     </service>
 
     <service verb="run" noun="OrderRoutingRule" transaction-timeout="36000">
         <in-parameters>
-            <parameter name="routingGroupId"/>
+            <parameter name="orderRoutingId"/>
+            <parameter name="routingRuleId"/>
+            <parameter name="orderId"/>
+            <parameter name="shipGroupSeqId"/>
         </in-parameters>
         <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="true"/>
+            <if condition="!orderRoutingRule">
+                <return error="true" message="No order routing found for id ${routingRuleId}"/>
+            </if>
+            <if condition="!'RULE_ACTIVE'.equals(orderRoutingRule.statusId)">
+                <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${orderRoutingId}] is not active"/>
+            </if>
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
+                <econdition field-name="routingRuleId" from="routingRuleId"/>
+            </entity-find>
+            <set field="inventoryFilterMap" from="[:]" />
+            <filter-map-list list="inventoryConditions" to-list="inventoryFilterConditions">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
+            </filter-map-list>
+            <iterate list="inventoryFilterConditions" entry="inventoryFilterCondition">
+                <script>
+                    inventoryFilterMap.put(inventoryFilterCondition.inputParamEnumId, inventoryFilterCondition)
+                </script>
+            </iterate>
+
+            <log message="==inventoryFilterMap==${inventoryFilterMap}="/>
+            <filter-map-list list="inventoryConditions" to-list="inventorySortConditions">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
+            </filter-map-list>
+            <set field="templateLoc" value="component://order-routing/sql/CheckInventory.sql.ftl"/>
+            <script>
+                Writer writer = new StringWriter()
+                ec.resourceFacade.template(templateLoc, writer)
+                ec.logger.info("====writer==${writer}")
+            </script>
             <!--
             - Get the  order routing rule
             -->

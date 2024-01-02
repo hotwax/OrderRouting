@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-3.xsd">
+
+    <view-entity entity-name="OrderItemsQueue" package="co.hotwax.order">
+        <member-entity entity-alias="OH" entity-name="org.apache.ofbiz.order.order.OrderHeader">
+            <entity-condition>
+                <econdition field-name="orderTypeId" value="SALES_ORDER"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="OIS" entity-name="org.apache.ofbiz.order.order.OrderItemShipGroup" join-from-alias="OH">
+            <key-map field-name="orderId"/>
+        </member-entity>
+        <member-entity entity-alias="OI" entity-name="org.apache.ofbiz.order.order.OrderItem" join-from-alias="OIS">
+            <key-map field-name="orderId"/>
+            <key-map field-name="shipGroupSeqId"/>
+        </member-entity>
+        <alias entity-alias="OH" name="orderId"/>
+        <alias entity-alias="OH" name="orderName"/>
+        <alias entity-alias="OH" name="orderTypeId"/>
+        <alias entity-alias="OH" name="statusId"/>
+        <alias entity-alias="OH" name="salesChannelEnumId"/>
+        <alias entity-alias="OH" name="externalId"/>
+        <alias entity-alias="OH" name="orderDate"/>
+        <alias entity-alias="OH" name="entryDate"/>
+        <alias entity-alias="OH" name="priority"/>
+        <alias entity-alias="OIS" name="shipGroupSeqId"/>
+        <alias entity-alias="OIS" name="shipmentMethodTypeId"/>
+        <alias entity-alias="OIS" name="carrierPartyId"/>
+        <alias entity-alias="OIS" name="facilityId"/>
+        <alias entity-alias="OIS" name="orderFacilityId"/>
+        <alias entity-alias="OIS" name="maySplit"/>
+        <alias entity-alias="OIS" name="shipAfterDate"/>
+        <alias entity-alias="OIS" name="shipByDate"/>
+        <alias entity-alias="OI" name="itemStatusId" field="statusId"/>
+        <alias entity-alias="OI" name="orderItemCount" field="orderItemSeqId" function="count"/>
+    </view-entity>
+</entities>
