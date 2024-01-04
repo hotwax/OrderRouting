@@ -7,27 +7,29 @@
         <!-- Order Routing Setup 1: Ecom next day orders -->
         <co.hotwax.order.routing.OrderRouting orderRoutingId="DEMO_ROUTING_1" routingGroupId="DEMO_GROUP_1" statusId="ROUTING_ACTIVE" routingName="Ecom Next Day Orders" sequenceNum="5" description="Ecom  next day shipping orders" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
         <!-- Filter Conditions -->
-        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" inputParamEnumId="OIP_SALES_CHANNEL" operatorEnumId="ENTCO_EQUALS" condValue="WEB_SALES_CHANNEL" sequenceNum="5"/>
-        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" inputParamEnumId="OIP_SHIP_METH_TYPE" operatorEnumId="ENTCO_EQUALS" condValue="NEXT_DAY" sequenceNum="10"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="salesChannelEnumId" operator="equals" fieldValue="WEB_SALES_CHANNEL" sequenceNum="5"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="shipmentMethodTypeId" operator="equals" fieldValue="NEXT_DAY" sequenceNum="10"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="5"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="shipmentMethodTypeId" sequenceNum="10"/>
         <!-- Routing Rule -->
         <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_1" orderRoutingId="DEMO_ROUTING_1" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
         <!-- Inventory Rules -->
-        <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_1" conditionSeqId="5" inputParamEnumId="IIP_FACILITY_GROUP" operatorEnumId="ENTCO_EQUALS" condValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
-<!--            <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_1" conditionSeqId="5" inputParamEnumId="SHELF_LIFE_REMAINING" operatorEnumId="GREATER_THAN" condValue="0" createdDate="2023-11-03T12:00:00"/>-->
-        <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_1" actionSeqId="5" actionTypeEnumId="RUA_MV_TO_QUEUE" actionValue="UNF_QUEUE" createdDate="2023-11-03T12:00:00"/>
+        <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+        <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_1" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="brokeringSafetyStock" operator="greater" fieldValue="3" createdDate="2023-11-03T12:00:00"/>
+        <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_1" actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNF_QUEUE" createdDate="2023-11-03T12:00:00"/>
         <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_1" actionSeqId="10" actionTypeEnumId="ORA_AUTO_CANCEL_DATE" actionValue="10" createdDate="2023-11-03T12:00:00"/>
 
         <!-- Order Routing Setup 2: Ecom Standard order -->
         <co.hotwax.order.routing.OrderRouting orderRoutingId="DEMO_ROUTING_2" routingGroupId="DEMO_GROUP_1" statusId="ROUTING_ACTIVE" routingName="Ecom Standard Day Orders" sequenceNum="2" description="Ecom standard order routing" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
         <!-- Filter Conditions -->
-        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_2" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" inputParamEnumId="OIP_SALES_CHANNEL" operatorEnumId="ENTCO_EQUALS" condValue="WEB_SALES_CHANNEL" sequenceNum="5"/>
-        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_2" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" inputParamEnumId="OIP_SHIP_METH_TYPE" operatorEnumId="ENTCO_EQUALS" condValue="SECOND_DAY" sequenceNum="10"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_2" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="salesChannelEnumId" operator="equals" fieldValue="WEB_SALES_CHANNEL" sequenceNum="5"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_2" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="shipmentMethodTypeId" operator="equals" fieldValue="SECOND_DAY" sequenceNum="10"/>
 
         <!-- Routing Rule -->
         <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_2" orderRoutingId="DEMO_ROUTING_2" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
 
         <!-- Inventory Rules -->
-        <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_2" conditionSeqId="5" inputParamEnumId="IIP_FACILITY_GROUP" operatorEnumId="ENTCO_EQUALS" condValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+        <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_2" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
         <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_2" actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNF_QUEUE" createdDate="2023-11-03T12:00:00"/>
         <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_2" actionSeqId="10" actionTypeEnumId="ORA_AUTO_CANCEL_DATE" actionValue="5" createdDate="2023-11-03T12:00:00"/>
 
@@ -36,13 +38,13 @@
     <!-- Order Routing Setup 3: Clothing Standard -->
     <co.hotwax.order.routing.OrderRouting orderRoutingId="DEMO_ROUTING_3" routingGroupId="DEMO_GROUP_2" statusId="ROUTING_ACTIVE" routingName="UNF Orders brokering" sequenceNum="5" description="Ecom standard order routing" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
     <!-- Filter Conditions -->
-    <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_3" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" inputParamEnumId="OIP_QUEUE" operatorEnumId="ENTCO_EQUALS" condValue="UNFILLABLE_PARKING" sequenceNum="5"/>
+    <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_3" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityId" operator="equals" fieldValue="UNFILLABLE_PARKING" sequenceNum="5"/>
 
     <!-- Routing Rule -->
     <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_3" orderRoutingId="DEMO_ROUTING_3" ruleName="UNF orders only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTIPLE" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
 
     <!-- Inventory Rules -->
-    <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_3" conditionSeqId="5" inputParamEnumId="IIP_FACILITY_GROUP" operatorEnumId="ENTCO_EQUALS" condValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+    <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_3" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
     <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_3" actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNF_QUEUE" createdDate="2023-11-03T12:00:00"/>
     <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_3" actionSeqId="10" actionTypeEnumId="ORA_AUTO_CANCEL_DATE" actionValue="5" createdDate="2023-11-03T12:00:00"/>
 </entity-facade-xml>
