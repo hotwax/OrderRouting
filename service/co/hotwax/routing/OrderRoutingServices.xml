@@ -148,15 +148,21 @@
                 import org.moqui.entity.EntityFind;
                 import org.moqui.impl.entity.EntityConditionFactoryImpl
 
-                EntityFind find = ec.entity.find("co.hotwax.order.OrderItemsQueue")
-                find.condition("itemStatusId", "ITEM_APPROVED")
-                find.condition("facilityId", "_NA_")
-                find.condition("orderItemCount", org.moqui.entity.EntityCondition.GREATER_THAN, "0")
+                EntityFind orderFind = ec.entity.find("co.hotwax.order.OrderItemsQueue")
+                orderFind.condition("itemStatusId", "ITEM_APPROVED")
+                orderFind.condition("orderItemCount", org.moqui.entity.EntityCondition.GREATER_THAN, "0")
                 if (orderId) {
-                    find.condition("orderId", orderId)
+                    orderFind.condition("orderId", orderId)
+                    orderFind.condition("shipGroupSeqId", shipGroupSeqId)
+                } else {
+                    for (filterCondition: filterConditions) {
+                        orderFind.condition(filterCondition.fieldName, EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), filterCondition.fieldValue)
+                    }
+                    for (sortField: sortFields) {
+                        orderFind.orderBy(sortField.fieldName)
+                    }
                 }
-
-                try (EntityListIterator eli = find.iterator()) {
+                try (EntityListIterator eli = orderFind.iterator()) {
                     while ((entityValue = eli.next()) != null) {
                         try {
                             ruleIterator = orderRoutingRules.iterator()
@@ -204,23 +210,28 @@
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
             </entity-find>
             <set field="inventoryFilterMap" from="[:]" />
-            <filter-map-list list="inventoryConditions" to-list="inventoryFilterConditions">
+            <filter-map-list list="inventoryConditions" to-list="filterConditions">
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
             </filter-map-list>
-            <iterate list="inventoryFilterConditions" entry="inventoryFilterCondition">
+            <iterate list="filterConditions" entry="filterCondition">
                 <script>
-                    inventoryFilterMap.put(inventoryFilterCondition.inputParamEnumId, inventoryFilterCondition)
+                    inventoryFilterMap.put(filterCondition.fieldName, filterCondition)
                 </script>
             </iterate>
-            <filter-map-list list="inventoryConditions" to-list="inventorySortConditions">
+            <filter-map-list list="inventoryConditions" to-list="sortFields">
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </filter-map-list>
+            <order-map-list list="sortFields">
+                <order-by field-name="sequenceNum ASC"/>
+            </order-map-list>
+            <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
             <set field="eligibleInventoryItems" from="[]"/>
 
             <script>
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
+                ec.logger.info("======writer==${writer}==")
                 java.sql.Connection con = ec.getEntity().getConnection(orderRoutingRule.getEntityDefinition().getEntityGroupName())
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
@@ -228,27 +239,27 @@
                             eligibleInventoryItems.add([
                                 orderId: resultSet.getString('ORDER_ID'),
                                 orderItemSeqId: resultSet.getString('ORDER_ITEM_SEQ_ID'),
-                                productId: resultSet.getString('PRODUCT_ID'),
-                                totalOrderedQty: resultSet.getInt('TOTAL_ORDER_QTY'),
+                                //productId: resultSet.getString('PRODUCT_ID'),
+                                shipGroupTotalQty: resultSet.getInt('ship_group_total_qty'),
                                 itemQty: resultSet.getInt('ITEM_QTY'),
                                 routedItemQty: resultSet.getInt('ROUTED_ITEM_QTY'),
                                 facilityTypeId: resultSet.getString('FACILITY_TYPE_ID'),
                                 facilityId: resultSet.getString('FACILITY_ID'),
-                                originPostalCode: resultSet.getString('ORIGIN_POSTAL_CODE'),
-                                destinationPostalCode: resultSet.getString('DESTINATION_POSTAL_CODE'),
+                                //originPostalCode: resultSet.getString('ORIGIN_POSTAL_CODE'),
+                                //destinationPostalCode: resultSet.getString('DESTINATION_POSTAL_CODE'),
                                 customerPrefShipMethod: resultSet.getString('CUSTOMER_PREF_SHIP_METHOD'),
-                                suggestedShipMethod: resultSet.getString('SUGGESTED_SHIP_METHOD'),
-                                groundTransitTime: resultSet.getInt('GROUND_TRANSIT_TIME'),
+                                //suggestedShipMethod: resultSet.getString('SUGGESTED_SHIP_METHOD'),
+                                //groundTransitTime: resultSet.getInt('GROUND_TRANSIT_TIME'),
                                 shippingZone: resultSet.getString('SHIPPING_ZONE'),
-                                rankByOrderAtFacility: resultSet.getString('RANK_BY_ORDER_AT_FACILITY'),
-                                rankByItemCnt: resultSet.getString('RANK_BY_ITEM_CNT'),
-                                carrierPostalCodeId: resultSet.getString('CARRIER_POSTAL_CODE_ID'),
-                                facilityExhausted: resultSet.getString('FACILITY_EXHAUSTED'),
-                                lastInventoryCount: resultSet.getString('LAST_INVENTORY_COUNT'),
-                                inv: resultSet.getString('INV'),
-                                maximumOrderLimit: resultSet.getString('MAXIMUM_ORDER_LIMIT'),
-                                lastOrderCount: resultSet.getString('LAST_ORDER_COUNT'),
-                                meetSLA: resultSet.getString('MEET_SLA')
+                                //rankByOrderAtFacility: resultSet.getString('RANK_BY_ORDER_AT_FACILITY'),
+                                //rankByItemCnt: resultSet.getString('RANK_BY_ITEM_CNT'),
+                                //carrierPostalCodeId: resultSet.getString('CARRIER_POSTAL_CODE_ID'),
+                                //facilityExhausted: resultSet.getString('FACILITY_EXHAUSTED'),
+                                //lastInventoryCount: resultSet.getString('LAST_INVENTORY_COUNT'),
+                                //inv: resultSet.getString('INV'),
+                                //maximumOrderLimit: resultSet.getString('MAXIMUM_ORDER_LIMIT'),
+                                //lastOrderCount: resultSet.getString('LAST_ORDER_COUNT'),
+                                //meetSLA: resultSet.getString('MEET_SLA')
                             ])
                         }
                     })
