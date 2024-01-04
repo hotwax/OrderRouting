@@ -90,6 +90,7 @@ under the License.
         <field name="operator" type="text-medium"><description>Operator used in the condition.</description></field>
         <field name="fieldValue" type="text-long"><description>Value of the condition.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
+        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <relationship type="one" fk-name="RULE_COND_TYPEENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration">
             <key-map field-name="conditionTypeEnumId" related="enumId"/>
         </relationship>
