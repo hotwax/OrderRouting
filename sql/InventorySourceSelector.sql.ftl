@@ -1,13 +1,10 @@
-<#assign invenoryGroupFiter =  {} />
-<#if inventoryFilterMap.get("IIP_FACILITY_GROUP")?has_content>
-    <#assign invenoryGroupFiter =  inventoryFilterMap.get("IIP_FACILITY_GROUP") />
-</#if>
-
+<#assign invenoryGroupFiter =  inventoryFilterMap.get("facilityGroupId")! />
+<#assign brokeringSafetyStock =  inventoryFilterMap.get("brokeringSafetyStock")! />
 select
     y.ORDER_ID,
     y.ORDER_ITEM_SEQ_ID,
     y.PRODUCT_ID,
-    y.TOTAL_ORDER_QTY,
+    y.ship_group_total_qty,
     y.ITEM_QTY,
     y.ROUTED_ITEM_QTY,
     y.FACILITY_TYPE_ID,
@@ -15,7 +12,7 @@ select
     y.ORIGIN_POSTAL_CODE,
     y.DESTINATION_POSTAL_CODE,
     y.CUSTOMER_PREF_SHIP_METHOD,
-    y.SUGGESTED_SHIP_METHOD,
+ -- y.SUGGESTED_SHIP_METHOD,
     y.distance,
     y.CARRIER_POSTAL_CODE_ID,
     y.GROUND_TRANSIT_TIME,
@@ -85,30 +82,30 @@ x.*
           (select /*oh.created_stamp*/oh.entry_date as order_entry_date,oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,fgm.SEQUENCE_NUM,fgm.FACILITY_GROUP_ID,f.facility_type_id,/*ft.PARENT_TYPE_ID*/cpcm.CARRIER_POSTAL_CODE_ID,
           ST_Distance_Sphere(point(fpa.LONGITUDE, fpa.LATITUDE),point(opa.LONGITUDE,opa.LATITUDE)) as distance,
           cpcm.SHIPPING_ZONE,cpcm.GROUND_TRANSIT_TIME,pf.last_inventory_count as ATP,pf.minimum_stock, (pf.last_inventory_count-ifnull(pf.MINIMUM_STOCK,0)) as total_inv,round(pf.last_inventory_count/(oi.quantity-ifnull(oi.cancel_quantity,0))*100,2) as availablity_pct,pf.facility_id,pf.ALLOW_BROKERING,
-          (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id in ('ITEM_APPROVED') group by order_id)  as total_order_qty,
+          (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id in ('ITEM_APPROVED') and ship_group_seq_id = '${shipGroupSeqId}' group by order_id)  as ship_group_total_qty,
           oi.quantity-ifnull(oi.cancel_quantity,0) as item_qty,oisg.carrier_party_id,oisg.SHIPMENT_METHOD_TYPE_ID as customer_pref_ship_method,
-          case when (smt.PARENT_TYPE_ID='STANDARD' OR smt.SHIPMENT_METHOD_TYPE_ID='STANDARD') and cpcm.GROUND_TRANSIT_TIME <= 8 then 'STANDARD'
-          when (smt.PARENT_TYPE_ID='NEXT_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='NEXT_DAY') and cpcm.GROUND_TRANSIT_TIME <= 1 then 'STANDARD'
-          when (smt.PARENT_TYPE_ID='NEXT_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='NEXT_DAY') and cpcm.GROUND_TRANSIT_TIME > 1 then 'NEXT_DAY'
-          when (smt.PARENT_TYPE_ID='SECOND_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='SECOND_DAY') and cpcm.GROUND_TRANSIT_TIME <= 2 then 'STANDARD'
-          when (smt.PARENT_TYPE_ID='SECOND_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='SECOND_DAY') and cpcm.GROUND_TRANSIT_TIME > 2 then 'SECOND_DAY'
-          when (smt.PARENT_TYPE_ID='THIRD_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='THIRD_DAY') and cpcm.GROUND_TRANSIT_TIME <= 3 then 'STANDARD'
-          when (smt.PARENT_TYPE_ID='THIRD_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='THIRD_DAY') and cpcm.GROUND_TRANSIT_TIME > 3 then 'THIRD_DAY' end as suggested_ship_method,
+          -- case when (smt.PARENT_TYPE_ID='STANDARD' OR smt.SHIPMENT_METHOD_TYPE_ID='STANDARD') and cpcm.GROUND_TRANSIT_TIME <= 8 then 'STANDARD'
+          -- when (smt.PARENT_TYPE_ID='NEXT_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='NEXT_DAY') and cpcm.GROUND_TRANSIT_TIME <= 1 then 'STANDARD'
+          -- when (smt.PARENT_TYPE_ID='NEXT_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='NEXT_DAY') and cpcm.GROUND_TRANSIT_TIME > 1 then 'NEXT_DAY'
+          -- when (smt.PARENT_TYPE_ID='SECOND_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='SECOND_DAY') and cpcm.GROUND_TRANSIT_TIME <= 2 then 'STANDARD'
+          -- when (smt.PARENT_TYPE_ID='SECOND_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='SECOND_DAY') and cpcm.GROUND_TRANSIT_TIME > 2 then 'SECOND_DAY'
+          -- when (smt.PARENT_TYPE_ID='THIRD_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='THIRD_DAY') and cpcm.GROUND_TRANSIT_TIME <= 3 then 'STANDARD'
+          -- when (smt.PARENT_TYPE_ID='THIRD_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='THIRD_DAY') and cpcm.GROUND_TRANSIT_TIME > 3 then 'THIRD_DAY' end as suggested_ship_method,
           case when (case when (smt.PARENT_TYPE_ID='NEXT_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='NEXT_DAY') then 1
           when (smt.PARENT_TYPE_ID='SECOND_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='SECOND_DAY') then 2
           when (smt.PARENT_TYPE_ID='THIRD_DAY' OR smt.SHIPMENT_METHOD_TYPE_ID='THIRD_DAY') then 3
           else 8 end) >= cpcm.GROUND_TRANSIT_TIME then 'Y' else 'N' end as meet_sla,
           fpa.postal_code as origin_postal_code,opa.postal_code as destination_postal_code,f.maximum_order_limit,foc.entry_date,foc.last_order_count, inv_count.INV,
           ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id /*inner join order_item_ship_group_assoc oisgay on oisgay.order_id=oi1.order_id and oi1.ORDER_ITEM_SEQ_ID=oisgay.ORDER_ITEM_SEQ_ID where oisgay.SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID*/ where oi1.order_id=oh.ORDER_ID and pf1.facility_id=pf.facility_id and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0)) < oi1.quantity-ifnull(oi1.cancel_quantity,0) and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility,
-          ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id /*inner join order_item_ship_group_assoc oisgay on oisgay.order_id=oi1.order_id and oi1.ORDER_ITEM_SEQ_ID=oisgay.ORDER_ITEM_SEQ_ID where oisgay.SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID*/ where oi1.order_id=oh.ORDER_ID and pf1.facility_id=pf.facility_id /*and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0))  < oi1.quantity-ifnull(oi1.cancel_quantity,0)*/ and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0)) < 3 and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility_threshold,
+          ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id /*inner join order_item_ship_group_assoc oisgay on oisgay.order_id=oi1.order_id and oi1.ORDER_ITEM_SEQ_ID=oisgay.ORDER_ITEM_SEQ_ID where oisgay.SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID*/ where oi1.order_id=oh.ORDER_ID and pf1.facility_id=pf.facility_id /*and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0))  < oi1.quantity-ifnull(oi1.cancel_quantity,0)*/ <#if brokeringSafetyStock?has_content> and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0)) < ${brokeringSafetyStock.fieldValue!} </#if> and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility_threshold,
           ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id and (pf2.LAST_INVENTORY_COUNT-ifnull(pf2.MINIMUM_STOCK,0)) > 0  and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' /* inner join order_item_ship_group_assoc oisgaz on oisgaz.order_id=oi2.order_id and oi2.ORDER_ITEM_SEQ_ID=oisgaz.ORDER_ITEM_SEQ_ID where oisgaz.SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID*/ where oi2.order_id=oh.ORDER_ID and pf2.facility_id=pf.facility_id and (pf2.last_inventory_count-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID in ('ITEM_APPROVED') group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt,
-          ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id and (pf2.LAST_INVENTORY_COUNT-ifnull(pf2.MINIMUM_STOCK,0)) > 3  and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' /* inner join order_item_ship_group_assoc oisgaz on oisgaz.order_id=oi2.order_id and oi2.ORDER_ITEM_SEQ_ID=oisgaz.ORDER_ITEM_SEQ_ID where oisgaz.SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID*/ where oi2.order_id=oh.ORDER_ID and pf2.facility_id=pf.facility_id and (pf2.last_inventory_count-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID in ('ITEM_APPROVED') group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt_at_threshold
+          ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id  <#if brokeringSafetyStock?has_content> and (pf2.LAST_INVENTORY_COUNT-ifnull(pf2.MINIMUM_STOCK,0)) > ${brokeringSafetyStock.fieldValue!} </#if> and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' /* inner join order_item_ship_group_assoc oisgaz on oisgaz.order_id=oi2.order_id and oi2.ORDER_ITEM_SEQ_ID=oisgaz.ORDER_ITEM_SEQ_ID where oisgaz.SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID*/ where oi2.order_id=oh.ORDER_ID and pf2.facility_id=pf.facility_id and (pf2.last_inventory_count-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID in ('ITEM_APPROVED') group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt_at_threshold
           from order_header oh
           inner join order_item oi on oh.order_id=oi.order_id and oi.status_id in ('ITEM_APPROVED') and oh.STATUS_ID in ('ORDER_APPROVED')
 -- left join order_contact_mech ocm on ocm.order_id=oi.order_id and ocm.contact_mech_purpose_type_id='SHIPPING_LOCATION'
 -- inner join postal_address opa on opa.contact_mech_id=ocm.contact_mech_id
 -- left join order_item_ship_group oisg on oisg.order_id=oh.order_id and ocm.contact_mech_id=oisg.contact_mech_id
-          left join order_item_ship_group oisg on oisg.order_id=oh.order_id -- and ocm.contact_mech_id=oisg.contact_mech_id
+          left join order_item_ship_group oisg on oisg.order_id=oh.order_id and oisg.ship_group_seq_id=oi.ship_group_seq_id -- and ocm.contact_mech_id=oisg.contact_mech_id
           inner join postal_address opa on opa.contact_mech_id=oisg.contact_mech_id
           inner join shipment_method_type smt on smt.shipment_method_type_id=oisg.shipment_method_type_id
           left join product_facility pf on oi.product_id=pf.product_id and (pf.LAST_INVENTORY_COUNT-ifnull(pf.MINIMUM_STOCK,0)) > 0 and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y'
@@ -125,18 +122,18 @@ x.*
           inner join product_store_facility psf on oh.product_store_id = psf.product_store_id and psf.facility_id = f.facility_id
 -- inner join facility_type ft on f.FACILITY_TYPE_ID = ft.FACILITY_TYPE_ID
           inner join (select fg.FACILITY_GROUP_TYPE_ID,fgrm.FACILITY_ID, fgrm.FACILITY_GROUP_ID,fgrm.SEQUENCE_NUM from facility_group_member fgrm inner join facility_group fg on fgrm.FACILITY_GROUP_ID=fg.FACILITY_GROUP_ID and fg.FACILITY_GROUP_TYPE_ID='BROKERING_GROUP' and (fgrm.THRU_DATE > now() or fgrm.THRU_DATE is null)) fgm on f.FACILITY_ID=fgm.FACILITY_ID
-          where oh.ORDER_ID='${orderId}'-- oh.order_id in (?)  /* and ft.PARENT_TYPE_ID not in (ifnull(?,'')) */ and oisg.SHIP_GROUP_SEQ_ID in (?) and
+          where oh.ORDER_ID='${orderId}' and oi.SHIP_GROUP_SEQ_ID in (${shipGroupSeqId}) -- oh.order_id in (?)  /* and ft.PARENT_TYPE_ID not in (ifnull(?,'')) */ and oisg.SHIP_GROUP_SEQ_ID in (?) and
 -- NEW and f.FACILITY_TYPE_ID in (ifnull(?,''), ifnull(?,''), ifnull(?,''), ifnull(?,''))
 -- and f.FACILITY_TYPE_ID not in (select distinct facility_type_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_type_id IS NOT NULL)
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
 -- and oi.ORDER_ITEM_SEQ_ID in (select order_item_seq_id from order_item_ship_group_assoc where SHIP_GROUP_SEQ_ID=oisg.SHIP_GROUP_SEQ_ID and ORDER_ID=oisg.ORDER_ID and QUANTITY > ifnull(CANCEL_QUANTITY,0))
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
-          AND fgm.FACILITY_GROUP_ID in ('${invenoryGroupFiter.get("condValue")}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
+          AND fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
           having meet_sla='Y' -- NEW to perform routing only when SLA is met
           order by oh.ENTRY_DATE,oh.order_id,
           fgm.SEQUENCE_NUM, -- NEW for sorting based on facility group and their sequencing/priority
-          case when fgm.FACILITY_GROUP_ID in ('${invenoryGroupFiter.get("condValue")}') then field(rank_by_order_at_facility_threshold,'Y','N')  -- NEW for sorting facility having all the items above threshold
-          when fgm.FACILITY_GROUP_ID in ('${invenoryGroupFiter.get("condValue")}') then field(rank_by_order_at_facility,'Y','N') else field(rank_by_order_at_facility,'Y','N') end , -- make it case based on Sales Channel & Shipment methods
+          case when fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') then field(rank_by_order_at_facility_threshold,'Y','N')  -- NEW for sorting facility having all the items above threshold
+          when fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') then field(rank_by_order_at_facility,'Y','N') else field(rank_by_order_at_facility,'Y','N') end , -- make it case based on Sales Channel & Shipment methods
           rank_by_item_cnt_at_threshold, -- NEW
           rank_by_item_cnt desc,field(meet_sla,'Y','N'),
           - distance desc, -- NEW sorting based on proximity(lat/long diff) with store having ATP-SS > 3 then else
@@ -146,5 +143,5 @@ x.*
           INV DESC,f.facility_id, availablity_pct DESC,oi.ORDER_ITEM_SEQ_ID) as x
           cross join (select @rn:= 0,@r :=0,@oh :=0,@oi :=0, @f :=0,@ps :=0, @s :=0, @aq :=0,@rtd :=0,@fom :=0, @foc :=0, @fpuim :=0) as t
      ) as y
-where y.retained=1 and y.allocated_ord_qty <= y.total_order_qty and y.facility_exhausted='N'
+where y.retained=1 and y.allocated_ord_qty <= y.ship_group_total_qty and y.facility_exhausted='N'
 order by y.row_num
