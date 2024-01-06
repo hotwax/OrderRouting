@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://moqui.org/xsd/service-definition-3.xsd">
+    <service  verb="run" noun="FacilityAllocation" type="remote-rest" location="${omsBaseUrl}/api/service/orderFulfillmentAllocation?token=${token}" method="post">
+        <in-parameters>
+            <parameter name="facilityAllocation" type="List"/>
+            <parameter name="orderId"/>
+            <parameter name="token"/>
+            <parameter name="omsBaseUrl"/>
+        </in-parameters>
+    </service>
+</services>

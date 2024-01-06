@@ -410,19 +410,11 @@
             <set field="token" value=""/>
             <set field="omsBaseUrl" value=""/>
             <if condition="facilityAllocation">
-                <service-call name="co.hotwax.routing.OrderRoutingServices.run#FacilityAllocation" transaction-timeout="3600"
+                <service-call name="co.hotwax.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
                               in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
                               ignore-error="true" out-map="outResult"/>
 
             </if>
         </actions>
-    </service>
-    <service  verb="run" noun="FacilityAllocation" type="remote-rest" location="${omsBaseUrl}/api/service/orderFulfillmentAllocation?token=${token}" method="post">
-        <in-parameters>
-            <parameter name="facilityAllocation" type="List"/>
-            <parameter name="orderId"/>
-            <parameter name="token"/>
-            <parameter name="omsBaseUrl"/>
-        </in-parameters>
     </service>
 </services>
