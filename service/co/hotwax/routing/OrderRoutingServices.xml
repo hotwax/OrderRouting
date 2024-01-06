@@ -77,7 +77,7 @@
                     <econdition field-name="routingGroupId" from="routingGroupId"/>
                     <econdition field-name="statusId" value="ROUTING_ACTIVE"/>
                 </econditions>
-                <order-by field-name="sequenceNum"/>
+                <order-by field-name="sequenceNum asc"/>
             </entity-find>
             <if condition="!orderRoutings">
                 <return type="warning" message="No order routing configuration found for the specified routing group [${routingGroupId}]."/>
@@ -94,10 +94,13 @@
                         As we want to log the hasError status at the OrderRoutingRun level, to address this we are calling service in script tag
                     */
                     try {
-                        ec.service.sync().name("co.hotwax.routing.OrderRoutingServices.run#OrderRouting")
+                        def routingResult = ec.service.sync().name("co.hotwax.routing.OrderRoutingServices.run#OrderRouting")
                                 .requireNewTransaction(true)
                                 .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId])
                                 .call()
+                        if (!routingResult.runNextRouting &amp;&amp; orderId) {
+                            break;
+                        }
                     } catch (Throwable e) {
                         ec.logger.error("There is an issue with run#OrderRouting", e)
                     }
@@ -123,7 +126,11 @@
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
         </in-parameters>
+        <out-parameters>
+            <parameter name="runNextRouting" type="Boolean"/>
+        </out-parameters>
         <actions>
+            <set field="runNextRouting" value="true" type="Boolean"/>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
             <log message="Running orderRouting ${orderRouting.routingName} [${orderRoutingId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
             <if condition="!orderRouting">
@@ -134,7 +141,7 @@
             </if>
             <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
-                <order-by field-name="sequenceNum"/>
+                <order-by field-name="sequenceNum asc"/>
             </entity-find>
             <filter-map-list list="orderFilterConditions" to-list="filterConditions">
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
@@ -147,7 +154,7 @@
                     <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                     <econdition field-name="statusId" value="RULE_ACTIVE"/>
                 </econditions>
-                <order-by field-name="sequenceNum"/>
+                <order-by field-name="sequenceNum asc"/>
             </entity-find>
 
             <if condition="!orderRoutingRules">
@@ -193,7 +200,8 @@
                                         ec.logger.warn("Ignoring order routing actions errors" + ec.message.getErrorsString())
                                     }
                                     if (!actionResult.runNextRule) {
-                                        //TODO: Break the outer loop as well
+                                        //Break the outer loop as well if its only for single orderId
+                                        if (orderId) { runNextRouting = false }
                                         break
                                     }
                                 } else {
@@ -230,6 +238,7 @@
             <if condition="!'RULE_ACTIVE'.equals(orderRoutingRule.statusId)">
                 <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${orderRoutingId}] is not active"/>
             </if>
+            <log message="Running orderRoutingRule ${orderRoutingRule.ruleName} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
@@ -247,7 +256,7 @@
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </filter-map-list>
             <order-map-list list="sortFields">
-                <order-by field-name="sequenceNum ASC"/>
+                <order-by field-name="sequenceNum asc"/>
             </order-map-list>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
@@ -256,7 +265,7 @@
             <script>
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
-                ec.logger.info("======writer==${writer}==")
+                //ec.logger.info("======writer==${writer}==")
                 java.sql.Connection con = ec.getEntity().getConnection(orderRoutingRule.getEntityDefinition().getEntityGroupName())
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
@@ -312,107 +321,81 @@
                     import java.time.format.DateTimeFormatter;
                     import java.time.ZonedDateTime
                     import java.util.stream.Collectors;
+                    import org.moqui.entity.EntityCondition
                     //TODO: Check for single vs multi, as discussed with Swapnil, this can be done in sql itself
                     //if single assignment preferred, then sql will return result only if all the shipgroup items available at single location
 
                     //TODO: selectField not working as expected, need to veirfy syntax
                     def orderItems = ec.entity.find("org.apache.ofbiz.order.order.OrderItem")
                             .condition([orderId: orderId,statusId: 'ITEM_APPROVED', shipGroupSeqId: shipGroupSeqId]).list();
-                    def ruleActions = routingRule.findRelated("co.hotwax.order.routing.OrderRoutingRuleAction", null, null, true, false)
-                    actionMap = [:]
+
+                    def ruleActions = ec.entity.find("co.hotwax.order.routing.OrderRoutingRuleAction").useCache(true)
+                            .condition("routingRuleId", routingRuleId)
+                            .condition("actionValue", EntityCondition.IS_NOT_NULL, null).list();
+
+                    /*def ruleActions = routingRule.findRelated("co.hotwax.order.routing.OrderRoutingRuleAction", null, null, true, false)
+                            .filterByCondition(ec.entity.getConditionFactory().makeCondition('actionValue', EntityCondition.IS_NOT_NULL, null))*/
+                    /*actionMap = [:]
                     ruleActions.each {ruleAction ->
-                        if (ruleAction.actionValue) {
                             actionMap.put(ruleAction.actionTypeEnumId, ruleAction.actionValue)
-                        }
-                    }
+                    }*/
+
+                    def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
+
                     facilityAllocation = [];
-                    if ('ORA_SINGLE' == routingRule.assignmentEnumId) {
-                        //Assuming sql will not return result if items not brokerd at single location
-                        if (!suggestedFulfillmentLocations) {
-                            def queue = null, autoCancelDate = null ;
-                            if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
-                                queue = actionMap.get('ORA_MV_TO_QUEUE');
-                                runNextRule = false
-                            }
-                            if (actionMap.get('ORA_AUTO_CANCEL_DATE') != null) {
-                                ZonedDateTime now = ZonedDateTime.now()
-                                now = now.plusDays(Long.valueOf(actionMap.get('ORA_AUTO_CANCEL_DATE')))
-                                autoCancelDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                                if (!queue) {
-                                    queue = orderItemShipGroup.facilityId;
-                                }
-                            }
-                            if (queue || autoCancelDate) {
-                                items = [];
-                                //As selectField not workgin, here is the work around
-                                orderItems.each {orderItem->
-                                    items.add([orderItemSeqId: orderItem.orderItemSeqId, autoCancelDate: autoCancelDate]);
-                                }
-                                facilityAllocation.add([facilityId:queue, items: items])
-                            }
-                        } else {
-                            runNextRule = false
-                            def queue = suggestedFulfillmentLocations.facilityId as Set
-                            if (!(queue.size() == 1)) {
-                                ec.message.addError("Invenotry not found at single location");
-                                return
-                            }
-                            items = [];
-                            //As selectField not workgin, here is the work around
-                            suggestedFulfillmentLocations.each {suggestedFulfillmentLocation->
-                                items.add([orderItemSeqId: suggestedFulfillmentLocation.orderItemSeqId, autoCancelDate: autoCancelDate]);
-                            }
-                            facilityAllocation.add([facilityId:queue[0], items: items])
-                        }
-                    } else if ('ORA_MULTIPLE' == routingRule.assignmentEnumId) {
-                        //prepare map for brokered items
-                    def queue = null, autoCancelDate = null ;
-                        if (suggestedFulfillmentLocations) {
-                            def facilityIds = suggestedFulfillmentLocations.facilityId as Set;
-                            facilityIds.each { facilityId->
-                                def facilityItems = suggestedFulfillmentLocations.collect()
-                                filterMapList(facilityItems, ["facilityId":facilityId], false)
-                                def items = [];
-                                facilityItems.each { facilityItem->
-                                    items.add([orderItemSeqId: facilityItem.orderItemSeqId]);
-                                }
-                                facilityAllocation.add([facilityId:facilityId, items: items])
-                            }
-                        }
-                        brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
-                        unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
-                        if (unfillableItemSeqIds) {
-                            if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
-                                queue = actionMap.get('ORA_MV_TO_QUEUE');
-                                runNextRule = false
-                            }
-                            if (actionMap.get('ORA_AUTO_CANCEL_DATE') != null) {
-                                if (!queue) {
-                                    queue = orderItemShipGroup.facilityId;
-                                }
-                                ZonedDateTime now = ZonedDateTime.now()
-                                now = now.plusDays(Long.valueOf(actionMap.get('ORA_AUTO_CANCEL_DATE')))
-                                autoCancelDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                            }
-                            if (queue || autoCancelDate) {
-                                def items = []
-                                unfillableItemSeqIds.each {unfillableItemSeqId ->
-                                    items.add([orderItemSeqId:unfillableItemSeqId, autoCancelDate: autoCancelDate])
-                                }
-                                facilityAllocation.add([facilityId: queue, items: items])
-                            }
-                        } else {
-                            runNextRule = false
+                    if (!'ORA_MULTIPLE'.equals(routingRule.assignmentEnumId)) {
+                        def facilityIdList = suggestedFulfillmentLocations.facilityId as Set
+                        if (!(facilityIdList.size() == 1)) {
+                            ec.logger.info("Inventory not found at single location for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}");
+                            return
                         }
                     }
+                    //prepare map for brokered items
+                    def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [] ;
+                    if (suggestedFulfillmentLocations) {
+                        brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
+                        def facilityIds = suggestedFulfillmentLocations.facilityId as Set;
+                        facilityIds.each { facilityId->
+                            def facilityItems = suggestedFulfillmentLocations.collect()
+                            filterMapList(facilityItems, ["facilityId":facilityId], false)
+                            /*def items = [];
+                            facilityItems.each { facilityItem->
+                                items.add([orderItemSeqId: facilityItem.orderItemSeqId]);
+                            }*/
+                            def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
+                            facilityAllocation.add([facilityId:facilityId, items: items])
+                        }
+                    }
+                    def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
+                    if (unfillableItemSeqIds) {
+                        if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
+                            queue = actionMap.get('ORA_MV_TO_QUEUE');
+                            runNextRule = false
+                        }
+                        if (actionMap.get('ORA_AUTO_CANCEL_DATE') != null) {
+                            if (!queue) {
+                                queue = orderItemShipGroup.facilityId;
+                            }
+                            /*now = ZonedDateTime.now().plusDays(Long.valueOf(actionMap.get('ORA_AUTO_CANCEL_DATE')))
+                            autoCancelDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))*/
+                            autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DATE') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        }
+                        if (queue || autoCancelDate) {
+                            facilityAllocation.add([facilityId: queue, items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate] }])
+                        }
+                    } else {
+                        runNextRule = false
+                    }
+                    //}
                 </script>
             <!--TODO : Find way to generate the oms token and oms base url -->
             <set field="token" value=""/>
             <set field="omsBaseUrl" value=""/>
+            <log message="==facilityAllocation===${facilityAllocation}="/>
             <if condition="facilityAllocation">
-                <service-call name="co.hotwax.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
+                <!--<service-call name="co.hotwax.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
                               in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
-                              ignore-error="true" out-map="outResult"/>
+                              ignore-error="true" out-map="outResult"/>-->
 
             </if>
         </actions>
