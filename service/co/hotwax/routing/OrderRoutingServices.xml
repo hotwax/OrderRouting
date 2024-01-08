@@ -353,21 +353,6 @@
                     //TODO: Check for single vs multi, as discussed with Swapnil, this can be done in sql itself
                     //if single assignment preferred, then sql will return result only if all the shipgroup items available at single location
 
-                    //TODO: selectField not working as expected, need to veirfy syntax
-                    /*def orderItems = ec.entity.find("org.apache.ofbiz.order.order.OrderItem")
-                            .condition([orderId: orderId,statusId: 'ITEM_APPROVED', shipGroupSeqId: shipGroupSeqId]).list();*/
-
-                    /*def ruleActions = ec.entity.find("co.hotwax.order.routing.OrderRoutingRuleAction").useCache(true)
-                            .condition("routingRuleId", routingRuleId)
-                            .condition("actionValue", EntityCondition.IS_NOT_NULL, null).list();*/
-
-                    /*def ruleActions = routingRule.findRelated("co.hotwax.order.routing.OrderRoutingRuleAction", null, null, true, false)
-                            .filterByCondition(ec.entity.getConditionFactory().makeCondition('actionValue', EntityCondition.IS_NOT_NULL, null))*/
-                    /*actionMap = [:]
-                    ruleActions.each {ruleAction ->
-                            actionMap.put(ruleAction.actionTypeEnumId, ruleAction.actionValue)
-                    }*/
-
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
@@ -387,10 +372,6 @@
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
-                            /*def items = [];
-                            facilityItems.each { facilityItem->
-                                items.add([orderItemSeqId: facilityItem.orderItemSeqId]);
-                            }*/
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
                             facilityAllocation.add([facilityId:facilityId, items: items])
                         }
@@ -407,8 +388,6 @@
                             if (!queue) {
                                 queue = orderItemShipGroup.facilityId;
                             }
-                            /*now = ZonedDateTime.now().plusDays(Long.valueOf(actionMap.get('ORA_AUTO_CANCEL_DATE')))
-                            autoCancelDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))*/
                             autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DATE') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                         }
                         if (queue || autoCancelDate) {
