@@ -5,6 +5,10 @@
           location for processing and shipment.
           It involves determining the most efficient and cost-effective way to fulfill customer orders based on various factors such as inventory levels, location of the products, shipping costs, and delivery times.">
 
+    <resource name="login" require-authentication="anonymous-all">
+        <method type="post"><service name="co.hotwax.routing.CommonServices.login#User"/></method>
+    </resource>
+
     <resource name="enums">
         <method type="get"><entity name="org.apache.ofbiz.common.enum.Enumeration" operation="list"/></method>
         <id name="enumId">

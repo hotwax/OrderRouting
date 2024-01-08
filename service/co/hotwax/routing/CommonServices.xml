@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://moqui.org/xsd/service-definition-3.xsd">
+
+
+    <service verb="login" noun="User">
+        <in-parameters>
+            <parameter name="username" required="true"/>
+            <parameter name="password" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="token"/>
+        </out-parameters>
+        <actions>
+            <set field="code" value="200" type="Integer"/>
+            <script>
+                try {
+                    loggedIn = ec.user.loginUser(username, password)
+                    //TODO: Avoid using api_key pattern , please refer following thread
+                    //https://groups.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/moqui/gQzEtMweM2E/ObEGLik_AAAJ
+                    if (loggedIn) {
+                        token = ec.user.getLoginKey()
+                        return;
+                    } else {
+                        if (ec.message.hasError()) {
+                            ec.logger.error("User login error : " + ec.message.getErrorsString())
+                            ec.message.clearErrors()
+                        }
+                    }
+                }   catch (Exception e) {
+                    ec.logger.error("Error while generating token ", e)
+                }
+            </script>
+            <return error="true" message="Sorry, your username and/or password are incorrect - please try again." />
+        </actions>
+    </service>
+</services>
