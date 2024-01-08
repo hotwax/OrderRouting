@@ -42,7 +42,7 @@
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_ROU_ASSIGN_TYPE" description="Determine the assignment type in the context of routing (single/multi)" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_SINGLE" description="Single" sequenceNum="5" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="SINGLE"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_MULTIPLE" description="Multiple" sequenceNum="10" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="MULTIPLE"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_MULTI" description="Partial assignment" sequenceNum="10" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="MULTI"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORDER_RULE_ACT_TYPE" description="Determine the type of action to be performed in the context of routing rules" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_BROKER" description="Broker" sequenceNum="5" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="Broker"/>

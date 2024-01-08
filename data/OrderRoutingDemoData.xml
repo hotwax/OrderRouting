@@ -19,7 +19,7 @@
         <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_1" actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNFILLABLE_PARKING" createdDate="2023-11-03T12:00:00"/>
         <co.hotwax.order.routing.OrderRoutingRuleAction routingRuleId="ROUTING_RULE_1" actionSeqId="10" actionTypeEnumId="ORA_AUTO_CANCEL_DATE" actionValue="10" createdDate="2023-11-03T12:00:00"/>
 
-        <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_1_2" orderRoutingId="DEMO_ROUTING_1" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTIPLE" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
+        <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_1_2" orderRoutingId="DEMO_ROUTING_1" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTI" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
         <!-- Inventory Rules -->
         <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_1_2" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
         <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_1_2" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="brokeringSafetyStock" operator="greater" fieldValue="3" createdDate="2023-11-03T12:00:00"/>
@@ -48,7 +48,7 @@
     <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_3" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityId" operator="equals" fieldValue="UNFILLABLE_PARKING" sequenceNum="5"/>
 
     <!-- Routing Rule -->
-    <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_3" orderRoutingId="DEMO_ROUTING_3" ruleName="UNF orders only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTIPLE" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
+    <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_3" orderRoutingId="DEMO_ROUTING_3" ruleName="UNF orders only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTI" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
 
     <!-- Inventory Rules -->
     <co.hotwax.order.routing.OrderRoutingRuleInvCond routingRuleId="ROUTING_RULE_3" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
