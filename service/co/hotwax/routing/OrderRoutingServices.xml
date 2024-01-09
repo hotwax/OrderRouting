@@ -361,7 +361,7 @@
                         //SQL will not reutrn result if items not available at single location
                         //Additional check to make sure all items are available at single location,
                         if (!(suggestedFacilityIds.size() == 1)) {
-                            ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.rulleName} [routingRule.routingRuleId] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
+                            ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.ruleName} [routingRule.routingRuleId] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
                             suggestedFulfillmentLocations = []
                         }
                     }
@@ -403,6 +403,7 @@
             <set field="omsBaseUrl" value=""/>
             <log message="facilityAllocatio====${facilityAllocation}"/>
             <if condition="facilityAllocation">
+                <!-- TODO: Handle the 500 status code, if OMS failed to respond, don't run the next rule -->
                 <!--<service-call name="co.hotwax.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
                               in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
                               ignore-error="true" out-map="outResult"/>-->

@@ -35,10 +35,15 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_BRK_SFTY_STOCK" description="Brokering safety stock" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="brokeringSafetyStock"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_ORDER_DATE" description="Order date" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="orderDate"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_BY" description="Ship by" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipBeforeDate"/><!-- OrderItem.shipBeforeDate -->
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_AFTER" description="Ship after" sequenceNum="10" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipAfterDate"/><!-- OrderItem.shipAfterDate -->
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_ORDER_DATE" description="Order date" sequenceNum="15" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="orderDate"/><!-- OrderHeader.orderDate -->
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_METH" description="Shipping method" sequenceNum="20" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shippingMethod"/> <!-- CarrierShipmentMethod.deliveryDays -->
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="proximity"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="proxifmity"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_INV_BAL" description="Inventory balance" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="inventory"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_CUST_SEQ" description="Custom sequence" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="customSequence"/> <!-- FacilityGroupMember.sequenceNum -->
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_ROU_ASSIGN_TYPE" description="Determine the assignment type in the context of routing (single/multi)" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_SINGLE" description="Single" sequenceNum="5" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="SINGLE"/>

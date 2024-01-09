@@ -1,5 +1,6 @@
 <#assign invenoryGroupFiter =  inventoryFilterMap.get("facilityGroupId")! />
 <#assign brokeringSafetyStock =  inventoryFilterMap.get("brokeringSafetyStock")! />
+<#assign proximity =  inventoryFilterMap.get("proximity")! />
 select
     y.ORDER_ID,
     y.ORDER_ITEM_SEQ_ID,
@@ -114,11 +115,11 @@ x.*
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
           AND fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
-           having meet_sla='N' -- NEW to perform routing only when SLA is met
-/*TODO: parameterized condition single allocation */           -- and case when fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') then rank_by_order_at_facility_threshold='Y' end  -- NEW for sorting facility having all the items above threshold
+          having meet_sla='N' -- NEW to perform routing only when SLA is met
+          <#if !orderRoutingRule.assignmentEnumId?has_content || 'ORA_SINGLE' == orderRoutingRule.assignmentEnumId> and case when fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') then rank_by_order_at_facility_threshold='Y' end  -- NEW for sorting facility having all the items above threshold
 --  and case when fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') then rank_by_order_at_facility='Y' end  -- make it case based on Sales Channel & Shipment methods
-/*TODO:: split alllocation with threashold */     and case when rank_by_order_at_facility='Y' then item_at_facility_at_threshold='Y' end
-          order by oh.ENTRY_DATE,oh.order_id,
+          <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId>and case when rank_by_order_at_facility='Y' then item_at_facility_at_threshold='Y' end </#if>
+          order by oh.order_date,oh.order_id,
           fgm.SEQUENCE_NUM, -- NEW for sorting based on facility group and their sequencing/priority
           rank_by_item_cnt_at_threshold desc, -- NEW
           rank_by_item_cnt desc,field(meet_sla,'Y','N'),

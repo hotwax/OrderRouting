@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<entity-facade-xml type="seed">
+
+    <moqui.security.UserAccount userId="MARK_CHEN" username="mark.chen" userFullName="Mark Chen"
+                                currentPassword="16ac58bbfa332c1c55bd98b53e60720bfa90d394" passwordHashType="SHA"
+                                passwordHint="framework name, lowercase" currencyUomId="USD" locale="en_US"
+                                emailAddress="mark.chen@example.com"/>
+    <moqui.security.UserGroupMember userGroupId="ADMIN" userId="MARK_CHEN" fromDate="1265184000000"/>
+    <moqui.security.UserGroupMember userGroupId="ADMIN_ADV" userId="MARK_CHEN" fromDate="1265184000000"/>
+    <moqui.security.UserLoginHistory userId="MARK_CHEN" fromDate="1265184000000" successfulLogin="Y"/>
+</entity-facade-xml>
