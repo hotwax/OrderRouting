@@ -11,10 +11,10 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_EQUALS" description="not-equals" sequenceNum="30" enumTypeId="COMPARISON_OPERATOR" enumCode="not-equals"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_IN" description="in" sequenceNum="35" enumTypeId="COMPARISON_OPERATOR" enumCode="in"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_IN" description="not-in" sequenceNum="40" enumTypeId="COMPARISON_OPERATOR" enumCode="not-in"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_BETWEEN" description="between" sequenceNum="45" enumTypeId="COMPARISON_OPERATOR" enumCode="between"/>
+    <!--<org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_BETWEEN" description="between" sequenceNum="45" enumTypeId="COMPARISON_OPERATOR" enumCode="between"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_BETWEEN" description="not-between" sequenceNum="50" enumTypeId="COMPARISON_OPERATOR" enumCode="not-between"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_LIKE" description="like" sequenceNum="55" enumTypeId="COMPARISON_OPERATOR" enumCode="like"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_LIKE" description="not-like" sequenceNum="60" enumTypeId="COMPARISON_OPERATOR" enumCode="not-like"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_NOT_LIKE" description="not-like" sequenceNum="60" enumTypeId="COMPARISON_OPERATOR" enumCode="not-like"/>-->
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_IS_NULL" description="is-null" sequenceNum="65" enumTypeId="COMPARISON_OPERATOR" enumCode="is-null"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_IS_NOT_NULL" description="is-not-null" sequenceNum="70" enumTypeId="COMPARISON_OPERATOR" enumCode="is-not-null"/>
 
