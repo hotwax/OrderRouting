@@ -280,7 +280,7 @@
             <script>
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
-                //ec.logger.info("======writer==${writer}==")
+                ec.logger.info("======writer==${writer}==")
                 java.sql.Connection con = ec.getEntity().getConnection(orderRoutingRule.getEntityDefinition().getEntityGroupName())
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
@@ -299,7 +299,7 @@
                                 customerPrefShipMethod: resultSet.getString('CUSTOMER_PREF_SHIP_METHOD'),
                                 //suggestedShipMethod: resultSet.getString('SUGGESTED_SHIP_METHOD'),
                                 //groundTransitTime: resultSet.getInt('GROUND_TRANSIT_TIME'),
-                                shippingZone: resultSet.getString('SHIPPING_ZONE'),
+                                //shippingZone: resultSet.getString('SHIPPING_ZONE'),
                                 //rankByOrderAtFacility: resultSet.getString('RANK_BY_ORDER_AT_FACILITY'),
                                 //rankByItemCnt: resultSet.getString('RANK_BY_ITEM_CNT'),
                                 //carrierPostalCodeId: resultSet.getString('CARRIER_POSTAL_CODE_ID'),
