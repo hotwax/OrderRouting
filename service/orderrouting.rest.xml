@@ -12,6 +12,13 @@
         <resource name="profile">
             <method type="get"><service name="co.hotwax.routing.CommonServices.getUserProfile"/></method>
         </resource>
+        <resource name="productStore">
+            <!--
+                TODO: Need to get the User's ProductStore, as of now returing all the productStore
+                As UserAccount and ProductStore are part of two different datasource
+             -->
+            <method type="get"><entity name="org.apache.ofbiz.product.store.ProductStore" operation="list"/></method>
+        </resource>
     </resource>
     <resource name="enums">
         <method type="get"><entity name="org.apache.ofbiz.common.enum.Enumeration" operation="list"/></method>
