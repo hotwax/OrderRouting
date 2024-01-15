@@ -12,12 +12,10 @@ select
     y.FACILITY_ID,
     y.ORIGIN_POSTAL_CODE,
     y.DESTINATION_POSTAL_CODE,
-    y.CUSTOMER_PREF_SHIP_METHOD,
     y.distance,
     y.rank_by_order_at_facility as RANK_BY_ORDER_AT_FACILITY,
     y.rank_by_item_cnt AS RANK_BY_ITEM_CNT,
     y.FACILITY_EXHAUSTED,
---    y.MEET_SLA,
     y.total_inv as LAST_INVENTORY_COUNT,
     y.inventoryForAllocation,
     ifnull(y.ALLOW_BROKERING, 'Y') as ALLOW_BROKERING,
@@ -76,11 +74,11 @@ concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)) as item,
 case when x.order_id is null and x.ORDER_ITEM_SEQ_ID is null then 'Y' else 'N' end as backordered,
 x.*
       from
-          (select /*oh.order_date,oh.entry_date as order_entry_date,*/oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,f.facility_type_id,
+          (select oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,f.facility_type_id,
           ifnull(ST_Distance_Sphere(point(fpa.LONGITUDE, fpa.LATITUDE),point(opa.LONGITUDE,opa.LATITUDE)), 0) as distance,
           pf.last_inventory_count as ATP,pf.minimum_stock, (pf.last_inventory_count-ifnull(pf.MINIMUM_STOCK,0)) as total_inv,round(pf.last_inventory_count/(oi.quantity-ifnull(oi.cancel_quantity,0))*100,2) as availablity_pct,pf.facility_id,pf.ALLOW_BROKERING,
           (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id in ('ITEM_APPROVED') and ship_group_seq_id = '${shipGroupSeqId}' group by order_id)  as ship_group_total_qty,
-          oi.quantity-ifnull(oi.cancel_quantity,0) as item_qty,oisg.carrier_party_id,oisg.SHIPMENT_METHOD_TYPE_ID as customer_pref_ship_method,
+          oi.quantity-ifnull(oi.cancel_quantity,0) as item_qty,oisg.carrier_party_id,
           fpa.postal_code as origin_postal_code,opa.postal_code as destination_postal_code,f.maximum_order_limit,foc.entry_date,foc.last_order_count, inv_count.inventoryForAllocation,
           ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id where oi1.order_id=oh.ORDER_ID and pf1.facility_id=pf.facility_id and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0)) < oi1.quantity-ifnull(oi1.cancel_quantity,0) and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility,
           ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id where oi1.order_id=oh.ORDER_ID and pf1.facility_id=pf.facility_id <#if brokeringSafetyStock?has_content> and (pf1.last_inventory_count-ifnull(pf1.MINIMUM_STOCK,0)) < ${brokeringSafetyStock.fieldValue!} </#if> and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_above_facility_threshold,
@@ -91,7 +89,6 @@ x.*
           inner join order_item oi on oh.order_id=oi.order_id and oi.status_id in ('ITEM_APPROVED') and oh.STATUS_ID in ('ORDER_APPROVED')
           left join order_item_ship_group oisg on oisg.order_id=oh.order_id and oisg.ship_group_seq_id=oi.ship_group_seq_id
           inner join postal_address opa on opa.contact_mech_id=oisg.contact_mech_id
-          inner join shipment_method_type smt on smt.shipment_method_type_id=oisg.shipment_method_type_id
           left join product_facility pf on oi.product_id=pf.product_id and (pf.LAST_INVENTORY_COUNT-ifnull(pf.MINIMUM_STOCK,0)) > 0 and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y'
           left join facility f on pf.facility_id=f.facility_id
           left join (select foc1.facility_id,foc1.entry_date,foc1.last_order_count from facility_order_count foc1
@@ -107,7 +104,7 @@ x.*
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
           AND fgm.FACILITY_GROUP_ID in ('${(invenoryGroupFiter.get("fieldValue"))!}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
-          having distance/ 1000  >=  ${(proximity.get("fieldValue"))!0}
+          having distance/ 1000  >=  ${(proximity.get("fieldValue"))!0} -- TODO: Need to check for miles/km
           <#if !orderRoutingRule.assignmentEnumId?has_content || 'ORA_SINGLE' == orderRoutingRule.assignmentEnumId> and rank_by_order_above_facility_threshold='Y'  -- NEW for sorting facility having all the items above threshold
           <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId> and case when rank_by_order_at_facility='Y' then item_at_facility_above_threshold='Y' end </#if>
           order by

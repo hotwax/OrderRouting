@@ -300,7 +300,7 @@
                                 facilityId: resultSet.getString('FACILITY_ID'),
                                 //originPostalCode: resultSet.getString('ORIGIN_POSTAL_CODE'),
                                 //destinationPostalCode: resultSet.getString('DESTINATION_POSTAL_CODE'),
-                                customerPrefShipMethod: resultSet.getString('CUSTOMER_PREF_SHIP_METHOD'),
+                                //customerPrefShipMethod: resultSet.getString('CUSTOMER_PREF_SHIP_METHOD'),
                                 //suggestedShipMethod: resultSet.getString('SUGGESTED_SHIP_METHOD'),
                                 //groundTransitTime: resultSet.getInt('GROUND_TRANSIT_TIME'),
                                 //shippingZone: resultSet.getString('SHIPPING_ZONE'),
