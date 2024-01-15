@@ -35,6 +35,9 @@
             <resource name="routings">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
             </resource>
+            <resource name="routingRuns">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRun" operation="list"/></method>
+            </resource>
         </id>
     </resource>
     <resource name="routings">
@@ -47,6 +50,9 @@
             </resource>
             <resource name="filter-conditions">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="list"/></method>
+            </resource>
+            <resource name="routingRuns">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRun" operation="list"/></method>
             </resource>
         </id>
     </resource>
