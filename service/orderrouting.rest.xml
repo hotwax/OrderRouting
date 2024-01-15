@@ -28,16 +28,20 @@
     </resource>
     <resource name="groups">
         <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list"/></method>
+        <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store"/></method>
         <id name="routingGroupId">
             <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="one"/></method>
+            <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store"/></method>
             <resource name="routings">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
             </resource>
         </id>
     </resource>
     <resource name="routings">
+        <method type="post"><entity name="co.hotwax.order.routing.OrderRouting" operation="store"/></method>
         <id name="orderRoutingId">
             <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="one"/></method>
+            <method type="post"><entity name="co.hotwax.order.routing.OrderRouting" operation="store"/></method>
             <resource name="rules">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="list"/></method>
             </resource>
@@ -47,13 +51,17 @@
         </id>
     </resource>
     <resource name="rules">
+        <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="store"/></method>
         <id name="routingRuleId">
             <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="one"/></method>
+            <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="store"/></method>
             <resource name="condition">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="list"/></method>
+                <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="store"/></method>
             </resource>
             <resource name="actions">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="list"/></method>
+                <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="store"/></method>
             </resource>
         </id>
     </resource>
