@@ -118,9 +118,11 @@
                     } else {
                         routingResult = ec.message.getMessagesString()
                     }
+                    if (routingResult &amp;&amp; routingResult.length() &gt; 255) {
+                        routingResult = routingResult.substring(0, 255)
+                    }
                     ec.message.clearAll();
                 </script>
-
                 <service-call name="update#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                         in-map="[routingRunId:routingRunResult.routingRunId,hasError:hasError, routingResult:routingResult, endDate:ec.user.nowTimestamp]"
                         out-map="routingRunResult"/>
@@ -223,7 +225,7 @@
                                     }
                                 } else {
                                     ec.logger.warn("Ignoring order routing rule errors" + ec.message.getErrorsString())
-                                    ec.message.clearErrors()
+                                    ec.message.clearAll()
                                 }
                             }
                         } catch (Throwable e) {
@@ -282,6 +284,7 @@
             <set field="suggestedFulfillmentLocations" from="[]"/>
 
             <script>
+                try {
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
                 ec.logger.info("======writer==${writer}==")
@@ -317,6 +320,9 @@
                         }
                     })
                 })
+                } catch (Exception e) {
+                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getMessage()}")
+                }
             </script>
         </actions>
     </service>
