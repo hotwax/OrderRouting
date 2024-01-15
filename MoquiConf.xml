@@ -3,4 +3,5 @@
 <moqui-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-3.xsd">
 
     <default-property name="webapp_require_session_token" value="false"/>
+    <default-property name="webapp_allow_origins" value="localhost,hotwax.io"/>
 </moqui-conf>
