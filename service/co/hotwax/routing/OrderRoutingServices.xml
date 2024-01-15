@@ -300,22 +300,7 @@
                                 itemQty: resultSet.getInt('ITEM_QTY'),
                                 routedItemQty: resultSet.getInt('ROUTED_ITEM_QTY'),
                                 facilityTypeId: resultSet.getString('FACILITY_TYPE_ID'),
-                                facilityId: resultSet.getString('FACILITY_ID'),
-                                //originPostalCode: resultSet.getString('ORIGIN_POSTAL_CODE'),
-                                //destinationPostalCode: resultSet.getString('DESTINATION_POSTAL_CODE'),
-                                //customerPrefShipMethod: resultSet.getString('CUSTOMER_PREF_SHIP_METHOD'),
-                                //suggestedShipMethod: resultSet.getString('SUGGESTED_SHIP_METHOD'),
-                                //groundTransitTime: resultSet.getInt('GROUND_TRANSIT_TIME'),
-                                //shippingZone: resultSet.getString('SHIPPING_ZONE'),
-                                //rankByOrderAtFacility: resultSet.getString('RANK_BY_ORDER_AT_FACILITY'),
-                                //rankByItemCnt: resultSet.getString('RANK_BY_ITEM_CNT'),
-                                //carrierPostalCodeId: resultSet.getString('CARRIER_POSTAL_CODE_ID'),
-                                //facilityExhausted: resultSet.getString('FACILITY_EXHAUSTED'),
-                                //lastInventoryCount: resultSet.getString('LAST_INVENTORY_COUNT'),
-                                //inv: resultSet.getString('inventoryForAllocation'),
-                                //maximumOrderLimit: resultSet.getString('MAXIMUM_ORDER_LIMIT'),
-                                //lastOrderCount: resultSet.getString('LAST_ORDER_COUNT'),
-                                //meetSLA: resultSet.getString('MEET_SLA')
+                                facilityId: resultSet.getString('FACILITY_ID')
                             ])
                         }
                     })
