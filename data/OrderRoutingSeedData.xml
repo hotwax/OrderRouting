@@ -41,9 +41,9 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_METH" description="Shipping method" sequenceNum="20" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shippingMethod"/> <!-- CarrierShipmentMethod.deliveryDays -->
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="proxifmity"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_INV_BAL" description="Inventory balance" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="inventory"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_CUST_SEQ" description="Custom sequence" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="customSequence"/> <!-- FacilityGroupMember.sequenceNum -->
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="distance"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_INV_BAL" description="Inventory balance" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="inventoryForAllocation"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_CUST_SEQ" description="Custom sequence" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="facilitySequence"/> <!-- FacilityGroupMember.sequenceNum -->
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_ROU_ASSIGN_TYPE" description="Determine the assignment type in the context of routing (single/multi)" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_SINGLE" description="Single" sequenceNum="5" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="SINGLE"/>
