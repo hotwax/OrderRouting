@@ -43,7 +43,7 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_BY" description="Ship by" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipBeforeDate"/><!-- OrderItem.shipBeforeDate -->
     <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_AFTER" description="Ship after" sequenceNum="10" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipAfterDate"/><!-- OrderItem.shipAfterDate -->
     <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_ORDER_DATE" description="Order date" sequenceNum="15" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="orderDate"/><!-- OrderHeader.orderDate -->
-    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_METH" description="Shipping method" sequenceNum="20" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shippingMethod"/> <!-- CarrierShipmentMethod.deliveryDays -->
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_METH" description="Shipping method" sequenceNum="20" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="deliveryDays"/> <!-- CarrierShipmentMethod.deliveryDays -->
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="distance"/>

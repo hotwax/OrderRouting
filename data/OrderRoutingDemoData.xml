@@ -10,7 +10,7 @@
         <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="salesChannelEnumId" operator="equals" fieldValue="WEB_SALES_CHANNEL" sequenceNum="5"/>
         <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="shipmentMethodTypeId" operator="equals" fieldValue="NEXT_DAY" sequenceNum="10"/>
         <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="5"/>
-        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="shipmentMethodTypeId" sequenceNum="10"/>
+        <co.hotwax.order.routing.OrderFilterCondition orderRoutingId="DEMO_ROUTING_1" conditionSeqId="5" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="deliveryDays" sequenceNum="10"/>
         <!-- Routing Rule -->
         <co.hotwax.order.routing.OrderRoutingRule routingRuleId="ROUTING_RULE_1" orderRoutingId="DEMO_ROUTING_1" ruleName="Warehouse only" statusId="RULE_DRAFT" sequenceNum="5" assignmentEnumId="ORA_SINGLE" fulfillEntireShipGroup="N" createdByUserLogin="admin" createdDate="2023-11-03T12:00:00"/>
         <!-- Inventory Rules -->

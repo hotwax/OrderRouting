@@ -15,12 +15,12 @@ select
     y.FACILITY_ID,
     y.ORIGIN_POSTAL_CODE,
     y.DESTINATION_POSTAL_CODE,
-    y.distance as distanceInMeters,
+    y.distance,
     y.rank_by_order_at_facility as RANK_BY_ORDER_AT_FACILITY,
     y.rank_by_item_cnt AS RANK_BY_ITEM_CNT,
     y.FACILITY_EXHAUSTED,
     y.total_inv as LAST_INVENTORY_COUNT,
-    y.inventoryForAllocation,
+    y.inventoryForAllocation as INVENTORY_FOR_ALLOCATION,
     ifnull(y.ALLOW_BROKERING, 'Y') as ALLOW_BROKERING,
     y.MAXIMUM_ORDER_LIMIT,
     y.LAST_ORDER_COUNT
@@ -78,7 +78,7 @@ case when x.order_id is null and x.ORDER_ITEM_SEQ_ID is null then 'Y' else 'N' e
 x.*
       from
           (select oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,<#if invenoryGroupFiter?has_content>fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,</#if>f.facility_type_id,
-          ifnull(ST_Distance_Sphere(point(fpa.LONGITUDE, fpa.LATITUDE),point(opa.LONGITUDE,opa.LATITUDE)), 0) as distance,
+          ifnull(ST_Distance_Sphere(point(fpa.LONGITUDE, fpa.LATITUDE),point(opa.LONGITUDE,opa.LATITUDE)), 0) * ${conversionFactor} as distance,
           pf.last_inventory_count as ATP,pf.minimum_stock, (pf.last_inventory_count-ifnull(pf.MINIMUM_STOCK,0)) as total_inv,round(pf.last_inventory_count/(oi.quantity-ifnull(oi.cancel_quantity,0))*100,2) as availablity_pct,pf.facility_id,pf.ALLOW_BROKERING,
           (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id = 'ITEM_APPROVED' and ship_group_seq_id = '${shipGroupSeqId}' group by order_id) as ship_group_total_qty,
           oi.quantity-ifnull(oi.cancel_quantity,0) as item_qty,oisg.carrier_party_id,
@@ -108,7 +108,7 @@ x.*
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
           <#if invenoryGroupFiter?has_content>AND fgm.FACILITY_GROUP_ID <@buildSqlCondition value=invenoryGroupFiter /></#if> -- in ('${(invenoryGroupFiter.get("fieldValue"))!}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
           having
-          <#if distance?has_content>distance * ${conversionFactor} <@buildSqlCondition value=distance /> and </#if> -- >= ${(distance.get("fieldValue"))!0} -- TODO: Need to check for miles/km
+          <#if distance?has_content>distance <@buildSqlCondition value=distance /> and </#if> -- >= ${(distance.get("fieldValue"))!0} -- TODO: Need to check for miles/km
           <#if !orderRoutingRule.assignmentEnumId?has_content || 'ORA_SINGLE' == orderRoutingRule.assignmentEnumId> rank_by_order_above_facility_threshold='Y' -- NEW for sorting facility having all the items above threshold
           <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId> case when rank_by_order_at_facility='Y' then item_at_facility_above_threshold='Y' end </#if>
           order by

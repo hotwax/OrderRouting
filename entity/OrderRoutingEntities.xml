@@ -59,8 +59,11 @@ under the License.
         <field name="fieldValue" type="text-long"><description>Value of the condition.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
-        <relationship type="one" fk-name="ORO_COND_TYPE_ENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration">
+        <relationship type="one" fk-name="OFC_COND_TYPE_ENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration">
             <key-map field-name="conditionTypeEnumId" related="enumId"/>
+        </relationship>
+        <relationship type="one" fk-name="OFC_ORD_ROUTING" related="co.hotwax.order.routing.OrderRouting">
+            <key-map field-name="orderRoutingId"/>
         </relationship>
     </entity>
     <entity entity-name="OrderRoutingRule" package="co.hotwax.order.routing" group="ofbiz_transactional">

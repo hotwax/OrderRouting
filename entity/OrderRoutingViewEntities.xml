@@ -34,6 +34,11 @@ under the License.
             <key-map field-name="orderId"/>
             <key-map field-name="shipGroupSeqId"/>
         </member-entity>
+        <member-entity entity-alias="CSM" entity-name="org.apache.ofbiz.shipment.shipment.CarrierShipmentMethod" join-from-alias="OIS" join-optional="true">
+            <key-map field-name="shipmentMethodTypeId"/>
+            <key-map field-name="carrierPartyId" related="partyId"/>
+            <key-map field-name="carrierRoleTypeId" related="roleTypeId"/>
+        </member-entity>
         <alias entity-alias="OH" name="orderId"/>
         <alias entity-alias="OH" name="orderName"/>
         <alias entity-alias="OH" name="orderTypeId"/>
@@ -46,6 +51,7 @@ under the License.
         <alias entity-alias="OIS" name="shipGroupSeqId"/>
         <alias entity-alias="OIS" name="shipmentMethodTypeId"/>
         <alias entity-alias="OIS" name="carrierPartyId"/>
+        <alias entity-alias="CSM" name="deliveryDays"/>
         <alias entity-alias="OIS" name="facilityId"/>
         <alias entity-alias="OIS" name="orderFacilityId"/>
         <alias entity-alias="OIS" name="maySplit"/>
