@@ -224,7 +224,7 @@
                                         break
                                     }
                                 } else {
-                                    ec.logger.warn("Ignoring order routing rule errors" + ec.message.getErrorsString())
+                                    ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
                                     ec.message.clearAll()
                                 }
                             }
@@ -273,7 +273,7 @@
                 </script>
             </iterate>
             <set field="conversionFactor" value="0.000621371"/>
-            <set field="measurementSystem" from="inventoryFilterMap.measurementSystem.fieldValue" default-value="IMPERIAL"/>
+            <set field="measurementSystem" from="inventoryFilterMap?.measurementSystem?.fieldValue" default-value="IMPERIAL"/>
             <if condition="measurementSystem.equals('METRIC')">
                 <set field="conversionFactor" value="0.0001"/>
             </if>

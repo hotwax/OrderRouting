@@ -15,7 +15,7 @@ select
     y.FACILITY_ID,
     y.ORIGIN_POSTAL_CODE,
     y.DESTINATION_POSTAL_CODE,
-    y.distance,
+    y.distance as distanceInMeters,
     y.rank_by_order_at_facility as RANK_BY_ORDER_AT_FACILITY,
     y.rank_by_item_cnt AS RANK_BY_ITEM_CNT,
     y.FACILITY_EXHAUSTED,
