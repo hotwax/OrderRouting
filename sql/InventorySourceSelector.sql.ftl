@@ -3,7 +3,7 @@
 </#macro>
 <#assign invenoryGroupFiter = inventoryFilterMap.get("facilityGroupId")! />
 <#assign brokeringSafetyStock = inventoryFilterMap.get("brokeringSafetyStock")! />
-<#assign proximity = inventoryFilterMap.get("proximity")! />
+<#assign distance = inventoryFilterMap.get("distance")! />
 select
     y.ORDER_ID,
     y.ORDER_ITEM_SEQ_ID,
@@ -77,7 +77,7 @@ concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)) as item,
 case when x.order_id is null and x.ORDER_ITEM_SEQ_ID is null then 'Y' else 'N' end as backordered,
 x.*
       from
-          (select oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,f.facility_type_id,
+          (select oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,<#if invenoryGroupFiter?has_content>fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,</#if>f.facility_type_id,
           ifnull(ST_Distance_Sphere(point(fpa.LONGITUDE, fpa.LATITUDE),point(opa.LONGITUDE,opa.LATITUDE)), 0) as distance,
           pf.last_inventory_count as ATP,pf.minimum_stock, (pf.last_inventory_count-ifnull(pf.MINIMUM_STOCK,0)) as total_inv,round(pf.last_inventory_count/(oi.quantity-ifnull(oi.cancel_quantity,0))*100,2) as availablity_pct,pf.facility_id,pf.ALLOW_BROKERING,
           (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id = 'ITEM_APPROVED' and ship_group_seq_id = '${shipGroupSeqId}' group by order_id) as ship_group_total_qty,
@@ -102,13 +102,13 @@ x.*
           left join (SELECT PFI.FACILITY_ID,PFI.LAST_INVENTORY_COUNT AS inventoryForAllocation,ifnull(PFI.MINIMUM_STOCK,0) as MIN_STOCK, count(PFI.PRODUCT_ID) as PRODUCT_COUNT FROM PRODUCT_FACILITY PFI INNER JOIN ORDER_ITEM OII ON PFI.PRODUCT_ID=OII.PRODUCT_ID WHERE PFI.LAST_INVENTORY_COUNT > ifnull(PFI.MINIMUM_STOCK,0) and OII.ORDER_ID = '${orderId}' -- NEW
           and ifnull(PFI.ALLOW_BROKERING,'Y') = 'Y' group by PFI.FACILITY_ID, PFI.LAST_INVENTORY_COUNT,MINIMUM_STOCK having inventoryForAllocation > 0 order by PRODUCT_COUNT DESC, inventoryForAllocation DESC) inv_count on pf.facility_id = inv_count.facility_id
           inner join product_store_facility psf on oh.product_store_id = psf.product_store_id and psf.facility_id = f.facility_id
-          inner join (select fg.FACILITY_GROUP_TYPE_ID,fgrm.FACILITY_ID, fgrm.FACILITY_GROUP_ID,fgrm.SEQUENCE_NUM from facility_group_member fgrm inner join facility_group fg on fgrm.FACILITY_GROUP_ID=fg.FACILITY_GROUP_ID and fg.FACILITY_GROUP_TYPE_ID='BROKERING_GROUP' and (fgrm.THRU_DATE > now() or fgrm.THRU_DATE is null)) fgm on f.FACILITY_ID=fgm.FACILITY_ID
+          <#if invenoryGroupFiter?has_content>inner join (select fg.FACILITY_GROUP_TYPE_ID,fgrm.FACILITY_ID, fgrm.FACILITY_GROUP_ID,fgrm.SEQUENCE_NUM from facility_group_member fgrm inner join facility_group fg on fgrm.FACILITY_GROUP_ID=fg.FACILITY_GROUP_ID and fg.FACILITY_GROUP_TYPE_ID='BROKERING_GROUP' and (fgrm.THRU_DATE > now() or fgrm.THRU_DATE is null)) fgm on f.FACILITY_ID=fgm.FACILITY_ID</#if>
           where oh.ORDER_ID='${orderId}' and oi.SHIP_GROUP_SEQ_ID = '${shipGroupSeqId}'
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
           <#if invenoryGroupFiter?has_content>AND fgm.FACILITY_GROUP_ID <@buildSqlCondition value=invenoryGroupFiter /></#if> -- in ('${(invenoryGroupFiter.get("fieldValue"))!}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
           having
-          <#if proximity?has_content>distance/ 1000 <@buildSqlCondition value=proximity /> and </#if> -- >= ${(proximity.get("fieldValue"))!0} -- TODO: Need to check for miles/km
+          <#if distance?has_content>distance * ${conversionFactor} <@buildSqlCondition value=distance /> and </#if> -- >= ${(distance.get("fieldValue"))!0} -- TODO: Need to check for miles/km
           <#if !orderRoutingRule.assignmentEnumId?has_content || 'ORA_SINGLE' == orderRoutingRule.assignmentEnumId> rank_by_order_above_facility_threshold='Y' -- NEW for sorting facility having all the items above threshold
           <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId> case when rank_by_order_at_facility='Y' then item_at_facility_above_threshold='Y' end </#if>
           order by

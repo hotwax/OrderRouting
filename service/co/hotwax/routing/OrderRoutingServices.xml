@@ -257,7 +257,7 @@
             <if condition="!'RULE_ACTIVE'.equals(orderRoutingRule.statusId)">
                 <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${orderRoutingId}] is not active"/>
             </if>
-            <log level="debug" message="Executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
+            <log level="info" message="Executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
@@ -272,6 +272,11 @@
                     inventoryFilterMap.put(filterCondition.fieldName, filterCondition)
                 </script>
             </iterate>
+            <set field="conversionFactor" value="0.000621371"/>
+            <set field="measurementSystem" from="inventoryFilterMap.measurementSystem.fieldValue" default-value="IMPERIAL"/>
+            <if condition="measurementSystem.equals('METRIC')">
+                <set field="conversionFactor" value="0.0001"/>
+            </if>
             <filter-map-list list="inventoryConditions" to-list="sortFields">
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </filter-map-list>
@@ -279,10 +284,8 @@
                 <order-by field-name="sequenceNum asc"/>
             </order-map-list>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
-            <!--TODO: Pass the assignment type in template -->
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
             <set field="suggestedFulfillmentLocations" from="[]"/>
-
             <script>
                 try {
                 Writer writer = new StringWriter()
@@ -300,7 +303,8 @@
                                 itemQty: resultSet.getInt('ITEM_QTY'),
                                 routedItemQty: resultSet.getInt('ROUTED_ITEM_QTY'),
                                 facilityTypeId: resultSet.getString('FACILITY_TYPE_ID'),
-                                facilityId: resultSet.getString('FACILITY_ID')
+                                facilityId: resultSet.getString('FACILITY_ID'),
+                                distance: resultSet.getString('distance')
                             ])
                         }
                     })
@@ -345,9 +349,7 @@
                     import java.time.ZonedDateTime
                     import java.util.stream.Collectors;
                     import org.moqui.entity.EntityCondition
-                    //TODO: Check for single vs multi, as discussed with Swapnil, this can be done in sql itself
                     //if single assignment preferred, then sql will return result only if all the shipgroup items available at single location
-
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
@@ -396,7 +398,7 @@
             <!--TODO : Find way to generate the oms token and oms base url -->
             <set field="token" value=""/>
             <set field="omsBaseUrl" value=""/>
-            <log message="facilityAllocatio====${facilityAllocation}"/>
+            <log message="facilityAllocation=${orderId} ===${facilityAllocation}"/>
             <if condition="facilityAllocation">
                 <!-- TODO: Handle the 500 status code, if OMS failed to respond, don't run the next rule -->
                 <!--<service-call name="co.hotwax.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"

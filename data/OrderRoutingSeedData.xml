@@ -22,6 +22,10 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCT_SORT_BY" description="Order by" sequenceNum="5" enumTypeId="CONDITION_TYPE" enumCode="order by"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCT_FILTER" description="Condition" sequenceNum="10" enumTypeId="CONDITION_TYPE" enumCode="condition"/>
 
+    <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="MSMNT_SYSTEM_TYPE" description="Measurement System type" parentTypeId="ORDER_ROUTING"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="MSMNT_IMPERIAL" description="Imperial system (default)" sequenceNum="5" enumTypeId="MSMNT_SYSTEM_TYPE" enumCode="IMPERIAL"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="MSMNT_METRIC" description="Metric system" sequenceNum="10" enumTypeId="MSMNT_SYSTEM_TYPE" enumCode="METRIC"/>
+
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_FILTER_PRM_TYPE" description="Determine the input parameter or field to be considered in order filter condition " parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SALES_CHANNEL" description="Sales channel" sequenceNum="5" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="salesChannelEnumId"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SHIP_METH_TYPE" description="Shipment method type" sequenceNum="10" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="shipmentMethodTypeId"/>
@@ -31,8 +35,9 @@
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_FILTER_PRM_TYPE" description="Determine the input parameter or field to be considered in a inventory condition " parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_FACILITY_GROUP" description="Facility group" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="facilityGroupId"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="proximity"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="distance"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_BRK_SFTY_STOCK" description="Brokering safety stock" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="brokeringSafetyStock"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_MSMNT_SYSTEM" description="Systems of measurement" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="measurementSystem"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="OSP_SHIP_BY" description="Ship by" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipBeforeDate"/><!-- OrderItem.shipBeforeDate -->
