@@ -26,6 +26,12 @@
             <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="one"/></method>
         </id>
     </resource>
+    <resource name="facilities" description="Get the facilities">
+        <method type="get"><entity name="co.hotwax.facility.FacilityAndType" operation="list"/></method>
+        <id name="facilityId">
+            <method type="get"><entity name="co.hotwax.facility.FacilityAndType" operation="one"/></method>
+        </id>
+    </resource>
     <resource name="groups">
         <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list"/></method>
         <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store"/></method>
