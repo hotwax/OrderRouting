@@ -20,10 +20,10 @@
             <method type="get"><entity name="org.apache.ofbiz.product.store.ProductStore" operation="list"/></method>
         </resource>
     </resource>
-    <resource name="enums">
-        <method type="get"><entity name="org.apache.ofbiz.common.enum.Enumeration" operation="list"/></method>
+    <resource name="enums" description="Get the enumerations">
+        <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="list"/></method>
         <id name="enumId">
-            <method type="get"><entity name="org.apache.ofbiz.common.enum.Enumeration" operation="one"/></method>
+            <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="one"/></method>
         </id>
     </resource>
     <resource name="groups">

@@ -54,4 +54,16 @@ under the License.
         <alias entity-alias="OI" name="itemStatusId" field="statusId"/>
         <alias entity-alias="OI" name="orderItemCount" field="orderItemSeqId" function="count"/>
     </view-entity>
+
+    <view-entity entity-name="EnumerationAndType" package="co.hotwax.common.enum">
+        <member-entity entity-alias="ENUM" entity-name="org.apache.ofbiz.common.enum.Enumeration"/>
+        <member-entity entity-alias="TYPE" entity-name="org.apache.ofbiz.common.enum.EnumerationType" join-from-alias="ENUM" join-optional="true">
+            <key-map field-name="enumTypeId"/>
+        </member-entity>
+        <alias-all entity-alias="ENUM"/>
+        <alias-all entity-alias="TYPE">
+            <exclude field="description"/>
+        </alias-all>
+        <alias name="typeDescription" field="description" entity-alias="TYPE"/>
+    </view-entity>
 </entities>
