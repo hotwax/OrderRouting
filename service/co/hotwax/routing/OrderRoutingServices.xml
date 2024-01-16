@@ -181,6 +181,7 @@
                 import org.moqui.entity.EntityListIterator
                 import org.moqui.entity.EntityFind;
                 import org.moqui.impl.entity.EntityConditionFactoryImpl
+                import java.time.format.DateTimeFormatter;
 
                 EntityFind orderFind = ec.entity.find("co.hotwax.order.OrderItemsQueue")
                 // Prepare the default base condition to get the eligible orderItemShipGroup
@@ -290,7 +291,7 @@
                 try {
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
-                ec.logger.info("======writer==${writer}==")
+                //ec.logger.info("======writer==${writer}==")
                 java.sql.Connection con = ec.getEntity().getConnection(orderRoutingRule.getEntityDefinition().getEntityGroupName())
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
@@ -396,8 +397,20 @@
                     //}
                 </script>
             <!--TODO : Find way to generate the oms token and oms base url -->
-            <set field="token" value=""/>
-            <set field="omsBaseUrl" value=""/>
+            <entity-find-one entity-name="org.apache.ofbiz.common.property.SystemProperty" value-field="baseUrlProperty" cache="true">
+                <field-map field-name="systemResourceId" value="url"/>
+                <field-map field-name="systemPropertyId" value="content.url.prefix.secure"/>
+            </entity-find-one>
+            <script>
+                token = co.hotwax.order.routing.OrderRoutingHelper.getJwtToken(ec.ecfi, [userLoginId: 'admin'], ZonedDateTime.now().plusHours(23).toInstant());
+            </script>
+            <if condition="!token">
+                <return error="true" message="Unable to generate oms token, check JWT configuration"/>
+            </if>
+            <set field="omsBaseUrl" from="baseUrlProperty?.systemPropertyValue"/>
+            <if condition="!omsBaseUrl">
+                <return error="true" message="OMS base url not found"/>
+            </if>
             <log message="facilityAllocation=${orderId} ===${facilityAllocation}"/>
             <if condition="facilityAllocation">
                 <!-- TODO: Handle the 500 status code, if OMS failed to respond, don't run the next rule -->

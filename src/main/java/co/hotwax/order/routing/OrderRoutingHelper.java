@@ -1,16 +1,26 @@
 package co.hotwax.order.routing;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
+import com.auth0.jwt.algorithms.Algorithm;
 import org.moqui.entity.EntityCondition;
+import org.moqui.impl.context.ExecutionContextFactoryImpl;
 import org.moqui.impl.entity.EntityConditionFactoryImpl;
+import org.moqui.util.SystemBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.moqui.entity.EntityValue;
 
+import javax.cache.Cache;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 public class OrderRoutingHelper {
     protected static final Logger logger = LoggerFactory.getLogger(OrderRoutingHelper.class);
+    protected static Cache<String, String> jwtCache;
     public static String makeSqlWhere(EntityValue ev) {
         @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
         StringBuilder sql = new StringBuilder();
@@ -68,6 +78,30 @@ public class OrderRoutingHelper {
         }
         // TODO: any other useful types to convert?
         return value;
+    }
+
+    public static String getJwtToken(ExecutionContextFactoryImpl ecfi, Map<String, String> claims, Instant expiresAt) {
+        jwtCache = ecfi.cacheFacade.getCache("jwt.token");
+        if (jwtCache.get("token") == null) {
+            jwtCache.put("token", createJwt(claims, expiresAt));
+        }
+        return jwtCache.get("token");
+    }
+    public static String createJwt(Map<String, String> claims, Instant expiresAt) {
+        String key = getJWTKey();
+
+        JWTCreator.Builder builder = JWT.create()
+                .withIssuedAt(ZonedDateTime.now().toInstant())
+                .withExpiresAt(expiresAt)
+                .withIssuer(SystemBinding.getPropOrEnv("ofbiz.instance.name"));
+        for (Map.Entry<String, String> entry : claims.entrySet()) {
+            builder.withClaim(entry.getKey(), entry.getValue());
+        }
+        return builder.sign(Algorithm.HMAC512(key));
+    }
+
+    protected static String getJWTKey() {
+        return SystemBinding.getPropOrEnv("jwt.secret.key");
     }
 
 }

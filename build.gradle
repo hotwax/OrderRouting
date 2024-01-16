@@ -49,6 +49,7 @@ tasks.withType(GroovyCompile) { options.compilerArgs << "-proc:none" }
 
 dependencies {
     implementation project(':framework')
+    implementation 'com.auth0:java-jwt:4.0.0'
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)

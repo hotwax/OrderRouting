@@ -27,11 +27,11 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="MSMNT_METRIC" description="Metric system" sequenceNum="10" enumTypeId="MSMNT_SYSTEM_TYPE" enumCode="METRIC"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORD_FILTER_PRM_TYPE" description="Determine the input parameter or field to be considered in order filter condition " parentTypeId="ORDER_ROUTING"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SALES_CHANNEL" description="Sales channel" sequenceNum="5" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="salesChannelEnumId"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SHIP_METH_TYPE" description="Shipment method type" sequenceNum="10" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="shipmentMethodTypeId"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_QUEUE" description="Queue" sequenceNum="15" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="facilityId"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PRIORITY" description="Order Priority" sequenceNum="15" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="priority"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PROMISE_DATE" description="Promise Date" sequenceNum="15" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="promisedDatetime"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SHIP_METH_TYPE" description="Shipment method type" sequenceNum="10" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="shipmentMethodTypeId"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PRIORITY" description="Order Priority" sequenceNum="20" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="priority"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PROMISE_DATE" description="Promise Date" sequenceNum="25" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="promiseDaysCutoff"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SALES_CHANNEL" description="Sales channel" sequenceNum="5" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="salesChannelEnumId"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_FILTER_PRM_TYPE" description="Determine the input parameter or field to be considered in a inventory condition " parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_FACILITY_GROUP" description="Facility group" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="facilityGroupId"/>
