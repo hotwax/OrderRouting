@@ -26,7 +26,7 @@
                 <method type="get"><entity name="org.apache.ofbiz.product.store.ProductStoreShipmentMeth" operation="list"/></method>
             </resource>
             <resource name="facilityGroups">
-                <method type="get"><entity name="co.hotwax.facility.ProductStoreFacilityGroup" operation="list"/></method>
+                <method type="get"><entity name="co.hotwax.facility.ProductStoreAndFacilityGroup" operation="list"/></method>
             </resource>
         </id>
     </resource>
