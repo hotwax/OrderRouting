@@ -101,7 +101,7 @@
                         As we want to log the hasError status at the OrderRoutingRun level, to address this we are calling service in script tag
                     */
                     try {
-                        def orderRoutingResult = ec.service.sync().name("co.hotwax.routing.OrderRoutingServices.run#OrderRouting")
+                        def orderRoutingResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRouting")
                                 .requireNewTransaction(true)
                                 .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId])
                                 .call()
@@ -205,13 +205,13 @@
                             ruleIterator = orderRoutingRules.iterator()
                             while (ruleIterator.hasNext()) {
                                 routingRule = ruleIterator.next()
-                                ruleResult = ec.service.sync().name("co.hotwax.routing.OrderRoutingServices.run#OrderRoutingRule")
+                                ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
                                         .requireNewTransaction(true)
                                         .parameters([orderRoutingId: orderRouting.orderRoutingId, routingRuleId: routingRule.routingRuleId,
                                                 orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId])
                                         .call()
                                 if (!ec.message.hasError()) {
-                                    actionResult = ec.service.sync().name("co.hotwax.routing.OrderRoutingServices.eval#OrderRoutingActions")
+                                    actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
                                             .requireNewTransaction(true)
                                             .parameters([orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId,
                                                     routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
@@ -415,10 +415,45 @@
             <log message="facilityAllocation=${orderId} ===${facilityAllocation}"/>
             <if condition="facilityAllocation">
                 <!-- TODO: Handle the 500 status code, if OMS failed to respond, don't run the next rule -->
-                <!--<service-call name="co.hotwax.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
+                <!--<service-call name="co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
                               in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
                               ignore-error="true" out-map="outResult"/>-->
 
+            </if>
+        </actions>
+    </service>
+
+    <!-- We can achieve this by OrderRoutingGroup and ServiceJob, as both the entity belongs to different database so we can;t create join between them -->
+    <service verb="get" noun="OrderRoutingGroupSchedule">
+        <in-parameters>
+            <parameter name="routingGroupId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="schedule" type="Map">
+                <auto-parameters entity-name="moqui.service.job.ServiceJob"/>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
+            <if condition="!orderRoutingGroup">
+                <return error="true" message="OrderRoutingGroup not found for specified routingGroupId [${routingGroupId}]."/>
+            </if>
+            <if condition="!orderRoutingGroup.jobName">
+                <return message="No schedule found for order routing group ${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}]/"/>
+            </if>
+            <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
+                <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
+            </entity-find-one>
+            <if condition="serviceJob">
+                <script>
+                    schedule = serviceJob.getMap()
+                    schedule.cronDescription = org.moqui.impl.service.ScheduledJobRunner.getCronDescription(schedule.cronExpression, ec.user.getLocale(), true)
+                    cronExecutionTime = org.moqui.impl.service.ScheduledJobRunner.getExecutionTime(schedule.cronExpression)
+                    nextExecutionTime = cronExecutionTime.nextExecution(java.time.ZonedDateTime.now()).orElse(null)
+                    if (nextExecutionTime != null) {
+                        schedule.nextExecutionDateTime = nextExecutionTime.toEpochSecond()
+                    }
+                </script>
             </if>
         </actions>
     </service>

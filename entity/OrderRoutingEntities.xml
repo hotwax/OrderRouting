@@ -25,6 +25,7 @@ under the License.
         <field name="productStoreId" type="id"><description>Unique identifier for the product store</description></field>
         <field name="groupName" type="text-medium"><description>Name of the routing group.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
+        <field name="jobName" type="text-medium"><description>moqui.service.job.Service reference</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the routing group.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing group was created</description></field>
