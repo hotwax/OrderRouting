@@ -457,4 +457,64 @@
             </if>
         </actions>
     </service>
+    <service verb="store" noun="OrderRoutingGroupSchedule">
+        <in-parameters>
+            <parameter name="routingGroupId" required="true"/>
+            <auto-parameters entity-name="moqui.service.job.ServiceJob" include="nonpk">
+                <exclude field-name="description"/>
+                <exclude field-name="serviceName"/>
+            </auto-parameters>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="jobName"/>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
+            <if condition="!orderRoutingGroup">
+                <return error="true" message="OrderRoutingGroup not found for specified routingGroupId [${routingGroupId}]."/>
+            </if>
+            <if condition="!orderRoutingGroup.productStoreId">
+                <return message="No productStore associated with routing group ${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}]/"/>
+            </if>
+            <if condition="cronExpression">
+                <script>
+                    try {
+                        cronDescription = org.moqui.impl.service.ScheduledJobRunner.getCronDescription(cronExpression, ec.user.getLocale(), false)
+                    } catch (Exception e) {
+                        ec.logger.error("Error getting cron description: ${e.getMessage()}")
+                        ec.message.addError("Error getting cron description: ${e.getMessage()}")
+                        return
+                    }
+                </script>
+            </if>
+            <if condition="orderRoutingGroup.jobName">
+                <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
+                    <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
+                </entity-find-one>
+            </if>
+            <set field="description" value="Service job for order routing group ${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}]"/>
+            <set field="serviceName" value="co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingGroup"/>
+            <if condition="!serviceJob">
+                <if condition="!paused">
+                    <set field="paused" value="N"/>
+                </if>
+                <set field="jobName" value="Order_Routing_Group_${orderRoutingGroup.routingGroupId}"/>
+                <service-call name="create#moqui.service.job.ServiceJob" in-map="context + [jobName: jobName]" out-map="context"/>
+                <!-- Set the JobName in orderRoutingGroup entity -->
+                <set field="orderRoutingGroup.jobName" from="jobName"/>
+                <service-call name="update#co.hotwax.order.routing.OrderRoutingGroup" in-map="[routingGroupId:routingGroupId, jobName: jobName]"/>
+                <!-- for order routing scheduling we need only two parameters
+                 - productStoreId - This is to ensure only one routing is in execution for an ProductStore
+                 - routingGroupId
+                 -->
+                <service-call name="create#moqui.service.job.ServiceJobParameter" in-map="[jobName: jobName, parameterName: 'routingGroupId', parameterValue: routingGroupId]"/>
+                <service-call name="create#moqui.service.job.ServiceJobParameter" in-map="[jobName: jobName, parameterName: 'productStoreId', parameterValue: orderRoutingGroup.productStoreId]"/>
+                <return message="Order routing group schedule has been created successfully."/>
+            <else>
+                <service-call name="update#moqui.service.job.ServiceJob" in-map="context + [jobName: serviceJob.jobName]" out-map="context"/>
+                <return message="Order routing group schedule has been updated successfully."/>
+            </else>
+            </if>
+        </actions>
+    </service>
 </services>

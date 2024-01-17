@@ -40,6 +40,7 @@
             <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store"/></method>
             <resource name="schedule">
                 <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>
+                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/></method>
             </resource>
             <resource name="routings">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
