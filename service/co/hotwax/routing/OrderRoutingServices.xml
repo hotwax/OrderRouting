@@ -218,6 +218,7 @@
                                             .call()
                                     if (ec.message.hasError()) {
                                         ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [routingRule.routingRuleId] " + ec.message.getErrorsString())
+                                        ec.message.clearAll()
                                     }
                                     if (!actionResult.runNextRule) {
                                         //Break the outer loop as well if its only for single orderId
@@ -402,7 +403,7 @@
                 <field-map field-name="systemPropertyId" value="content.url.prefix.secure"/>
             </entity-find-one>
             <script>
-                token = co.hotwax.order.routing.OrderRoutingHelper.getJwtToken(ec.ecfi, [userLoginId: 'admin'], ZonedDateTime.now().plusHours(23).toInstant());
+                token = co.hotwax.order.routing.OrderRoutingHelper.getOmsJwtToken(ec.ecfi);
             </script>
             <if condition="!token">
                 <return error="true" message="Unable to generate oms token, check JWT configuration"/>

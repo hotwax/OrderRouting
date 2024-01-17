@@ -79,29 +79,13 @@ public class OrderRoutingHelper {
         // TODO: any other useful types to convert?
         return value;
     }
-
-    public static String getJwtToken(ExecutionContextFactoryImpl ecfi, Map<String, String> claims, Instant expiresAt) {
-        jwtCache = ecfi.cacheFacade.getCache("jwt.token");
-        if (jwtCache.get("token") == null) {
-            jwtCache.put("token", createJwt(claims, expiresAt));
+    public static String getOmsJwtToken(ExecutionContextFactoryImpl ecfi) {
+        //TODO: For now just hardcode the SystemMessageRemote, need to find a better way to do this
+        EntityValue tokenSysMessage = ecfi.entityFacade.find("moqui.service.message.SystemMessageRemote")
+                .condition("systemMessageRemoteId", "HC_OMS_CONFIG").useCache(true).disableAuthz().one();
+        if (tokenSysMessage != null) {
+            return tokenSysMessage.getString("remotePublicKey");
         }
-        return jwtCache.get("token");
+        return null;
     }
-    public static String createJwt(Map<String, String> claims, Instant expiresAt) {
-        String key = getJWTKey();
-
-        JWTCreator.Builder builder = JWT.create()
-                .withIssuedAt(ZonedDateTime.now().toInstant())
-                .withExpiresAt(expiresAt)
-                .withIssuer(SystemBinding.getPropOrEnv("ofbiz.instance.name"));
-        for (Map.Entry<String, String> entry : claims.entrySet()) {
-            builder.withClaim(entry.getKey(), entry.getValue());
-        }
-        return builder.sign(Algorithm.HMAC512(key));
-    }
-
-    protected static String getJWTKey() {
-        return SystemBinding.getPropOrEnv("jwt.secret.key");
-    }
-
 }

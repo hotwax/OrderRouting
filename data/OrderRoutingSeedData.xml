@@ -76,4 +76,8 @@
         <!-- Full permissions for the ADMIN user group -->
         <authz artifactAuthzId="ORDER_ROUTING_API_ADMIN" userGroupId="ADMIN" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
     </artifactGroups>
+    <!-- TODO: Will improve this configuration -->
+    <moqui.service.message.SystemMessageRemote systemMessageRemoteId="HC_OMS_CONFIG"
+                                               description="HotWax OMS server JWT token"
+                                               remotePublicKey=""/>
 </entity-facade-xml>
