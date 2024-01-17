@@ -60,6 +60,8 @@
             </resource>
             <resource name="filter-conditions">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="list"/></method>
+                <method type="post"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="store"/></method>
+                <method type="delete"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="delete"/></method>
             </resource>
             <resource name="routingRuns">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRun" operation="list"/></method>
@@ -74,6 +76,7 @@
             <resource name="condition">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="list"/></method>
                 <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="store"/></method>
+                <method type="delete"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="delete"/></method>
             </resource>
             <resource name="actions">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="list"/></method>
