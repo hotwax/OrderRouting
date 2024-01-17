@@ -193,12 +193,25 @@
                     orderFind.condition("orderId", orderId)
                     if (shipGroupSeqId) orderFind.condition("shipGroupSeqId", shipGroupSeqId)
                 }
-                filterConditions.each { filterCondition ->
-                    orderFind.condition(filterCondition.fieldName, EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), filterCondition.fieldValue)
+                def selectFields = ["orderId", "shipGroupSeqId"];
+                filterConditions.each{filterCondition ->
+                    if ("promiseDaysCutoff".equals(filterCondition.fieldName)) {
+                        if (filterCondition.fieldValue) {
+                            //if promiseDaysCutoff is set, use it brokering will run for each order item instead at shipGroup level
+                            //it means partial allocation won't work as expected
+                            selectFields.add("orderItemSeqId")
+                            promisedDatetime = ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long).with(java.time.LocalTime.MAX).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+                            orderFind.condition('promisedDatetime', EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), promisedDatetime)
+                        }
+                    } else {
+                        orderFind.condition(filterCondition.fieldName, EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), filterCondition.fieldValue)
+                    }
                 }
+
                 sortFields.each { sortField ->
                     orderFind.orderBy(sortField.fieldName)
                 }
+                orderFind.selectFields(selectFields)
                 try (EntityListIterator eli = orderFind.iterator()) {
                     while ((shipGroup = eli.next()) != null) {
                         try {
@@ -208,12 +221,12 @@
                                 ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
                                         .requireNewTransaction(true)
                                         .parameters([orderRoutingId: orderRouting.orderRoutingId, routingRuleId: routingRule.routingRuleId,
-                                                orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId])
+                                                orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId, orderItemSeqId: shipGroup.orderItemSeqId])
                                         .call()
                                 if (!ec.message.hasError()) {
                                     actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
                                             .requireNewTransaction(true)
-                                            .parameters([orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId,
+                                            .parameters([orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId,orderItemSeqId: shipGroup.orderItemSeqId,
                                                     routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
                                             .call()
                                     if (ec.message.hasError()) {
@@ -247,6 +260,7 @@
             <parameter name="routingRuleId"/>
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
+            <parameter name="orderItemSeqId"/>
         </in-parameters>
         <out-parameters>
             <parameter name="suggestedFulfillmentLocations"/>
@@ -322,6 +336,7 @@
         <in-parameters>
             <parameter name="orderId" required="true"/>
             <parameter name="shipGroupSeqId" required="true"/>
+            <parameter name="orderItemSeqId"/>
             <parameter name="routingRuleId" required="true"/>
             <parameter name="suggestedFulfillmentLocations" type="List"/>
         </in-parameters>
@@ -337,6 +352,7 @@
                 <econditions>
                     <econdition field-name="orderId" from="orderId"/>
                     <econdition field-name="shipGroupSeqId" from="shipGroupSeqId"/>
+                    <econdition field-name="orderItemSeqId" from="orderItemSeqId" ignore-if-empty="true"/>
                     <econdition field-name="statusId" value="ITEM_APPROVED"/>
                 </econditions>
             </entity-find>
@@ -418,7 +434,6 @@
                 <service-call name="co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
                               in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
                               ignore-error="true" out-map="outResult"/>
-
             </if>
         </actions>
     </service>

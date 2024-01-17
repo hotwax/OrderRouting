@@ -67,6 +67,7 @@ under the License.
         <alias entity-alias="OIS" name="shipByDate"/>
         <alias entity-alias="OI" name="itemStatusId" field="statusId"/>
         <alias entity-alias="OI" name="promisedDatetime"/>
+        <alias entity-alias="OI" name="orderItemSeqId"/>
         <alias entity-alias="OI" name="orderItemCount" field="orderItemSeqId" function="count"/>
     </view-entity>
 
