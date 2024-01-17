@@ -21,7 +21,7 @@
         </actions>
     </service>
 
-    <service verb="run" noun="OrderRoutingGroup" transaction-timeout="36000"
+    <service verb="run" noun="OrderRoutingGroup" transaction-timeout="36000" authenticate="anonymous-all"
              semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="120" semaphore-name="OrderRoutingGroup">
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
@@ -193,7 +193,7 @@
                     orderFind.condition("orderId", orderId)
                     if (shipGroupSeqId) orderFind.condition("shipGroupSeqId", shipGroupSeqId)
                 }
-                def selectFields = ["orderId", "shipGroupSeqId"];
+                selectFields = ["orderId", "shipGroupSeqId"];
                 filterConditions.each{filterCondition ->
                     if ("promiseDaysCutoff".equals(filterCondition.fieldName)) {
                         if (filterCondition.fieldValue) {
@@ -212,6 +212,8 @@
                     orderFind.orderBy(sortField.fieldName)
                 }
                 orderFind.selectFields(selectFields)
+                long attemptedCount = orderFind.count()
+                ec.logger.info("Fetching order with condition ${orderFind} for routing ${orderRouting.routingName} [${orderRoutingId}]")
                 try (EntityListIterator eli = orderFind.iterator()) {
                     while ((shipGroup = eli.next()) != null) {
                         try {
@@ -251,6 +253,7 @@
                     ec.logger.error(e.getMessage())
                 }
             </script>
+            <return message="Attempted to process ${attemptedCount} ${selectFields.contains('orderItemSeqId')?'items':'shipGroups'} for the '${orderRouting.routingName} [${orderRoutingId}]' order routing"/>
         </actions>
     </service>
 
@@ -428,12 +431,15 @@
             <if condition="!omsBaseUrl">
                 <return error="true" message="OMS base url not found"/>
             </if>
-            <log message="Suggested facilityAllocation for orderId [${orderId}]: ${facilityAllocation}"/>
             <if condition="facilityAllocation">
+                <log message="Facility allocation for order ID [${orderId}:${shipGroupSeqId}${orderItemSeqId?': + orderItemSeqId' :''}]: ${facilityAllocation}, applied under the '${routingRule.ruleName} [${routingRule.routingRuleId}]' routing rule."/>
                 <!-- TODO: Handle the 500 status code, if OMS failed to respond, don't run the next rule -->
                 <service-call name="co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
                               in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
                               ignore-error="true" out-map="outResult"/>
+            <else>
+                <log message="No facility allocation found for orderId [${orderId}] for routing rule ${routingRule.ruleName} [${routingRule.routingRuleId}}"/>
+            </else>
             </if>
         </actions>
     </service>

@@ -42,6 +42,9 @@
             <method type="get"><entity name="co.hotwax.facility.FacilityAndType" operation="one"/></method>
         </id>
     </resource>
+    <resource name="serviceJobRuns">
+        <id name="jobName"><method type="get"><entity name="moqui.service.job.ServiceJobRun" operation="list"/></method></id>
+    </resource>
     <resource name="groups">
         <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list"/></method>
         <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store"/></method>
