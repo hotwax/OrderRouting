@@ -232,7 +232,7 @@
                                                     routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
                                             .call()
                                     if (ec.message.hasError()) {
-                                        ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [routingRule.routingRuleId] " + ec.message.getErrorsString())
+                                        ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
                                         ec.message.clearAll()
                                     }
                                     if (!actionResult.runNextRule) {
@@ -350,6 +350,8 @@
         <actions>
             <set field="runNextRule" value="true" type="Boolean"/>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="routingRule" cache="true"/>
+            <entity-find-related-one value-field="routingRule" relationship-name="co.hotwax.order.routing.OrderRouting" to-value-field="orderRouting" cache="true"/>
+            <entity-find-related-one value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingGroup" to-value-field="orderRoutingGroup" cache="true"/>
             <entity-find-one entity-name="org.apache.ofbiz.order.order.OrderItemShipGroup" value-field="orderItemShipGroup"/>
             <entity-find entity-name="org.apache.ofbiz.order.order.OrderItem" list="orderItems">
                 <econditions>
@@ -374,12 +376,15 @@
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
+                    def comments= null
+                    def routingRuleName = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : ${orderRouting.routingName} [${orderRouting.orderRoutingId}] : ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
                         //SQL will not reutrn result if items not available at single location
                         //Additional check to make sure all items are available at single location,
                         if (!(suggestedFacilityIds.size() == 1)) {
-                            ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.ruleName} [routingRule.routingRuleId] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
+                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
+                            ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
                             suggestedFulfillmentLocations = []
                         }
                     }
@@ -389,16 +394,21 @@
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
+                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
-                            facilityAllocation.add([facilityId:facilityId, items: items])
+                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName])
                         }
                     }
                     def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
                     if (unfillableItemSeqIds) {
+                        if (suggestedFulfillmentLocations) {
+                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
+                        }
                         //If unfillable items found, check for actions
                         if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
                             queue = actionMap.get('ORA_MV_TO_QUEUE');
+                            comments += "Unfillalbe items moved to ${queue}."
                             //If action is to move to queue, then no need to run next rule. As all unfillable items will be moved to queue
                             runNextRule = false
                         }
@@ -408,11 +418,15 @@
                                 queue = orderItemShipGroup.facilityId
                             }
                             if (!clearAutoCancelDate &amp;&amp;actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
+                                comments += "Set the auto cancel date to 10 days from now."
                                 autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DAYS') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                            } else if (clearAutoCancelDate) {
+                                comments += "Clear the auto cancel date."
                             }
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
-                            facilityAllocation.add([facilityId: queue, items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate] }])
+                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName,
+                                    items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate] }])
                         }
                     } else {
                         //If all items allocated no need to run next rule

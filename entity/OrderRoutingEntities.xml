@@ -78,6 +78,9 @@ under the License.
         <field name="fulfillEntireShipGroup" type="text-indicator"><description>Indicator for fulfilling the entire ship group.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing rule was created.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
+        <relationship type="one" fk-name="ORO_STATUS" related="org.apache.ofbiz.common.status.StatusItem">
+            <key-map field-name="statusId"/>
+        </relationship>
         <relationship type="one" fk-name="ORO_RULE_ASENUM" related="org.apache.ofbiz.common.enum.Enumeration">
             <key-map field-name="assignmentEnumId" related="enumId"/>
         </relationship>
