@@ -94,6 +94,7 @@
             <resource name="actions">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="list"/></method>
                 <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="store"/></method>
+                <method type="delete"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="delete"/></method>
             </resource>
         </id>
     </resource>
