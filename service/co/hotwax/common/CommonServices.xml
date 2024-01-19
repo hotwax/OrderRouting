@@ -67,7 +67,7 @@
         </out-parameters>
         <actions>
             <script>
-                availableTimeZones = TimeZone.getAvailableIDs().collect { id ->
+                timeZones = TimeZone.getAvailableIDs().collect { id ->
                     TimeZone tz = TimeZone.getTimeZone(id)
                         [
                             id: tz.ID,
