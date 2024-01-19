@@ -26,10 +26,10 @@
         </in-parameters>
         <actions>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
-            <if condition="orderRoutingGroup">
+            <if condition="!orderRoutingGroup">
                 <return error="true" message="Order routing group not found for routingGroupId [${routingGroupId}]."/>
             </if>
-            <if condition="!orderRoutingGroup.joName">
+            <if condition="!orderRoutingGroup.jobName">
                 <return error="true" message="Scheduler not configured for order routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
             </if>
             <script>
