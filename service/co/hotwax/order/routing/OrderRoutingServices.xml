@@ -20,6 +20,25 @@
             <log message="Removed ${recordsRemoved} OrderRoutingRun records."/>
         </actions>
     </service>
+    <service verb="scheduleNow" noun="OrderRoutingGroup">
+        <in-parameters>
+            <parameter name="routingGroupId" required="true"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
+            <if condition="orderRoutingGroup">
+                <return error="true" message="Order routing group not found for routingGroupId [${routingGroupId}]."/>
+            </if>
+            <if condition="!orderRoutingGroup.joName">
+                <return error="true" message="Scheduler not configured for order routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
+            </if>
+            <script>
+                jobRunId = ec.service.job(orderRoutingGroup.jobName).run()
+            </script>
+            <return message="Scheduled job run ${jobRunId} for order routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
+        </actions>
+
+    </service>
 
     <service verb="run" noun="OrderRoutingGroup" transaction-timeout="36000" authenticate="anonymous-all"
              semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="120" semaphore-name="OrderRoutingGroup">
