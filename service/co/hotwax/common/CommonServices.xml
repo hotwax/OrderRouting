@@ -20,11 +20,9 @@
                     if (loggedIn) {
                         token = ec.user.getLoginKey()
                         return;
-                    } else {
-                        if (ec.message.hasError()) {
-                            ec.logger.error("User login error : " + ec.message.getErrorsString())
-                            ec.message.clearErrors()
-                        }
+                    } else if (ec.message.hasError()) {
+                        ec.logger.error("User login error : " + ec.message.getErrorsString())
+                        ec.message.clearErrors()
                     }
                 }   catch (Exception e) {
                     ec.logger.error("Error while generating token ", e)
