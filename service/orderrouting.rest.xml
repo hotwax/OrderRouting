@@ -12,6 +12,9 @@
         <resource name="profile">
             <method type="get"><service name="co.hotwax.common.CommonServices.getUserProfile"/></method>
         </resource>
+        <resource name="getAvailableTimeZones">
+            <method type="get"><service name="co.hotwax.common.CommonServices.getAvailableTimeZones"/></method>
+        </resource>
         <resource name="productStore">
             <!--
                 TODO: Need to get the User's ProductStore, as of now returing all the productStore

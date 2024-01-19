@@ -41,7 +41,9 @@
             <parameter name="timeZone"/>
             <parameter name="locale"/>
             <parameter name="emailAddress"/>
-            <parameter name="preferences" type="Map" entity-name="moqui.security.UserPreference"/>
+            <parameter name="preferences" type="Map">
+                <auto-parameters entity-name="moqui.security.UserPreference"/>
+            </parameter>
         </out-parameters>
         <actions>
             <set field="userId" from="ec.user.UserAccount.userId"/>
@@ -51,6 +53,29 @@
             <set field="locale" from="ec.user.UserAccount.locale"/>
             <set field="emailAddress" from="ec.user.UserAccount.emailAddress"/>
             <set field="preferences" from="ec.user.UserAccount.preferences"/>
+        </actions>
+    </service>
+    <service verb="get" noun="AvailableTimeZones">
+        <out-parameters>
+            <parameter name="timeZones" type="List">
+                <parameter name="timeZone" type="Map">
+                    <parameter name="id"/>
+                    <parameter name="label"/>
+                    <parameter name="offset"/>
+                </parameter>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <script>
+                availableTimeZones = TimeZone.getAvailableIDs().collect { id ->
+                    TimeZone tz = TimeZone.getTimeZone(id)
+                        [
+                            id: tz.ID,
+                            label: tz.getDisplayName(tz.useDaylightTime(), TimeZone.LONG, ec.user.getLocale()),
+                            offset: tz.rawOffset
+                        ]
+                    }.toSorted { a, b -> a.id &lt;=&gt; b.id }
+            </script>
         </actions>
     </service>
 </services>
