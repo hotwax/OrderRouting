@@ -46,7 +46,17 @@
         </id>
     </resource>
     <resource name="serviceJobRuns">
-        <id name="jobName"><method type="get"><entity name="moqui.service.job.ServiceJobRun" operation="list"/></method></id>
+        <id name="jobName">
+            <method type="get"><entity name="moqui.service.job.ServiceJobRun" operation="list"/></method>
+            <id name="jobRunId">
+                <method type="get"><entity name="moqui.service.job.ServiceJobRun" operation="one"/></method>
+            </id>
+            <resource name="activeJob">
+                <method type="get">
+                    <entity name="moqui.service.job.ServiceJobRunLock" operation="one"/>
+                </method>
+            </resource>
+        </id>
     </resource>
     <resource name="groups">
         <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list"/></method>

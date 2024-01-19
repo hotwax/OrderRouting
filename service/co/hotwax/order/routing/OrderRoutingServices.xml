@@ -24,6 +24,9 @@
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
         </in-parameters>
+        <out-parameters>
+            <parameter name="jobRunId"/>
+        </out-parameters>
         <actions>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
             <if condition="!orderRoutingGroup">
@@ -41,7 +44,7 @@
     </service>
 
     <service verb="run" noun="OrderRoutingGroup" transaction-timeout="36000" authenticate="anonymous-all"
-             semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="120" semaphore-name="OrderRoutingGroup">
+             semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="60" semaphore-ignore="7200" semaphore-name="OrderRoutingGroup">
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
             <parameter name="productStoreId" required="true"/>
@@ -114,7 +117,7 @@
                         out-map="routingRunResult"/>
                 <set field="runNextRouting" value="true" default-value="true" type="Boolean"/>
                 <script>
-                    /*
+                   /*
                         Calling a service in a script with ignore-error="true".
                         In this scenario, there is no direct way to identify if the service returned an error.
                         As we want to log the hasError status at the OrderRoutingRun level, to address this we are calling service in script tag
