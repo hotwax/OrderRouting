@@ -51,7 +51,7 @@
             <id name="jobRunId">
                 <method type="get"><entity name="moqui.service.job.ServiceJobRun" operation="one"/></method>
             </id>
-            <resource name="activeJob">
+            <resource name="activeJobRun">
                 <method type="get">
                     <entity name="moqui.service.job.ServiceJobRunLock" operation="one"/>
                 </method>
