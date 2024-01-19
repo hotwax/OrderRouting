@@ -50,6 +50,7 @@ under the License.
         <alias entity-alias="OH" name="orderTypeId"/>
         <alias entity-alias="OH" name="statusId"/>
         <alias entity-alias="OH" name="salesChannelEnumId"/>
+        <alias entity-alias="OH" name="productStoreId"/>
         <alias entity-alias="OH" name="externalId"/>
         <alias entity-alias="OH" name="orderDate"/>
         <alias entity-alias="OH" name="entryDate"/>
