@@ -32,10 +32,19 @@ under the License.
         <relationship type="one-nofk" fk-name="ORG_PROD_STR" related="org.apache.ofbiz.product.store.ProductStore" short-alias="productStore">
             <key-map field-name="productStoreId"/>
         </relationship>
+        <relationship type="one-nofk" related="moqui.service.job.ServiceJob" short-alias="schedule">
+            <key-map field-name="jobName"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRouting" short-alias="routings">
             <key-map field-name="routingGroupId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRun" short-alias="runs">
             <key-map field-name="routingGroupId"/></relationship>
+        <master>
+            <detail relationship="routings"/>
+            <detail relationship="schedule"/>
+        </master>
+        <master name="schedule">
+            <detail relationship="schedule"/>
+        </master>
         <!--CreateByUser relationship not added, due to different databases -->
     </entity>
     <entity entity-name="OrderRouting" package="co.hotwax.order.routing" group="ofbiz_transactional">
@@ -54,12 +63,16 @@ under the License.
         <relationship type="one" fk-name="OR_ROUTING_GRP" related="co.hotwax.order.routing.OrderRoutingGroup" short-alias="group">
             <key-map field-name="routingGroupId"/>
         </relationship>
-        <relationship type="many" related="co.hotwax.order.routing.OrderFilterCondition" short-alias="filters">
+        <relationship type="many" related="co.hotwax.order.routing.OrderFilterCondition" short-alias="orderFilters">
             <key-map field-name="orderRoutingId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRule" short-alias="rules">
             <key-map field-name="orderRoutingId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRun" short-alias="runs">
             <key-map field-name="orderRoutingId"/></relationship>
+        <master>
+            <detail relationship="orderFilters"><detail relationship="conditionType"/> </detail>
+            <detail relationship="rules"><detail relationship="assignment"/></detail>
+        </master>
     </entity>
     <entity entity-name="OrderFilterCondition" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Defines conditions used in order routing rules to filter and route orders based on specified criteria.</description>
@@ -71,12 +84,15 @@ under the License.
         <field name="fieldValue" type="text-long"><description>Value of the condition.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
-        <relationship type="one" fk-name="OFC_COND_TYPE_ENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="type">
+        <relationship type="one" fk-name="OFC_COND_TYPE_ENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="conditionType">
             <key-map field-name="conditionTypeEnumId" related="enumId"/>
         </relationship>
         <relationship type="one" fk-name="OFC_ORD_ROUTING" related="co.hotwax.order.routing.OrderRouting" short-alias="routing">
             <key-map field-name="orderRoutingId"/>
         </relationship>
+        <master>
+            <detail relationship="conditionType"/>
+        </master>
     </entity>
     <entity entity-name="OrderRoutingRule" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Represents a rule used in order routing, defining conditions, actions, and assignment logic for order fulfillment.</description>
@@ -92,20 +108,20 @@ under the License.
         <relationship type="one" fk-name="ORO_STATUS" related="org.apache.ofbiz.common.status.StatusItem" short-alias="status">
             <key-map field-name="statusId"/>
         </relationship>
-        <relationship type="one" fk-name="ORO_RULE_ASENUM" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="type">
+        <relationship type="one" fk-name="ORO_RULE_ASENUM" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="assignment">
             <key-map field-name="assignmentEnumId" related="enumId"/>
         </relationship>
         <relationship type="one" fk-name="ORR_ORD_ROUTING" related="co.hotwax.order.routing.OrderRouting" short-alias="routing">
             <key-map field-name="orderRoutingId"/>
         </relationship>
-        <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRuleInvCond" short-alias="filters">
+        <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRuleInvCond" short-alias="inventoryFilters">
             <key-map field-name="routingRuleId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRuleAction" short-alias="actions">
             <key-map field-name="routingRuleId"/></relationship>
-        <master name="rule">
-            <detail relationship="filters"/>
-            <detail relationship="actions"><detail relationship="type"/></detail>
-            <detail relationship="type"/>
+        <master>
+            <detail relationship="inventoryFilters"><detail relationship="conditionType"/></detail>
+            <detail relationship="actions"><detail relationship="actionType"/></detail>
+            <detail relationship="assignment"/>
         </master>
     </entity>
     <entity entity-name="OrderRoutingRuleInvCond" package="co.hotwax.order.routing" group="ofbiz_transactional">
@@ -118,12 +134,15 @@ under the License.
         <field name="fieldValue" type="text-long"><description>Value of the condition.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
-        <relationship type="one" fk-name="RULE_COND_TYPEENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="type">
+        <relationship type="one" fk-name="RULE_COND_TYPEENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="conditionType">
             <key-map field-name="conditionTypeEnumId" related="enumId"/>
         </relationship>
         <relationship type="one" fk-name="RULE_INV_OOR" related="co.hotwax.order.routing.OrderRoutingRule" short-alias="rule">
             <key-map field-name="routingRuleId" related="routingRuleId"/>
         </relationship>
+        <master>
+            <detail relationship="conditionType"/>
+        </master>
     </entity>
     <entity entity-name="OrderRoutingRuleAction" package="co.hotwax.order.routing" group="ofbiz_transactional">
         <description>Specifies actions to be performed when a routing rule is triggered during order processing.</description>
@@ -135,9 +154,12 @@ under the License.
         <relationship type="one" fk-name="ORRA_RULE" related="co.hotwax.order.routing.OrderRoutingRule" short-alias="rule">
             <key-map field-name="routingRuleId" related="routingRuleId"/>
         </relationship>
-        <relationship type="one" fk-name="ORRA_RULE_ENUM" title="Action" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="type">
+        <relationship type="one" fk-name="ORRA_RULE_ENUM" title="Action" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="actionType">
             <key-map field-name="actionTypeEnumId" related="enumId"/>
         </relationship>
+        <master>
+            <detail relationship="actionType"/>
+        </master>
     </entity>
     <!-- A relationship was not added in 'OrderRoutingRun' to avoid potential deletion operation blockages due to foreign key constraints.-->
     <entity entity-name="OrderRoutingRun" package="co.hotwax.order.routing" group="ofbiz_transactional">
