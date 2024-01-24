@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Order Routing Group" default-menu-index="1">
+
+    <parameter name="routingGroupId" required="true"/>
+<!--    <transition name="jobRunList"><default-response url="../JobRuns/JobRunList"/></transition>-->
+
+    <transition name="orderRoutingGroupSchedule">
+        <service-call name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateServiceJob">
+        <service-call name="update#moqui.service.job.ServiceJob"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="runJob">
+        <actions><script>ec.service.job(jobName).run()</script></actions>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="updateRoutingGroup">
+        <service-call name="update#co.hotwax.order.routing.OrderRoutingGroup"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="createOrderRouting">
+        <service-call name="create#co.hotwax.order.routing.OrderRouting"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateOrderRouting">
+        <service-call name="update#co.hotwax.order.routing.OrderRouting"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
+        <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="routings">
+            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
+            <econdition field-name="routingGroupId" from="routingGroupId"/>
+        </entity-find>
+        <entity-find-one entity-name="moqui.service.job.ServiceJobRunLock" value-field="runLock">
+            <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
+        </entity-find-one>
+        <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
+            <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
+        </entity-find-one>
+    </actions>
+    <widgets>
+        <container-row>
+            <row-col lg="5">
+                <container-box>
+                    <box-header title="Order Routing Group"/>
+                    <box-body>
+                        <form-single name="RoutingGroupForm" map="orderRoutingGroup" transition="updateRoutingGroup">
+                            <field name="routingGroupId"><default-field><display/> </default-field></field>
+                            <field name="groupName"><default-field><text-line size="60"/></default-field></field>
+                            <field name="description"><default-field><text-line size="60"/></default-field></field>
+                            <field name="sequenceNum"><default-field><text-line size="60"/></default-field></field>
+                            <field name="productStoreId">
+                                <default-field>
+                                    <drop-down allow-empty="false" allow-multiple="false">
+                                        <entity-options key="${productStoreId}"
+                                                        text="${storeName}">
+                                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" distinct="true">
+                                                <select-field field-name="productStoreId"/><order-by field-name="storeName"/></entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field>
+                            </field>
+<!--                            <field name="jobName"><default-field><display/></default-field></field>-->
+                            <field name="createdByUser"><default-field><text-line size="4"/></default-field></field>
+                            <field name="createdDate"><default-field><date-time/></default-field></field>
+                            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                        </form-single>
+                    </box-body>
+                </container-box>
+                <container-box>
+                    <box-header title="Order Routing Group Schedule"/>
+                    <box-toolbar>
+                        <link url="runJob" text="Run now" confirmation="Are you sure to run order routing group now?" condition="serviceJob != null">
+                            <parameter name="jobName" from="orderRoutingGroup.jobName"/>
+                        </link>
+                        <link url="jobRunList" text="Group Runs" parameter-map="[jobName:jobName]" condition="serviceJob != null"/>
+                    </box-toolbar>
+                    <box-body>
+                        <section name="ScheduleJob">
+                            <condition><expression>serviceJob != null</expression></condition>
+                            <widgets>
+                                <form-single name="RoutingGroupScheduleForm" map="serviceJob" transition="updateServiceJob">
+                                    <field name="routingGroupId"><default-field><hidden/></default-field></field>
+                                    <field name="jobName"><default-field><hidden/></default-field></field>
+                                    <field name="description"><default-field><text-line/></default-field></field>
+                                    <field name="cronExpression"><default-field><text-line/></default-field></field>
+                                    <field name="fromDate"><default-field><date-time/></default-field></field>
+                                    <field name="thruDate"><default-field><date-time/></default-field></field>
+                                    <field name="paused">
+                                        <default-field><drop-down allow-empty="true"><option key="Y"/><option key="N"/></drop-down></default-field>
+                                    </field>
+                                    <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                                </form-single>
+                                <container-row>
+                                    <row-col md="2"><label text="Last Run" type="strong"/></row-col>
+                                    <row-col md="4"><label text="${ec.l10n.format(runLock?.lastRunTime, '')}"/></row-col>
+                                </container-row>
+                                <section name="ActiveJobSection" condition="runLock?.jobRunId">
+                                    <widgets>
+                                        <container-row>
+                                            <row-col></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col md="2"><label text="Active Job" type="strong"/></row-col>
+                                            <row-col md="4">
+                                                <link url="jobRunDetail" text="${runLock.jobRunId}" link-type="anchor" parameter-map="[jobRunId:runLock.jobRunId]"/>
+                                            </row-col>
+                                        </container-row>
+                                    </widgets>
+                                </section>
+                            </widgets>
+                            <fail-widgets>
+                                <label text="No schedule found." type="strong"/>
+                                <container-dialog id="AddRoutingSchedule" button-text="Add Schedule">
+                                    <form-single name="AddSchedule" transition="orderRoutingGroupSchedule">
+                                        <field name="routingGroupId"><default-field><hidden/></default-field></field>
+                                        <field name="cronExpression"><default-field><text-line size="60"/></default-field></field>
+                                        <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                                    </form-single>
+                                </container-dialog>
+                            </fail-widgets>
+                        </section>
+                    </box-body>
+                </container-box>
+                <container-box>
+                    <box-header title="Routings"/>
+                    <box-toolbar>
+                        <container-dialog id="AddOrderRouting" button-text="Add Order Routing">
+                            <form-single name="CreateOrderRouting" transition="createOrderRouting">
+                                <auto-fields-entity entity-name="co.hotwax.order.routing.OrderRouting" include="nonpk" field-type="edit"/>
+                                <field name="routingGroupId"><default-field><hidden/></default-field></field>
+                                <field name="statusId"><default-field>
+                                    <drop-down>
+                                        <entity-options key="${statusId}">
+                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                                <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
+                                            </entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field></field>
+                                <field name="createdDate"><default-field><date-time/></default-field></field>
+                                <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                            </form-single>
+                        </container-dialog>
+                    </box-toolbar>
+                    <box-body>
+                        <form-list name="OrderRouting" list="routings" list-entry="routing" transition="updateOrderRouting">
+                            <field name="orderRoutingId">
+                                <header-field show-order-by="true" title="Order Routing"/>
+                                <default-field><link url="" text="${routingName?:orderRoutingId}" link-type="anchor"/></default-field></field>
+                            <field name="statusId" >
+                                <header-field show-order-by="true"/>
+                                <default-field>
+                                <drop-down>
+                                    <entity-options key="${statusId}">
+                                        <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                            <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field> </field>
+                            <field name="description">
+                                <header-field show-order-by="true"></header-field>
+                                <default-field><display/></default-field>
+                            </field>
+                            <field name="sequenceNum">
+                                <header-field show-order-by="true"></header-field>
+                                <default-field><text-line/></default-field>
+                            </field>
+                            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                        </form-list>
+                    </box-body>
+                </container-box>
+            </row-col>
+        </container-row>
+    </widgets>
+</screen>

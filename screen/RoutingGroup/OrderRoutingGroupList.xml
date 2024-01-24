@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Order Routing Group List" default-menu-include="false">
+
+    <transition name="orderRoutingGroup"><default-response url="../OrderRoutingGroup"/></transition>
+    <transition name="createOrderRoutingGroup">
+        <service-call name="create#co.hotwax.order.routing.OrderRoutingGroup"/>
+        <default-response url="."/>
+    </transition>
+
+    <widgets>
+        <container-dialog id="AddOrderRoutingGroup" button-text="Add Order Routing Group">
+            <form-single name="CreateOrderRoutingGroup" transition="createOrderRoutingGroup">
+                <field name="groupName"><default-field><text-line/></default-field></field>
+                <field name="productStoreId"><default-field>
+                    <drop-down>
+                        <entity-options key="${productStoreId}" text="${storeName?:productStoreId} [${productStoreId}]">
+                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" distinct="true" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </default-field></field>
+                <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+            </form-single>
+        </container-dialog>
+        <form-list name="OrderRoutingGroupList" list="orderRoutingGroups" skip-form="true" show-page-size="true">
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" list="orderRoutingGroups">
+                <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
+            </entity-find>
+            <row-actions>
+                <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
+                    <field-map field-name="jobName" from="jobName"/>
+                </entity-find-one>
+                <if condition="serviceJob &amp;&amp; serviceJob.cronExpression">
+                    <set field="cronDescription" from="org.moqui.impl.service.ScheduledJobRunner.getCronDescription(serviceJob.cronExpression, ec.user.getLocale(), false)"/>
+                </if>
+            </row-actions>
+            <field name="groupName">
+                <header-field show-order-by="case-insensitive"><text-find hide-options="true" size="20"/></header-field>
+                <default-field><link text="${groupName?:routingGroupId}" url="orderRoutingGroup" link-type="anchor"/></default-field>
+            </field>
+            <field name="productStoreId">
+                <header-field show-order-by="true"><text-find hide-options="true" size="20"/> </header-field>
+                <default-field>
+                    <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
+                </default-field>
+            </field>
+            <field name="routingGroupId"><default-field><hidden/></default-field></field>
+            <field name="jobName"><default-field><hidden/></default-field></field>
+            <field name="cronExpression">
+                <header-field show-order-by="false"></header-field>
+                <default-field title="Frequency"><display text="${cronDescription?:''}"/></default-field>
+            </field>
+            <field name="sequenceNum">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="createdDate">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="paused">
+                <header-field show-order-by="true"></header-field>
+                <conditional-field condition="serviceJob"><display text="${serviceJob.paused?:'N'}"/></conditional-field>
+                <conditional-field condition="!serviceJob"><display text="Not scheduled"/></conditional-field>
+            </field>
+            <field name="findButton">
+                <header-field title="Find"><submit/></header-field>
+                <default-field><display text=" "/></default-field>
+            </field>
+        </form-list>
+    </widgets>
+</screen>
