@@ -67,10 +67,10 @@
             <resource name="runNow">
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.scheduleNow#OrderRoutingGroup"/></method>
             </resource>
-            <!--<resource name="schedule">
+            <resource name="schedule" description="Deprecated">
                 <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/></method>
-            </resource>-->
+            </resource>
             <resource name="routings">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
             </resource>
@@ -88,8 +88,10 @@
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="list"/></method>
             </resource>
             <resource name="orderFilters">
-                <!--<method type="get"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="list"/></method>
-                <method type="post"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="store"/></method>-->
+                <!-- TODO: Deprecated -->
+                <method type="get"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="list"/></method>
+                <method type="post"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="store"/></method>
+                <!-- -->
                 <method type="delete"><entity name="co.hotwax.order.routing.OrderFilterCondition" operation="delete"/></method>
             </resource>
             <resource name="routingRuns">
@@ -103,13 +105,17 @@
             <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="one" masterName="default"/></method>
             <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRule" operation="store" masterName="default"/></method>
             <resource name="inventoryFilters">
-                <!--<method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="list"/></method>
-                <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="store"/></method>-->
+                <!-- TODO: Deprecated -->
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="list"/></method>
+                <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="store"/></method>
+                <!--  -->
                 <method type="delete"><entity name="co.hotwax.order.routing.OrderRoutingRuleInvCond" operation="delete"/></method>
             </resource>
             <resource name="actions">
-                <!--<method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="list"/></method>
-                <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="store"/></method>-->
+                <!-- TODO: Deprecated -->
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="list"/></method>
+                <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="store"/></method>
+                <!--  -->
                 <method type="delete"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="delete"/></method>
             </resource>
         </id>
