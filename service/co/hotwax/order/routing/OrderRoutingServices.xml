@@ -175,7 +175,7 @@
             <if condition="!'ROUTING_ACTIVE'.equals(orderRouting.statusId)">
                 <return error="true" message="Order routing ${orderRouting.routingName} [${orderRoutingId}] is not active"/>
             </if>
-            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true"/>
+            <entity-find-related-one value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingGroup" to-value-field="orderRoutingGroup" cache="true"/>
             <log message="Started order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
             <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
@@ -208,7 +208,7 @@
 
                 EntityFind orderFind = ec.entity.find("co.hotwax.order.OrderItemsQueue")
                 // Prepare the default base condition to get the eligible orderItemShipGroup
-                orderFind.condition("productStoreId", orderRoutingGroup.productStoreId)
+                orderFind.condition("productStoreId", orderRoutingGroup?.productStoreId)
                 orderFind.condition("itemStatusId", "ITEM_APPROVED")
                 orderFind.condition("parentTypeId", "VIRTUAL_FACILITY")
                 orderFind.condition("orderItemCount", org.moqui.entity.EntityCondition.GREATER_THAN, "0")
