@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <entity-facade-xml type="demo">
+
+        <orderRoutingGroup routingGroupId="TEST_GROUP" productStoreId="STORE" groupName="Test order routing group" sequenceNum="0" description="Test order routing group">
+            <routings statusId="ROUTING_ACTIVE" routingName="Test routing" sequenceNum="5" description="Test orders" createdByUser="admin" createdDate="2023-11-03T12:00:00">
+                <orderFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="5"/>
+                <orderFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="salesChannelEnumId" operator="equals" fieldValue="WEB_SALES_CHANNEL" sequenceNum="5"/>
+                <rules ruleName="Test rule" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
+                    <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                    <actions actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNFILLABLE_PARKING" createdDate="2023-11-03T12:00:00"/>
+                </rules>
+            </routings>
+        </orderRoutingGroup>
         <!-- Order Routing Group 1: Regular Brokering -->
         <co.hotwax.order.routing.OrderRoutingGroup routingGroupId="DEMO_GROUP_1" productStoreId="STORE" groupName="Regular Brokering" sequenceNum="5" description="Group for regular order routing"/>
 
