@@ -28,7 +28,7 @@
                 <header-field show-order-by="case-insensitive">
                     <drop-down allow-empty="true">
                         <entity-options key="${jobName}" text="${jobName}">
-                            <entity-find entity-name="moqui.service.job.ServiceJob" limit="200">
+                            <entity-find entity-name="moqui.service.job.ServiceJob" limit="200" cache="true">
                                 <order-by field-name="jobName"/></entity-find>
                         </entity-options>
                     </drop-down>

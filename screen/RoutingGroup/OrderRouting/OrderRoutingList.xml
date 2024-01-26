@@ -25,7 +25,7 @@
                     <field name="statusId"><default-field>
                         <drop-down>
                             <entity-options key="${statusId}">
-                                <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
                                     <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
                                 </entity-find>
                             </entity-options>
@@ -46,7 +46,7 @@
                 <default-field>
                     <drop-down>
                         <entity-options key="${statusId}">
-                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
                                 <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
                             </entity-find>
                         </entity-options>

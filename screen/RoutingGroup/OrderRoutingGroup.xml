@@ -61,7 +61,7 @@
                                     <drop-down allow-empty="false" allow-multiple="false">
                                         <entity-options key="${productStoreId}"
                                                         text="${storeName}">
-                                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" distinct="true">
+                                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" distinct="true" cache="true">
                                                 <select-field field-name="productStoreId"/><order-by field-name="storeName"/></entity-find>
                                         </entity-options>
                                     </drop-down>
@@ -139,7 +139,7 @@
                                 <field name="statusId"><default-field>
                                     <drop-down>
                                         <entity-options key="${statusId}">
-                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
                                                 <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
                                             </entity-find>
                                         </entity-options>
@@ -160,7 +160,7 @@
                                 <default-field>
                                 <drop-down>
                                     <entity-options key="${statusId}">
-                                        <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                        <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
                                             <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
                                         </entity-find>
                                     </entity-options>
