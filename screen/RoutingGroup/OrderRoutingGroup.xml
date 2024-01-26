@@ -3,8 +3,8 @@
         default-menu-title="Order Routing Group" default-menu-index="1">
 
     <parameter name="routingGroupId" required="true"/>
-<!--    <transition name="jobRunList"><default-response url="../JobRuns/JobRunList"/></transition>-->
-
+    <transition name="jobRunList"><default-response url="../JobRuns/JobRunList"/></transition>
+    <transition name="orderRoutingDetail"><default-response url="../OrderRouting/OrderRoutingDetail"/></transition>
     <transition name="orderRoutingGroupSchedule">
         <service-call name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/>
         <default-response url="."/>
@@ -80,7 +80,7 @@
                         <link url="runJob" text="Run now" confirmation="Are you sure to run order routing group now?" condition="serviceJob != null">
                             <parameter name="jobName" from="orderRoutingGroup.jobName"/>
                         </link>
-                        <link url="jobRunList" text="Group Runs" parameter-map="[jobName:jobName]" condition="serviceJob != null"/>
+                        <link url="jobRunList" text="Group Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId]" condition="serviceJob != null"/>
                     </box-toolbar>
                     <box-body>
                         <section name="ScheduleJob">
@@ -154,7 +154,7 @@
                         <form-list name="OrderRouting" list="routings" list-entry="routing" transition="updateOrderRouting">
                             <field name="orderRoutingId">
                                 <header-field show-order-by="true" title="Order Routing"/>
-                                <default-field><link url="" text="${routingName?:orderRoutingId}" link-type="anchor"/></default-field></field>
+                                <default-field><link url="orderRoutingDetail" text="${routingName?:orderRoutingId}" parameter-map="[orderRoutingId: orderRoutingId]" link-type="anchor"/></default-field></field>
                             <field name="statusId" >
                                 <header-field show-order-by="true"/>
                                 <default-field>

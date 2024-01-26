@@ -67,8 +67,8 @@
             <resource name="runNow">
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.scheduleNow#OrderRoutingGroup"/></method>
             </resource>
-            <resource name="schedule" description="Deprecated">
-                <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>
+            <resource name="schedule">
+                <!--<method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>-->
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/></method>
             </resource>
             <resource name="routings">

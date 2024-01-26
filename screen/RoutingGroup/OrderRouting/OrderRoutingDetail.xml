@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Order Routing" default-menu-index="1">
+
+    <parameter name="orderRoutingId" required="true"/>
+
+    <transition name="orderRoutingGroup">
+        <default-response url="../../OrderRoutingGroup"/>
+    </transition>
+    <transition name="orderRoutingRule">
+        <default-response url="../OrderRoutingRule"/>
+    </transition>
+
+    <transition name="updateOrderRouting">
+        <service-call name="update#co.hotwax.order.routing.OrderRouting"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="createOrderFilterCondition">
+        <service-call name="create#co.hotwax.order.routing.OrderFilterCondition"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateOrderFilterCondition">
+        <service-call name="update#co.hotwax.order.routing.OrderFilterCondition"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="deleteOrderFilterCondition">
+        <service-call name="delete#co.hotwax.order.routing.OrderFilterCondition"/>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="createOrderRoutingRule">
+        <service-call name="create#co.hotwax.order.routing.OrderRoutingRule"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateOrderRoutingRule">
+        <service-call name="update#co.hotwax.order.routing.OrderRoutingRule"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting"/>
+        <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup">
+            <field-map field-name="routingGroupId" from="orderRouting.routingGroupId"/>
+        </entity-find-one>
+        <entity-find-related value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingRule" list="rules"/>
+        <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilters">
+            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
+            <econditions>
+                <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                <econdition field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
+            </econditions>
+        </entity-find>
+
+        <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderSortByList">
+            <!--            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>-->
+            <econditions>
+                <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                <econdition field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
+            </econditions>
+
+        </entity-find>
+    </actions>
+    <widgets>
+        <container-row>
+            <row-col lg="5">
+                <container-box>
+                    <box-header title="Order Routing"/>
+                    <box-body>
+                        <form-single name="OrderRoutingForm" map="orderRouting" transition="updateOrderRouting">
+                            <field name="orderRoutingId"><default-field><display/> </default-field></field>
+                            <field name="routingGroupId"><default-field title="Routing Group">
+                                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" link-type="anchor"/>
+                            </default-field></field>
+                            <field name="routingName"><default-field><text-line size="60"/></default-field></field>
+                            <field name="description"><default-field><text-line size="60"/></default-field></field>
+                            <field name="sequenceNum"><default-field><text-line size="60"/></default-field></field>
+                            <field name="statusId">
+                                <default-field>
+                                    <drop-down>
+                                        <entity-options key="${statusId}">
+                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                                <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
+                                            </entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field>
+                            </field>
+                            <!--                            <field name="jobName"><default-field><display/></default-field></field>-->
+                            <field name="createdByUser"><default-field><text/></default-field></field>
+                            <field name="createdDate"><default-field><text/></default-field></field>
+                            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                        </form-single>
+                    </box-body>
+                </container-box>
+                <container-box>
+                    <box-header title="Order Filters "/>
+                        <box-body>
+                            <container-box>
+                                <box-header title="Filter Condition"> </box-header>
+                                <box-toolbar>
+                                    <container-dialog id="AddOrderFilterCondition" button-text="Add Filter Condition">
+                                        <form-single name="CreateOrderFilterCondition" transition="createOrderFilterCondition">
+                                            <field name="conditionTypeEnumId"><default-field><hidden default-value="ENTCT_FILTER"/></default-field></field>
+                                            <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                            <field name="fieldName">
+                                                <default-field>
+                                                    <drop-down>
+                                                        <entity-options key="${enumCode}">
+                                                            <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                                <econdition field-name="enumTypeId" value="ORD_FILTER_PRM_TYPE"/>
+                                                            </entity-find>
+                                                        </entity-options>
+                                                    </drop-down>
+                                                </default-field></field>
+                                            <field name="operator"><default-field>
+                                                <drop-down>
+                                                    <entity-options key="${enumCode}">
+                                                        <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                            <econdition field-name="enumTypeId" value="COMPARISON_OPERATOR"/>
+                                                        </entity-find>
+                                                    </entity-options>
+                                                </drop-down>
+                                            </default-field></field>
+                                            <field name="fieldValue"><default-field><display/></default-field></field>
+                                            <field name="sequenceNum"><default-field><display/></default-field></field>
+                                            <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
+                                            <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                                        </form-single>
+                                    </container-dialog>
+                                </box-toolbar>
+                            <box-body>
+                            <form-list name="OrderFilterCondition" list="orderFilters" list-entry="orderFilter" transition="updateOrderFilterCondition">
+                                <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                <field name="fieldName">
+                                    <default-field>
+                                        <drop-down>
+                                            <entity-options key="${enumCode}">
+                                                <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                    <econdition field-name="enumTypeId" value="ORD_FILTER_PRM_TYPE"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="operator"><default-field>
+                                    <drop-down>
+                                        <entity-options key="${enumCode}">
+                                            <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                <econdition field-name="enumTypeId" value="COMPARISON_OPERATOR"/>
+                                            </entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field></field>
+                                <field name="fieldValue"><default-field><text-line/></default-field></field>
+                                <field name="sequenceNum"><default-field><text-line/></default-field></field>
+                                <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                                <field name="deleteLink"><default-field title=""><link url="deleteOrderFilterCondition" text="X" confirmation="Remove order filter condition?"
+                                                                                       parameter-map="[orderRoutingId:orderRoutingId, conditionSeqId:conditionSeqId]"/></default-field></field>
+                            </form-list>
+                            </box-body>
+                            </container-box>
+                <container-box>
+                    <box-header title="Sort By"> </box-header>
+                    <box-toolbar>
+                        <container-dialog id="AddOrderSortBy" button-text="Add Order Sort By">
+                            <form-single name="CreateOrderSortBy" transition="createOrderFilterCondition">
+                                <field name="conditionTypeEnumId"><default-field><hidden default-value="ENTCT_SORT_BY"/></default-field></field>
+                                <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                <field name="fieldName">
+                                    <default-field>
+                                        <drop-down>
+                                            <entity-options key="${enumCode}">
+                                                <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                    <econdition field-name="enumTypeId" value="ORD_SORT_PARAM_TYPE"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field></field>
+                                <field name="sequenceNum"><default-field><text-line/></default-field></field>
+                                <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
+                                <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                            </form-single>
+                        </container-dialog>
+                    </box-toolbar>
+                    <box-body>
+                            <form-list name="OrderSortBy" list="orderSortByList" list-entry="orderSortBy" transition="updateOrderFilterCondition" >
+                                <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                <field name="fieldName"><default-field><text-line/></default-field></field>
+                                <field name="fieldValue"><default-field><text-line/></default-field></field>
+                                <field name="sequenceNum"><default-field><text-line/></default-field></field>
+                                <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                                <field name="deleteLink"><default-field title=""><link url="deleteOrderFilterCondition" text="X" confirmation="Remove order sort by?"
+                                                                                       parameter-map="[orderRoutingId:orderRoutingId, conditionSeqId:conditionSeqId]"/></default-field></field>
+                            </form-list>
+                    </box-body>
+                </container-box>
+                    </box-body>
+                </container-box>
+                <container-box>
+                    <box-header title="Rules"/>
+                    <box-toolbar>
+                        <container-dialog id="AddOrderRoutingRule" button-text="Add Order Routing Rule">
+                            <form-single name="CreateOrderRoutingRule" transition="createOrderRoutingRule" >
+                                <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                <field name="ruleName"><default-field><text-line/></default-field></field>
+                                <field name="assignmentEnumId"><default-field title="Assignment Type">
+                                    <drop-down>
+                                        <entity-options key="${enumId}">
+                                            <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration">
+                                                <econdition field-name="enumTypeId" value="ORD_ROU_ASSIGN_TYPE"/>
+                                            </entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field></field>
+                                <field name="statusId"><default-field title="Status">
+                                    <drop-down>
+                                        <entity-options key="${statusId}">
+                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                                <econdition field-name="statusTypeId" value="ORD_ROUT_RULE_STATUS"/>
+                                            </entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field></field>
+                                <field name="sequenceNum">
+                                    <default-field><text-line/></default-field>
+                                </field>
+                                <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
+                                <field name="createdByUser"><default-field><hidden default-value="${ec.user.getUserId()}"/></default-field></field>
+                                <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                            </form-single>
+                        </container-dialog>
+                    </box-toolbar>
+                    <box-body>
+                        <form-list name="OrderRoutingRule" list="rules" list-entry="rule" transition="updateOrderRoutingRule">
+                            <field name="routingRuleId">
+                                <default-field>
+<!--                                    <dynamic-dialog id="rule_${routingRuleId}" button-text="${routingRuleId}" transition="orderRoutingRule" parameter-map="[routingRuleId:routingRuleId]"/>-->
+                                    <link url="orderRoutingRule" link-type="anchor" text="${routingRuleId}" parameter-map="[routingRuleId:routingRuleId]"/>
+                                </default-field></field>
+                            <field name="ruleName"><default-field><text-line/></default-field></field>
+                            <field name="assignmentEnumId"><default-field>
+                                <drop-down>
+                                    <entity-options key="${enumId}">
+                                        <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration">
+                                            <econdition field-name="enumTypeId" value="ORD_ROU_ASSIGN_TYPE"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field></field>
+                            <field name="sequenceNum">
+                                <header-field show-order-by="true"></header-field>
+                                <default-field><text-line size="2"/></default-field>
+                            </field>
+                            <field name="statusId" >
+                                <header-field show-order-by="true"/>
+                                <default-field>
+                                    <drop-down>
+                                        <entity-options key="${statusId}">
+                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                                <econdition field-name="statusTypeId" value="ORD_ROUT_RULE_STATUS"/>
+                                            </entity-find>
+                                        </entity-options>
+                                    </drop-down>
+                                </default-field>
+                            </field>
+                            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                        </form-list>
+                    </box-body>
+                </container-box>
+            </row-col>
+        </container-row>
+    </widgets>
+</screen>

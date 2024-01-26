@@ -4,6 +4,6 @@
 
     <subscreens default-item="OrderRoutingGroupList"/>
     <widgets>
-        <subscreens-panel id="RoutingGroupPanel" type="tab"/>
+        <subscreens-panel id="RoutingGroupPanel"/>
     </widgets>
 </screen>

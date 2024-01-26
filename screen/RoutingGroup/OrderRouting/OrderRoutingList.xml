@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Order Routing Group List" default-menu-include="false">
+
+    <transition name="orderRouting"><default-response url="../OrderRoutingDetail"/></transition>
+    <transition name="createOrderRouting">
+        <service-call name="create#co.hotwax.order.routing.OrderRouting"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="orderRoutingDetail"><default-response url="../OrderRoutingDetail"/></transition>
+
+    <widgets>
+        <container-dialog id="AddOrderRouting" button-text="Add Order Routing">
+            <container-dialog id="AddOrderRouting" button-text="Add Order Routing">
+                <form-single name="CreateOrderRouting" transition="createOrderRouting">
+                    <auto-fields-entity entity-name="co.hotwax.order.routing.OrderRouting" include="nonpk" field-type="edit"/>
+                    <field name="routingGroupId"><default-field>
+                        <drop-down required-manual-select="true">
+                            <entity-options key="${routingGroupId}" text="${groupName?:routingGroupId}">
+                                <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" cache="true"/>
+                            </entity-options>
+                        </drop-down>
+                    </default-field></field>
+                    <field name="statusId"><default-field>
+                        <drop-down>
+                            <entity-options key="${statusId}">
+                                <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                    <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </default-field></field>
+                    <field name="createdDate"><default-field><date-time/></default-field></field>
+                    <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                </form-single>
+            </container-dialog>
+        </container-dialog>
+        <form-list name="OrderRouting" list="routings" list-entry="routing" transition="updateOrderRouting">
+            <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="routings" cache="true"/>
+            <field name="orderRoutingId">
+                <header-field show-order-by="true" title="Order Routing"/>
+                <default-field><link url="orderRoutingDetail" text="${routingName?:orderRoutingId}" parameter-map="[orderRoutingId: orderRoutingId]" link-type="anchor"/></default-field></field>
+            <field name="statusId" >
+                <header-field show-order-by="true"/>
+                <default-field>
+                    <drop-down>
+                        <entity-options key="${statusId}">
+                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem">
+                                <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field> </field>
+            <field name="description">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="sequenceNum">
+                <header-field show-order-by="true"></header-field>
+                <default-field><text-line/></default-field>
+            </field>
+            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+        </form-list>
+    </widgets>
+</screen>
