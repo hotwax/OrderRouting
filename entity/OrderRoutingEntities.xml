@@ -19,7 +19,7 @@ under the License.
 -->
 
 <entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-3.xsd">
-    <entity entity-name="OrderRoutingGroup" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRoutingGroup" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="orderRoutingGroup">
         <description>Represents a group or category used for organizing and managing order routing configurations.</description>
         <field name="routingGroupId" type="id" is-pk="true"><description>Unique identifier for the routing group</description></field>
         <field name="productStoreId" type="id"><description>Unique identifier for the product store</description></field>
@@ -47,7 +47,7 @@ under the License.
         </master>
         <!--CreateByUser relationship not added, due to different databases -->
     </entity>
-    <entity entity-name="OrderRouting" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRouting" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="orderRouting">
         <description>Represents configurations for routing orders, including rules and conditions for order fulfillment.</description>
         <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
         <field name="routingGroupId" type="id"><description>Unique identifier for the routing group</description></field>
@@ -74,7 +74,7 @@ under the License.
             <detail relationship="rules"><detail relationship="assignment"/></detail>
         </master>
     </entity>
-    <entity entity-name="OrderFilterCondition" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderFilterCondition" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="routingOrderFilter">
         <description>Defines conditions used in order routing rules to filter and route orders based on specified criteria.</description>
         <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
         <field name="conditionSeqId" type="id" is-pk="true"><description>Unique identifier for the condition.</description></field>
@@ -94,7 +94,7 @@ under the License.
             <detail relationship="conditionType"/>
         </master>
     </entity>
-    <entity entity-name="OrderRoutingRule" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRoutingRule" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="orderRoutingRule">
         <description>Represents a rule used in order routing, defining conditions, actions, and assignment logic for order fulfillment.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
@@ -124,7 +124,7 @@ under the License.
             <detail relationship="assignment"/>
         </master>
     </entity>
-    <entity entity-name="OrderRoutingRuleInvCond" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRoutingRuleInvCond" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="routingRuleInvCondition">
         <description>Defines inventory-related conditions used in routing rules to determine order fulfillment based on inventory status.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="conditionSeqId" type="id" is-pk="true"><description>Unique identifier for the routing rule inventory condition.</description></field>
@@ -144,7 +144,7 @@ under the License.
             <detail relationship="conditionType"/>
         </master>
     </entity>
-    <entity entity-name="OrderRoutingRuleAction" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRoutingRuleAction" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="routingRuleAction">
         <description>Specifies actions to be performed when a routing rule is triggered during order processing.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="actionSeqId" type="id" is-pk="true"><description>Unique identifier for the action.</description></field>
@@ -162,7 +162,7 @@ under the License.
         </master>
     </entity>
     <!-- A relationship was not added in 'OrderRoutingRun' to avoid potential deletion operation blockages due to foreign key constraints.-->
-    <entity entity-name="OrderRoutingRun" package="co.hotwax.order.routing" group="ofbiz_transactional">
+    <entity entity-name="OrderRoutingRun" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="routingRuns">
         <description>Represents the execution and results of order routing runs, including information about errors and outcomes.</description>
         <field name="routingRunId" type="id" is-pk="true"><description>Unique identifier for the routing run.</description></field>
         <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
