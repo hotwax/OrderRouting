@@ -212,7 +212,7 @@
                             <form-list name="OrderRoutingRuleSortCond" list="inventorySortByList" list-entry="inventorySortBy" transition="updateOrderRoutingRuleInvCond" >
                                 <field name="routingRuleId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName"><default-field><text-line/></default-field></field>
-                                <field name="fieldValue"><default-field><text-line/></default-field></field>
+<!--                                <field name="fieldValue"><default-field><text-line/></default-field></field>-->
                                 <field name="sequenceNum"><header-field show-order-by="true"/><default-field><text-line/></default-field></field>
                                 <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
                                 <field name="deleteLink"><default-field title=""><link url="deleteOrderRoutingRuleInvCond" text="X" confirmation="Remove inventory sort by?"

@@ -104,7 +104,7 @@
                     <econdition field-name="routingGroupId" from="routingGroupId"/>
                     <econdition field-name="statusId" value="ROUTING_ACTIVE"/>
                 </econditions>
-                <order-by field-name="sequenceNum asc"/>
+                <order-by field-name="sequenceNum"/>
             </entity-find>
             <if condition="!orderRoutings">
                 <return type="warning" message="No order routing configuration found for the specified routing group [${routingGroupId}]."/>
@@ -179,7 +179,7 @@
             <log message="Started order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
             <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
-                <order-by field-name="sequenceNum asc"/>
+                <order-by field-name="sequenceNum"/>
             </entity-find>
             <!-- Prepare the filter conditions for the order routing -->
             <filter-map-list list="orderFilterConditions" to-list="filterConditions">
@@ -194,9 +194,8 @@
                     <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                     <econdition field-name="statusId" value="RULE_ACTIVE"/>
                 </econditions>
-                <order-by field-name="sequenceNum asc"/>
+                <order-by field-name="sequenceNum"/>
             </entity-find>
-
             <if condition="!orderRoutingRules">
                 <return error="true" message="No routing rule setup for order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
             </if>
@@ -304,7 +303,7 @@
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
-                <order-by field-name="sequenceNum asc"/>
+                <order-by field-name="sequenceNum"/>
             </entity-find>
             <set field="inventoryFilterMap" from="[:]" />
             <filter-map-list list="inventoryConditions" to-list="filterConditions">
@@ -324,7 +323,7 @@
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </filter-map-list>
             <order-map-list list="sortFields">
-                <order-by field-name="sequenceNum asc"/>
+                <order-by field-name="sequenceNum"/>
             </order-map-list>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>

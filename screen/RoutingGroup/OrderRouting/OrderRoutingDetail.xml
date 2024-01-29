@@ -43,7 +43,10 @@
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup">
             <field-map field-name="routingGroupId" from="orderRouting.routingGroupId"/>
         </entity-find-one>
-        <entity-find-related value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingRule" list="rules"/>
+        <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="rules">
+            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
+            <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+        </entity-find>
         <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilters">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
             <econditions>
@@ -53,7 +56,7 @@
         </entity-find>
 
         <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderSortByList">
-            <!--            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>-->
+            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
             <econditions>
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
@@ -187,7 +190,7 @@
                             <form-list name="OrderSortBy" list="orderSortByList" list-entry="orderSortBy" transition="updateOrderFilterCondition" >
                                 <field name="orderRoutingId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName"><default-field><text-line/></default-field></field>
-                                <field name="fieldValue"><default-field><text-line/></default-field></field>
+<!--                                <field name="fieldValue"><default-field><text-line/></default-field></field>-->
                                 <field name="sequenceNum"><default-field><text-line/></default-field></field>
                                 <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
                                 <field name="deleteLink"><default-field title=""><link url="deleteOrderFilterCondition" text="X" confirmation="Remove order sort by?"

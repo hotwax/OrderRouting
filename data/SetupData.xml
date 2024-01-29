@@ -2,7 +2,7 @@
 <entity-facade-xml type="seed">
     <moqui.screen.SubscreensItem screenLocation="component://webroot/screen/webroot/apps.xml"
                              subscreenName="OrderRouting" subscreenLocation="component://order-routing/screen/RoutingGroup.xml"
-                             menuTitle="Order Routing Group" menuIndex="9" menuInclude="Y"/>
+                             menuTitle="Order Routing Setup" menuIndex="9" menuInclude="Y"/>
 
     <artifactGroups artifactGroupId="ORDER_ROUTE_APP" description="Order routing app">
         <artifacts artifactName="component://order-routing/screen/RoutingGroup.xml" artifactTypeEnumId="AT_XML_SCREEN" inheritAuthz="Y"/>

@@ -55,7 +55,7 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_MULTI" description="Partial assignment" sequenceNum="10" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="MULTI"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORDER_RULE_ACT_TYPE" description="Determine the type of action to be performed in the context of routing rules" parentTypeId="ORDER_ROUTING"/>
-    <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_BROKER" description="Broker" sequenceNum="5" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="Broker"/>
+<!--    <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_BROKER" description="Broker" sequenceNum="5" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="Broker"/>-->
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_AUTO_CANCEL_DAYS" description="Add auto-cancel days" sequenceNum="10" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="ADD_AUTO_CANCEL_DATE"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_RM_CANCEL_DATE" description="Clear auto-cancel date" sequenceNum="15" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="RM_AUTO_CANCEL_DATE"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_NEXT_RULE" description="Move to next Rule" sequenceNum="20" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="NEXT_RULE"/>
