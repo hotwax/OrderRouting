@@ -73,7 +73,7 @@
                         <form-single name="OrderRoutingForm" map="orderRouting" transition="updateOrderRouting">
                             <field name="orderRoutingId"><default-field><display/> </default-field></field>
                             <field name="routingGroupId"><default-field title="Routing Group">
-                                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" parameter-map="[routingGroupId: routingGroupId, orderRoutingId:orderRoutingId]" link-type="anchor"/>
+                                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" parameter-map="[routingGroupId: routingGroupId]" link-type="anchor"/>
                             </default-field></field>
                             <field name="routingName"><default-field><text-line size="60"/></default-field></field>
                             <field name="description"><default-field><text-line size="60"/></default-field></field>

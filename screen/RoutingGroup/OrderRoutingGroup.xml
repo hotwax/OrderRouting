@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing Group" default-menu-index="1">
+        default-menu-title="Order Routing Group" default-menu-index="1" default-menu-include="false">
 
     <parameter name="routingGroupId" required="true"/>
     <transition name="jobRunList"><default-response url="../JobRuns/JobRunList"/></transition>
+    <transition name="routingRunList"><default-response url="../OrderRouting/OrderRoutingRunList"/></transition>
     <transition name="orderRoutingDetail"><default-response url="../OrderRouting/OrderRoutingDetail"/></transition>
     <transition name="orderRoutingGroupSchedule">
         <service-call name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/>
@@ -132,6 +133,7 @@
                 <container-box>
                     <box-header title="Routings"/>
                     <box-toolbar>
+                        <link url="routingRunList" text="Routing Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId]"/>
                         <container-dialog id="AddOrderRouting" button-text="Add Order Routing">
                             <form-single name="CreateOrderRouting" transition="createOrderRouting">
                                 <auto-fields-entity entity-name="co.hotwax.order.routing.OrderRouting" include="nonpk" field-type="edit"/>
@@ -175,6 +177,9 @@
                                 <default-field><text-line/></default-field>
                             </field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                            <field name="routingRun"><default-field>
+                                <link url="routingRunList" text="Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId, orderRoutingId:orderRoutingId]"/>
+                            </default-field></field>
                         </form-list>
                     </box-body>
                 </container-box>

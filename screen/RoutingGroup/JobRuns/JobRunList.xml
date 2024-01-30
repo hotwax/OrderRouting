@@ -43,10 +43,12 @@
             <field name="hasError"><header-field><drop-down allow-empty="true"><option key="Y"/><option key="N"/></drop-down></header-field>
                 <default-field><display/></default-field></field>
             <field name="startTime"><header-field show-order-by="true"><date-period allow-empty="true"/></header-field>
-                <default-field><display/></default-field></field>
+                <default-field><display format="yyyy-MM-dd HH:mm:ss"/></default-field></field>
             <field name="endTime"><header-field show-order-by="true"><date-period allow-empty="true"/></header-field>
                 <default-field><display/></default-field></field>
-
+            <field name="executionTime">
+                <conditional-field condition="endTime &amp;&amp; startTime">
+                    <display text="${(groovy.time.TimeCategory.minus(endTime, startTime))}"/></conditional-field></field>
             <field name="findButton"><header-field title="Find"><submit/></header-field><default-field>
                 <display text=" "/></default-field></field>
         </form-list>

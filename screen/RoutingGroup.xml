@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Routing Group" default-menu-index="1">
+        default-menu-title="Routing Group" default-menu-index="1" default-menu-include="false">
 
     <subscreens default-item="OrderRoutingGroupList"/>
     <widgets>
