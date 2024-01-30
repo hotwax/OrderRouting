@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<entity-facade-xml type="seed">
+<entity-facade-xml type="ext-seed">
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="ORDER_ROUTING" description="Order routing"/>
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="COMPARISON_OPERATOR"  description="Entity Comparison Operator" parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ENTCO_LESS" description="less" sequenceNum="5" enumTypeId="COMPARISON_OPERATOR" enumCode="less"/>
