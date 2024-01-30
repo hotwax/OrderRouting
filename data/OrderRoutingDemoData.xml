@@ -6,14 +6,14 @@
             <orderFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityId" operator="equals" fieldValue="UNFILLABLE_PARKING" sequenceNum="5"/>
             <orderFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="5"/>
             <rules routingRuleId="UNF_WH_RULE" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="distance" operator="less-equals" fieldValue="50" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="20" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_NEXT_RULE" createdDate="2023-11-03T12:00:00"/>
             </rules>
             <rules routingRuleId="UNF_STORE_RULE" ruleName="Stores only" statusId="RULE_ACTIVE" sequenceNum="10" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="distance" operator="less-equals" fieldValue="50" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="1" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="20" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
@@ -39,14 +39,14 @@
             <orderFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="deliveryDays" sequenceNum="5"/>
             <orderFilters conditionSeqId="20" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="10"/>
             <rules routingRuleId="REG_WH_RULE" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="distance" operator="less-equals" fieldValue="50" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="20" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_NEXT_RULE" createdDate="2023-11-03T12:00:00"/>
             </rules>
             <rules routingRuleId="REG_STORE_RULE" ruleName="Stores only" statusId="RULE_ACTIVE" sequenceNum="10" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="distance" operator="less-equals" fieldValue="50" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="20" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
@@ -72,13 +72,13 @@
             <orderFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityId" operator="equals" fieldValue="_NA_" sequenceNum="10"/>
             <orderFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="10"/>
             <rules routingRuleId="ST_WH_RULE" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_NEXT_RULE" createdDate="2023-11-03T12:00:00"/>
             </rules>
             <rules routingRuleId="ST_STORE_RULE" ruleName="Stores only" statusId="RULE_ACTIVE" sequenceNum="10" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="brokeringSafetyStock" operator="greater-equals" fieldValue="4" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="20" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
@@ -102,7 +102,7 @@
         <routings orderRoutingId="REJECTED_ORD_ROUTING" statusId="ROUTING_ACTIVE" routingName="Rejected orders re-brokering" sequenceNum="5" description="Rejected orders rebrokering" createdByUser="admin" createdDate="2023-11-03T12:00:00">
             <orderFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityId" operator="equals" fieldValue="REJECTED_PARKING" sequenceNum="5"/>
             <rules routingRuleId="REJ_ORD_RULE" ruleName="Rejected orders only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTI" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="AL_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="ALL_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance asc" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNFILLABLE_PARKING" createdDate="2023-11-03T12:00:00"/>
@@ -112,7 +112,7 @@
         <routings orderRoutingId="REJ_ORD_ROUTING" statusId="ROUTING_DRAFT" routingName="Rejected orders re-brokering" sequenceNum="5" description="Rejected orders rebrokering" createdByUser="admin" createdDate="2023-11-03T12:00:00">
             <orderFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityId" operator="equals" fieldValue="REJECTED_PARKING" sequenceNum="5"/>
             <rules routingRuleId="REJ_ORD_SING_RULE" ruleName="Rejected orders only" statusId="RULE_DRAFT" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="AL_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="ALL_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance asc" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_MV_TO_QUEUE" actionValue="UNFILLABLE_PARKING" createdDate="2023-11-03T12:00:00"/>
@@ -131,19 +131,19 @@
             <orderFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_FILTER" fieldName="promiseDaysCutoff" operator="less" fieldValue="5" sequenceNum="10"/>
             <orderFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="orderDate" sequenceNum="5"/>
             <rules routingRuleId="PREORDER_WH_RULE" ruleName="Warehouse only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="WH_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance asc" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_NEXT_RULE" createdDate="2023-11-03T12:00:00"/>
             </rules>
             <rules routingRuleId="PREORDER_ST_RULE" ruleName="Store only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_SINGLE" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="STORE_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance asc" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_NEXT_RULE" createdDate="2023-11-03T12:00:00"/>
             </rules>
             <rules routingRuleId="PREORDER_ALL_RULE" ruleName="Store only" statusId="RULE_ACTIVE" sequenceNum="5" assignmentEnumId="ORA_MULTI" createdByUser="admin" createdDate="2023-11-03T12:00:00">
-                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="ALL_FAC_GROUP" createdDate="2023-11-03T12:00:00"/>
+                <inventoryFilters conditionSeqId="5" conditionTypeEnumId="ENTCT_FILTER" fieldName="facilityGroupId" operator="equals" fieldValue="ALL_FACILITY_GROUP" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="10" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="distance asc" createdDate="2023-11-03T12:00:00"/>
                 <inventoryFilters conditionSeqId="15" conditionTypeEnumId="ENTCT_SORT_BY" fieldName="inventoryForAllocation desc" createdDate="2023-11-03T12:00:00"/>
                 <actions actionSeqId="5" actionTypeEnumId="ORA_RM_CANCEL_DATE" createdDate="2023-11-03T12:00:00"/>
