@@ -47,7 +47,7 @@
     </actions>
     <widgets>
         <container-row>
-            <row-col lg="5">
+            <row-col>
                 <container-box>
                     <box-header title="Order Routing Group"/>
                     <box-body>
@@ -68,8 +68,8 @@
                                 </default-field>
                             </field>
 <!--                            <field name="jobName"><default-field><display/></default-field></field>-->
-                            <field name="createdByUser"><default-field><text-line size="4"/></default-field></field>
-                            <field name="createdDate"><default-field><date-time/></default-field></field>
+                            <field name="createdByUser"><default-field><display/></default-field></field>
+                            <field name="createdDate"><default-field><display/></default-field></field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
                         </form-single>
                     </box-body>
@@ -104,9 +104,9 @@
                                 </container-row>
                                 <section name="ActiveJobSection" condition="runLock?.jobRunId">
                                     <widgets>
-                                        <container-row>
+                                        <!--<container-row>
                                             <row-col></row-col>
-                                        </container-row>
+                                        </container-row>-->
                                         <container-row>
                                             <row-col md="2"><label text="Active Job" type="strong"/></row-col>
                                             <row-col md="4">
@@ -145,7 +145,7 @@
                                         </entity-options>
                                     </drop-down>
                                 </default-field></field>
-                                <field name="createdDate"><default-field><date-time/></default-field></field>
+                                <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
                                 <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
                             </form-single>
                         </container-dialog>
@@ -154,7 +154,7 @@
                         <form-list name="OrderRouting" list="routings" list-entry="routing" transition="updateOrderRouting">
                             <field name="orderRoutingId">
                                 <header-field show-order-by="true" title="Order Routing"/>
-                                <default-field><link url="orderRoutingDetail" text="${routingName?:orderRoutingId}" parameter-map="[orderRoutingId: orderRoutingId]" link-type="anchor"/></default-field></field>
+                                <default-field><link url="orderRoutingDetail" text="${routingName?:orderRoutingId}" parameter-map="[orderRoutingId: orderRoutingId, routingGroupId: routingGroupId]" link-type="anchor"/></default-field></field>
                             <field name="statusId" >
                                 <header-field show-order-by="true"/>
                                 <default-field>

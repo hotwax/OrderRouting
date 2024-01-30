@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing Rule" default-menu-index="1">
+        default-menu-title="Order Routing Rule" default-menu-index="1" default-menu-include="false" >
 
     <parameter name="routingRuleId" required="true"/>
 
@@ -78,7 +78,7 @@
     </actions>
     <widgets>
         <container-row>
-            <row-col lg="5">
+            <row-col>
                 <container-box>
                     <box-header title="Order Routing Rule"/>
                     <box-body>
@@ -91,8 +91,8 @@
                             <field name="sequenceNum"><default-field><text-line size="60"/></default-field></field>
                             <field name="assignmentEnumId">
                                 <default-field>
-                                    <drop-down>
-                                        <entity-options key="${enumCode}">
+                                    <drop-down >
+                                        <entity-options key="${enumId}">
                                             <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
                                                 <econdition field-name="enumTypeId" value="ORD_ROU_ASSIGN_TYPE"/>
                                             </entity-find>
@@ -110,7 +110,7 @@
                                     </drop-down>
                                 </default-field>
                             </field>
-                            <field name="createdByUser"><default-field><hidden default-value="${ec.user.getUserId()}"/></default-field></field>
+                            <field name="createdByUser"><default-field><hidden default-value="${ec.user.getUsername()?:ec.user.getUserId()}"/></default-field></field>
                             <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
                         </form-single>

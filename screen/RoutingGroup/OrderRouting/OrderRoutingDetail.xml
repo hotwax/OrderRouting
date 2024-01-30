@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing" default-menu-index="1">
+        default-menu-title="Order Routing" default-menu-index="1" default-menu-include="false">
 
     <parameter name="orderRoutingId" required="true"/>
 
@@ -66,14 +66,14 @@
     </actions>
     <widgets>
         <container-row>
-            <row-col lg="5">
+            <row-col>
                 <container-box>
                     <box-header title="Order Routing"/>
                     <box-body>
                         <form-single name="OrderRoutingForm" map="orderRouting" transition="updateOrderRouting">
                             <field name="orderRoutingId"><default-field><display/> </default-field></field>
                             <field name="routingGroupId"><default-field title="Routing Group">
-                                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" link-type="anchor"/>
+                                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" parameter-map="[routingGroupId: routingGroupId, orderRoutingId:orderRoutingId]" link-type="anchor"/>
                             </default-field></field>
                             <field name="routingName"><default-field><text-line size="60"/></default-field></field>
                             <field name="description"><default-field><text-line size="60"/></default-field></field>
@@ -90,8 +90,8 @@
                                 </default-field>
                             </field>
                             <!--                            <field name="jobName"><default-field><display/></default-field></field>-->
-                            <field name="createdByUser"><default-field><text/></default-field></field>
-                            <field name="createdDate"><default-field><text/></default-field></field>
+                            <field name="createdByUser"><default-field><display/></default-field></field>
+                            <field name="createdDate"><default-field><display/></default-field></field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
                         </form-single>
                     </box-body>
@@ -229,7 +229,7 @@
                                     <default-field><text-line/></default-field>
                                 </field>
                                 <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
-                                <field name="createdByUser"><default-field><hidden default-value="${ec.user.getUserId()}"/></default-field></field>
+                                <field name="createdByUser"><default-field><hidden default-value="${ec.user.getUsername()?:ec.user.getUserId()}"/></default-field></field>
                                 <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
                             </form-single>
                         </container-dialog>
@@ -239,7 +239,7 @@
                             <field name="routingRuleId">
                                 <default-field>
 <!--                                    <dynamic-dialog id="rule_${routingRuleId}" button-text="${routingRuleId}" transition="orderRoutingRule" parameter-map="[routingRuleId:routingRuleId]"/>-->
-                                    <link url="orderRoutingRule" link-type="anchor" text="${routingRuleId}" parameter-map="[routingRuleId:routingRuleId]"/>
+                                    <link url="orderRoutingRule" link-type="anchor" text="${routingRuleId}" parameter-map="[routingRuleId:routingRuleId, orderRoutingId:orderRoutingId]"/>
                                 </default-field></field>
                             <field name="ruleName"><default-field><text-line/></default-field></field>
                             <field name="assignmentEnumId"><default-field>
