@@ -4,7 +4,7 @@
         default-menu-include="false" standalone="true">
 
     <parameter name="routingGroupId" required="true"/>
-    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroup"/></transition>
+    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroupDetail"/></transition>
     <transition name="jobRunDetail"><default-response url="//system/ServiceJob/JobRuns/JobRunDetail"/></transition>
     <transition name="serviceJobDetail">
         <default-response url="//system/ServiceJob/Jobs/ServiceJobDetail"/></transition>

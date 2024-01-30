@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
         default-menu-title="Order Routing Group List" default-menu-include="false">
 
-    <transition name="orderRoutingGroup"><default-response url="../OrderRoutingGroup"/></transition>
+    <transition name="orderRoutingGroup"><default-response url="../OrderRoutingGroupDetail"/></transition>
     <transition name="createOrderRoutingGroup">
         <service-call name="create#co.hotwax.order.routing.OrderRoutingGroup"/>
         <default-response url="."/>

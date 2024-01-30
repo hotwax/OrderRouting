@@ -5,7 +5,7 @@
     <parameter name="orderRoutingId" required="true"/>
 
     <transition name="orderRoutingGroup">
-        <default-response url="../../OrderRoutingGroup"/>
+        <default-response url="../../OrderRoutingGroupDetail"/>
     </transition>
     <transition name="orderRoutingRule">
         <default-response url="../OrderRoutingRule"/>

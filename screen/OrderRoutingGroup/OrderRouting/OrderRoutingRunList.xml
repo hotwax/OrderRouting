@@ -5,10 +5,10 @@
 
     <parameter name="routingGroupId" required="true"/>
     <parameter name="orderRoutingId"/>
-    <transition name="orderRoutingGroup"><default-response url="../OrderRoutingGroup"/></transition>
+    <transition name="orderRoutingGroup"><default-response url="../OrderRoutingGroupDetail"/></transition>
     <transition name="orderRouting"><default-response url="../OrderRoutingDetail"/></transition>
     <transition name="orderRoutingGroup">
-        <default-response url="../../OrderRoutingGroup"/>
+        <default-response url="../../OrderRoutingGroupDetail"/>
     </transition>
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true"/>
