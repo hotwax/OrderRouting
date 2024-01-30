@@ -103,4 +103,27 @@ under the License.
         <alias-all entity-alias="PSFG"/>
         <alias-all entity-alias="FG"/>
     </view-entity>
+    <view-entity entity-name="StatusItemAndType" package="co.hotwax.common.status">
+        <member-entity entity-alias="ST" entity-name="org.apache.ofbiz.common.status.StatusItem"/>
+        <member-entity entity-alias="TYPE" entity-name="org.apache.ofbiz.common.status.StatusType" join-from-alias="ST" join-optional="true">
+            <key-map field-name="statusTypeId"/>
+        </member-entity>
+        <alias-all entity-alias="ST"/>
+        <alias-all entity-alias="TYPE">
+            <exclude field="description"/>
+        </alias-all>
+        <alias name="typeDescription" field="description" entity-alias="TYPE"/>
+    </view-entity>
+
+    <view-entity entity-name="ProductStoreShipmentMethView" package="co.hotwax.product.store">
+        <member-entity entity-alias="PSSM" entity-name="org.apache.ofbiz.product.store.ProductStoreShipmentMeth"/>
+        <member-entity entity-alias="SM" entity-name="org.apache.ofbiz.shipment.shipment.ShipmentMethodType" join-from-alias="PSSM">
+            <key-map field-name="shipmentMethodTypeId"/>
+        </member-entity>
+        <alias-all entity-alias="PSSM"/>
+        <alias-all entity-alias="SM">
+            <exclude field="shipmentMethodTypeId"/>
+            <exclude field="sequenceNum"/>
+        </alias-all>
+    </view-entity>
 </entities>

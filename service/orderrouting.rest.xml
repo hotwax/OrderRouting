@@ -26,12 +26,15 @@
     <resource name="productStores">
         <id name="productStoreId">
             <resource name="shippingMethods">
-                <method type="get"><entity name="org.apache.ofbiz.product.store.ProductStoreShipmentMeth" operation="list"/></method>
+                <method type="get"><entity name="co.hotwax.product.store.ProductStoreShipmentMethView" operation="list"/></method>
             </resource>
             <resource name="facilityGroups">
                 <method type="get"><entity name="co.hotwax.facility.ProductStoreAndFacilityGroup" operation="list"/></method>
             </resource>
         </id>
+    </resource>
+    <resource name="status" description="Get the status items">
+        <method type="get"><entity name="co.hotwax.common.status.StatusItemAndType" operation="list"/></method>
     </resource>
     <resource name="enums" description="Get the enumerations">
         <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="list"/></method>
@@ -44,6 +47,9 @@
         <id name="facilityId">
             <method type="get"><entity name="co.hotwax.facility.FacilityAndType" operation="one"/></method>
         </id>
+    </resource>
+    <resource name="checkOmsConnection">
+        <method type="get"><service name="co.hotwax.common.CommonServices.checkOmsConnection"/></method>
     </resource>
     <resource name="serviceJobRuns">
         <id name="jobName">

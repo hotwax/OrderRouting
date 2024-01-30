@@ -61,12 +61,13 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_NEXT_RULE" description="Move to next Rule" sequenceNum="20" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="NEXT_RULE"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="ORA_MV_TO_QUEUE" description="Move to queue" sequenceNum="25" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="MOVE_TO_QUEUE"/>
 
-    <org.apache.ofbiz.common.status.StatusType statusTypeId="ORDER_ROUTING_STATUS" description="Order Routing Status" hasTable="N"/>
+    <org.apache.ofbiz.common.status.StatusType statusTypeId="ROUTING_STATUS" description="Routing Status" hasTable="N"/>
+    <org.apache.ofbiz.common.status.StatusType statusTypeId="ORDER_ROUTING_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Status" hasTable="N"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="ROUTING_DRAFT" description="Draft" sequenceId="01" statusCode="DRAFT" statusTypeId="ORDER_ROUTING_STATUS"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="ROUTING_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORDER_ROUTING_STATUS"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="ROUTING_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORDER_ROUTING_STATUS"/>
 
-    <org.apache.ofbiz.common.status.StatusType statusTypeId="ORD_ROUT_RULE_STATUS" description="Order Routing Rule Status" hasTable="N"/>
+    <org.apache.ofbiz.common.status.StatusType statusTypeId="ORD_ROUT_RULE_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Rule Status" hasTable="N"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="RULE_DRAFT" description="Draft" sequenceId="01" statusCode="DRAFT" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="RULE_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <org.apache.ofbiz.common.status.StatusItem statusId="RULE_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORD_ROUT_RULE_STATUS"/>
