@@ -399,7 +399,7 @@
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
-                    def comments= null
+                    def comments;
                     def routingRuleName = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : ${orderRouting.routingName} [${orderRouting.orderRoutingId}] : ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
@@ -440,8 +440,8 @@
                             if (!queue) {
                                 queue = orderItemShipGroup.facilityId
                             }
-                            if (!clearAutoCancelDate &amp;&amp;actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
-                                comments += "Set the auto cancel date to 10 days from now."
+                            if (!clearAutoCancelDate &amp;&amp; actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
+                                comments += "Set the auto cancel date to ${actionMap.get('ORA_AUTO_CANCEL_DAYS')} days from now."
                                 autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DAYS') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                             } else if (clearAutoCancelDate) {
                                 comments += "Clear the auto cancel date."
