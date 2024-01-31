@@ -40,7 +40,6 @@ under the License.
             <key-map field-name="routingGroupId"/></relationship>
         <master>
             <detail relationship="routings"/>
-<!--            <detail relationship="schedule"/>-->
         </master>
         <master name="defaultSchedule">
             <detail relationship="routings"/>

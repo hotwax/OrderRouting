@@ -510,11 +510,17 @@
             <if condition="serviceJob">
                 <script>
                     schedule = serviceJob.getMap()
+                    try {
                     schedule.cronDescription = org.moqui.impl.service.ScheduledJobRunner.getCronDescription(schedule.cronExpression, ec.user.getLocale(), true)
                     cronExecutionTime = org.moqui.impl.service.ScheduledJobRunner.getExecutionTime(schedule.cronExpression)
                     nextExecutionTime = cronExecutionTime.nextExecution(java.time.ZonedDateTime.now()).orElse(null)
                     if (nextExecutionTime != null) {
                         schedule.nextExecutionDateTime = nextExecutionTime.toEpochSecond()
+                    }
+                    schedule.executionTimeZone = TimeZone.getDefault().getID()
+                    } catch (Exception e) {
+                        ec.logger.error("Error getting cron description: ${e.getMessage()}")
+                        schedule.cronDescription = e.getMessage()
                     }
                 </script>
             </if>

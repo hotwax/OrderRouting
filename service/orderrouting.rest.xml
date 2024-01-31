@@ -65,7 +65,7 @@
         </id>
     </resource>
     <resource name="groups">
-        <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list" masterName="schedule"/></method>
+        <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="list"/></method>
         <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store"/></method>
         <id name="routingGroupId">
             <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="one" masterName="default" /></method>
@@ -74,7 +74,7 @@
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.scheduleNow#OrderRoutingGroup"/></method>
             </resource>
             <resource name="schedule">
-                <!--<method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>-->
+                <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/></method>
             </resource>
             <resource name="routings">

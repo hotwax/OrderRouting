@@ -47,8 +47,8 @@
             <set field="userId" from="ec.user.UserAccount.userId"/>
             <set field="username" from="ec.user.UserAccount.username"/>
             <set field="userFullName" from="ec.user.UserAccount.userFullName"/>
-            <set field="timeZone" from="ec.user.UserAccount.timeZone"/>
-            <set field="locale" from="ec.user.UserAccount.locale"/>
+            <set field="timeZone" from="ec.user.getTimeZone()"/>
+            <set field="locale" from="ec.user.getLocale()"/>
             <set field="emailAddress" from="ec.user.UserAccount.emailAddress"/>
             <set field="preferences" from="ec.user.UserAccount.preferences"/>
         </actions>
