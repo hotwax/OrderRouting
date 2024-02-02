@@ -37,6 +37,7 @@
         <service-call name="update#co.hotwax.order.routing.OrderRoutingRule"/>
         <default-response url="."/>
     </transition>
+    <transition name="routingRunList"><default-response url="../OrderRoutingRunList"/></transition>
 
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting"/>
@@ -69,6 +70,9 @@
             <row-col>
                 <container-box>
                     <box-header title="Order Routing"/>
+                    <box-toolbar>
+                        <link url="routingRunList" text="Routing Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId]"/>
+                    </box-toolbar>
                     <box-body>
                         <form-single name="OrderRoutingForm" map="orderRouting" transition="updateOrderRouting">
                             <field name="orderRoutingId"><default-field><display/> </default-field></field>

@@ -12,14 +12,19 @@
     </transition>
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true"/>
-        <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
+
     </actions>
     <widgets>
-        <form-list name="OrderRoutingRunList" list="orderRoutingRuns" skip-form="true" show-page-size="true">
+        <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true" show-page-size="true">
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="orderRoutingRuns">
-                <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
+                <search-form-inputs default-order-by="-startDate"/>
                 <econdition field-name="orderRoutingId" from="orderRoutingId" ignore-if-empty="true"/>
             </entity-find>
+            <row-actions>
+                <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true">
+                    <field-map field-name="orderRoutingId" from="orderRoutingId"/>
+                </entity-find-one>
+            </row-actions>
             <field name="routingRunId">
                 <header-field show-order-by="true"/>
                 <default-field><display/></default-field>
@@ -31,7 +36,7 @@
             <field name="orderRoutingId">
                 <header-field show-order-by="true"/>
                 <default-field>
-                <link url="orderRouting" text="${orderRouting.routingName?:orderRoutingGroup.orderRoutingId}" parameter-map="[routingGroupId: routingGroupId, orderRoutingId:orderRoutingId]" link-type="anchor"/>
+                <link url="orderRouting" text="${orderRouting.routingName?:orderRouting.orderRoutingId}" parameter-map="[routingGroupId: routingGroupId, orderRoutingId:orderRoutingId]" link-type="anchor"/>
             </default-field></field>
             <field name="productStoreId">
                 <default-field>
