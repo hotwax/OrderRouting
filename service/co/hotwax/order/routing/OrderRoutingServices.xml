@@ -450,8 +450,8 @@
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
                             facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName,
-                                    items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate,
-                                            routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId]}])
+                                    items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
+                                    routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
                         }
                     } else {
                         //If all items allocated no need to run next rule
