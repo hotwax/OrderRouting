@@ -14,8 +14,7 @@
                 basisCal.add(Calendar.DAY_OF_YEAR, (int) - daysToKeep)
                 basisTimestamp = new Timestamp(basisCal.getTimeInMillis())
                 recordsRemoved = ec.entity.find("moqui.service.job.ServiceJobRun")
-                .condition("startTime", EntityCondition.LESS_THAN, basisTimestamp)
-                .disableAuthz().deleteAll()
+                        .condition("startTime", EntityCondition.LESS_THAN, basisTimestamp).disableAuthz().deleteAll()
             </script>
             <log message="Removed ${recordsRemoved} OrderRoutingRun records."/>
         </actions>
@@ -44,7 +43,14 @@
     </service>
 
     <service verb="run" noun="OrderRoutingGroup" transaction-timeout="36000" authenticate="anonymous-all"
-             semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="60" semaphore-ignore="7200" semaphore-name="OrderRoutingGroup">
+             semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="60"
+             semaphore-ignore="7200" semaphore-name="OrderRoutingGroup">
+        <description>
+            The action initiates the processing or execution sequence for an Order Routing Group within the system.
+            This procedure is crucial for managing and directing orders through the appropriate fulfillment pathways based on predefined criteria and rules set within the Order Routing Group.
+            This service is designed to retrieve active order routings for a specified OrderRoutingGroup based on their sequence number.
+            It aims to prioritize and organize order processing efficiently, ensuring that orders are routed and fulfilled according to pre-established sequences that optimize logistics, delivery times, and resource allocation.
+        </description>
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
             <parameter name="productStoreId" required="true"/>
@@ -157,6 +163,11 @@
     </service>
 
     <service verb="run" noun="OrderRouting" transaction-timeout="36000">
+        <description>
+            The service is to streamline the fulfillment process by intelligently routing orders through the system based on predefined conditions and rules.
+            This service aims to optimize inventory distribution and order fulfillment efficiency by dynamically applying routing rules to each order's ship group,
+            ensuring that inventory allocation and subsequent actions are aligned with business logistics and inventory management strategies.
+        </description>
         <in-parameters>
             <parameter name="orderRoutingId" required="true"/>
             <parameter name="orderId"/>
@@ -217,11 +228,13 @@
                     if (shipGroupSeqId) orderFind.condition("shipGroupSeqId", shipGroupSeqId)
                 }
                 selectFields = ["orderId", "shipGroupSeqId"];
-                filterConditions.each{filterCondition ->
+                filterConditions.each { filterCondition ->
                     if ("promiseDaysCutoff".equals(filterCondition.fieldName)) {
                         if (filterCondition.fieldValue) {
-                            //if promiseDaysCutoff is set, use it brokering will run for each order item instead at shipGroup level
-                            //it means partial allocation won't work as expected
+                            /*
+                            When promiseDaysCutoff is configured, it acts as a constraint that prioritizes order items to be processed and allocated in a way that meets the delivery promise timeframe.
+                            The brokering process is executed at the individual order item level rather than at a more aggregated shipGroup level.
+                            */
                             selectFields.add("orderItemSeqId")
                             promisedDatetime = ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long).with(java.time.LocalTime.MAX).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
                             orderFind.condition('promisedDatetime', EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), promisedDatetime)
@@ -245,7 +258,7 @@
                                 routingRule = ruleIterator.next()
                                 ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
                                         .requireNewTransaction(true)
-                                        .parameters([orderRoutingId: orderRouting.orderRoutingId, routingRuleId: routingRule.routingRuleId,
+                                        .parameters([routingRuleId: routingRule.routingRuleId,
                                                 orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId, orderItemSeqId: shipGroup.orderItemSeqId])
                                         .call()
                                 if (!ec.message.hasError()) {
@@ -281,11 +294,14 @@
     </service>
 
     <service verb="run" noun="OrderRoutingRule" transaction-timeout="36000">
+        <description>
+            To dynamically fetch and allocate inventory for order fulfillment based on specific routing rule configurations.
+            These rules can encompass various criteria such as geographic location, inventory levels, delivery times, and cost efficiency.
+        </description>
         <in-parameters>
-            <parameter name="orderRoutingId"/>
-            <parameter name="routingRuleId"/>
-            <parameter name="orderId"/>
-            <parameter name="shipGroupSeqId"/>
+            <parameter name="routingRuleId" required="true"/>
+            <parameter name="orderId" required="true"/>
+            <parameter name="shipGroupSeqId" required="true"/>
             <parameter name="orderItemSeqId"/>
         </in-parameters>
         <out-parameters>
@@ -297,9 +313,9 @@
                 <return error="true" message="No order routing found for id ${routingRuleId}"/>
             </if>
             <if condition="!'RULE_ACTIVE'.equals(orderRoutingRule.statusId)">
-                <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${orderRoutingId}] is not active"/>
+                <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${routingRuleId}] is not active"/>
             </if>
-            <log level="info" message="Executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
+            <log message="Executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
@@ -359,6 +375,10 @@
     </service>
 
     <service verb="eval" noun="OrderRoutingActions" transaction-timeout="3600">
+        <description>
+            To dynamically evaluate and apply actions dictated by order routing rules, ensuring that orders are fulfilled in the most efficient and effective manner.
+            This evaluation process determines the optimal steps for order fulfillment based on predefined criteria and actions associated with routing rules.
+        </description>
         <in-parameters>
             <parameter name="orderId" required="true"/>
             <parameter name="shipGroupSeqId" required="true"/>
@@ -395,7 +415,7 @@
                     import java.time.ZonedDateTime
                     import java.util.stream.Collectors;
                     import org.moqui.entity.EntityCondition
-                    //if single assignment preferred, then sql will return result only if all the shipgroup items available at single location
+                    // If a single assignment is preferred, then SQL will return a result only if all the ship group items are available at a single location.
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
@@ -403,8 +423,8 @@
                     def routingRuleName = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : ${orderRouting.routingName} [${orderRouting.orderRoutingId}] : ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
-                        //SQL will not reutrn result if items not available at single location
-                        //Additional check to make sure all items are available at single location,
+                        // SQL will not return results if items are not available at a single location.
+                        // Additional check to ensure all items are available at a single location.
                         if (!(suggestedFacilityIds.size() == 1)) {
                             comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
                             ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
@@ -429,11 +449,11 @@
                         if (suggestedFulfillmentLocations) {
                             comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
                         }
-                        //If unfillable items found, check for actions
+                        // If unfillable items are found, check for actions.
                         if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
                             queue = actionMap.get('ORA_MV_TO_QUEUE');
                             comments += "Unfillalbe items moved to ${queue}."
-                            //If action is to move to queue, then no need to run next rule. As all unfillable items will be moved to queue
+                            // If the action is to move to a queue, then there is no need to run the next rule, as all unfillable items will be moved to the queue.
                             runNextRule = false
                         }
                         def clearAutoCancelDate = basicConvert(actionMap.get('ORA_RM_CANCEL_DATE'), 'Boolean') ?: false
@@ -457,7 +477,6 @@
                         //If all items allocated no need to run next rule
                         runNextRule = false
                     }
-                    //}
                 </script>
             <!--TODO : Find better way to generate the oms token and oms base url -->
             <entity-find-one entity-name="org.apache.ofbiz.common.property.SystemProperty" value-field="baseUrlProperty" cache="true">

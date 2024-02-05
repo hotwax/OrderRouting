@@ -82,4 +82,15 @@
     <moqui.service.message.SystemMessageRemote systemMessageRemoteId="HC_OMS_CONFIG"
                                                description="HotWax OMS server JWT token"
                                                remotePublicKey=""/>
+
+    <moqui.service.job.ServiceJob jobName="Order_Routing_" paused="Y" description="Service job for order routing group Morning order routing group [MORNING_ORDER_GROUP]" serviceName="co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingGroup">
+        <parameters parameterName="routingGroupId" parameterValue="MORNING_ORDER_GROUP"/>
+        <parameters parameterName="productStoreId" parameterValue="STORE"/>
+    </moqui.service.job.ServiceJob>
+
+    <!-- Service job data to purge order routing runs data older than 30 days -->
+    <moqui.service.job.ServiceJob jobName="clean_Routing_Runs" description="Clean Order Routing runs"
+                                  serviceName="co.hotwax.order.routing.OrderRoutingServices.clean#OrderRoutingRun" cronExpression="0 0 2 * * ?" paused="N">
+        <parameters parameterName="daysToKeep" parameterValue="30"/>
+    </moqui.service.job.ServiceJob>
 </entity-facade-xml>
