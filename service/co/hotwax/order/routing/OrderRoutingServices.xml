@@ -276,7 +276,7 @@
                     ec.logger.error(e.getMessage())
                 }
             </script>
-            <return message="Attempted to process ${attemptedCount} ${selectFields.contains('orderItemSeqId')?'item(s)':'ship group(s)'} for the '${orderRouting.routingName} [${orderRoutingId}]' order routing"/>
+            <return message="Attempted ${attemptedCount} ${selectFields.contains('orderItemSeqId')?'item(s)':'ship group(s)'} for the '${orderRouting.routingName} [${orderRoutingId}] order routing"/>
         </actions>
     </service>
 
@@ -420,7 +420,7 @@
                             comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
-                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName
+                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName,
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
                         }
                     }
@@ -450,7 +450,7 @@
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
                             facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName,
-                                    items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate
+                                    items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate,
                                             routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId]}])
                         }
                     } else {
