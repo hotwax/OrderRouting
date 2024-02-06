@@ -24,11 +24,12 @@ under the License.
         <field name="routingGroupId" type="id" is-pk="true"><description>Unique identifier for the routing group</description></field>
         <field name="productStoreId" type="id"><description>Unique identifier for the product store</description></field>
         <field name="groupName" type="text-medium"><description>Name of the routing group.</description></field>
-        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
+        <field name="sequenceNum" type="number-integer" enable-audit-log="true"><description>Sequence number for ordering.</description></field>
         <field name="jobName" type="text-medium"><description>moqui.service.job.Service reference</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the routing group.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing group was created</description></field>
+        <field name="lastModifiedDate" type="date-time"><description>Date and time when the routing group was updated</description></field>
         <relationship type="one-nofk" fk-name="ORG_PROD_STR" related="org.apache.ofbiz.product.store.ProductStore" short-alias="productStore">
             <key-map field-name="productStoreId"/>
         </relationship>
@@ -54,9 +55,9 @@ under the License.
         <description>Represents configurations for routing orders, including rules and conditions for order fulfillment.</description>
         <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
         <field name="routingGroupId" type="id"><description>Unique identifier for the routing group</description></field>
-        <field name="statusId" type="id"><description>Status identifier for the order routing.</description></field>
+        <field name="statusId" type="id" enable-audit-log="true"><description>Status identifier for the order routing.</description></field>
         <field name="routingName" type="text-medium"><description>Name or identifier for the order routing.</description></field>
-        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
+        <field name="sequenceNum" type="number-integer" enable-audit-log="true"><description>Sequence number for ordering.</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the order routing.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the order routing was created.</description></field>
@@ -82,9 +83,9 @@ under the License.
         <field name="orderRoutingId" type="id" is-pk="true"><description>Unique identifier for the order routing.</description></field>
         <field name="conditionSeqId" type="id" is-pk="true"><description>Unique identifier for the condition.</description></field>
         <field name="conditionTypeEnumId" type="id"><description>Type of condition (Filter/ Order by)</description></field>
-        <field name="fieldName" type="text-medium"><description>Input parameter for the condition.</description></field>
-        <field name="operator" type="text-medium"><description>Operator used in the condition.</description></field>
-        <field name="fieldValue" type="text-long"><description>Value of the condition.</description></field>
+        <field name="fieldName" type="text-medium" enable-audit-log="true"><description>Input parameter for the condition.</description></field>
+        <field name="operator" type="text-medium" enable-audit-log="true"><description>Operator used in the condition.</description></field>
+        <field name="fieldValue" type="text-long" enable-audit-log="true"><description>Value of the condition.</description></field>
         <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
         <relationship type="one" fk-name="OFC_COND_TYPE_ENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="conditionType">
@@ -102,9 +103,9 @@ under the License.
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
         <field name="ruleName" type="text-medium"><description>Name of the routing rule.</description></field>
-        <field name="statusId" type="id"><description>Status of the routing rule.</description></field>
-        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
-        <field name="assignmentEnumId" type="id"><description>Type of assignment for the routing rule (single/multi).</description></field>
+        <field name="statusId" type="id" enable-audit-log="true"><description>Status of the routing rule.</description></field>
+        <field name="sequenceNum" type="number-integer" enable-audit-log="true"><description>Sequence number for ordering.</description></field>
+        <field name="assignmentEnumId" type="id" enable-audit-log="true"><description>Type of assignment for the routing rule (single/multi).</description></field>
 <!--        <field name="fulfillEntireShipGroup" type="text-indicator"><description>Indicator for fulfilling the entire ship group.</description></field>-->
         <field name="createdDate" type="date-time"><description>Date and time when the routing rule was created.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
@@ -132,10 +133,10 @@ under the License.
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="conditionSeqId" type="id" is-pk="true"><description>Unique identifier for the routing rule inventory condition.</description></field>
         <field name="conditionTypeEnumId" type="id"><description>Type of condition (Filter/ Order by)</description></field>
-        <field name="fieldName" type="text-medium"><description>Input parameter for the condition.</description></field>
-        <field name="operator" type="text-medium"><description>Operator used in the condition.</description></field>
-        <field name="fieldValue" type="text-long"><description>Value of the condition.</description></field>
-        <field name="sequenceNum" type="number-integer"><description>Sequence number for ordering.</description></field>
+        <field name="fieldName" type="text-medium" enable-audit-log="true"><description>Input parameter for the condition.</description></field>
+        <field name="operator" type="text-medium" enable-audit-log="true"><description>Operator used in the condition.</description></field>
+        <field name="fieldValue" type="text-long" enable-audit-log="true"><description>Value of the condition.</description></field>
+        <field name="sequenceNum" type="number-integer" enable-audit-log="true"><description>Sequence number for ordering.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the condition was created.</description></field>
         <relationship type="one" fk-name="RULE_COND_TYPEENUM" title="ConditionType" related="org.apache.ofbiz.common.enum.Enumeration" short-alias="conditionType">
             <key-map field-name="conditionTypeEnumId" related="enumId"/>
@@ -151,8 +152,8 @@ under the License.
         <description>Specifies actions to be performed when a routing rule is triggered during order processing.</description>
         <field name="routingRuleId" type="id" is-pk="true"><description>Unique identifier for the routing rule.</description></field>
         <field name="actionSeqId" type="id" is-pk="true"><description>Unique identifier for the action.</description></field>
-        <field name="actionTypeEnumId" type="id"><description>Type of action to be performed.</description></field>
-        <field name="actionValue" type="text-long"><description>Value or details of the action.</description></field>
+        <field name="actionTypeEnumId" type="id" enable-audit-log="true"><description>Type of action to be performed.</description></field>
+        <field name="actionValue" type="text-long" enable-audit-log="true"><description>Value or details of the action.</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the action was created.</description></field>
         <relationship type="one" fk-name="ORRA_RULE" related="co.hotwax.order.routing.OrderRoutingRule" short-alias="rule">
             <key-map field-name="routingRuleId" related="routingRuleId"/>
