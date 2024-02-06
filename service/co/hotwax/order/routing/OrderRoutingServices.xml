@@ -593,9 +593,10 @@
                 <!-- Set the JobName in orderRoutingGroup entity -->
                 <set field="orderRoutingGroup.jobName" from="jobName"/>
                 <service-call name="update#co.hotwax.order.routing.OrderRoutingGroup" in-map="[routingGroupId:routingGroupId, jobName: jobName]"/>
-                <!-- for order routing scheduling we need only two parameters
-                 - productStoreId - This is to ensure only one routing is in execution for an ProductStore
-                 - routingGroupId
+                <!--
+                    For order routing scheduling we need only two parameters
+                    - productStoreId - This is to ensure only one routing is in execution for an ProductStore
+                    - routingGroupId
                  -->
                 <service-call name="create#moqui.service.job.ServiceJobParameter" in-map="[jobName: jobName, parameterName: 'routingGroupId', parameterValue: routingGroupId]"/>
                 <service-call name="create#moqui.service.job.ServiceJobParameter" in-map="[jobName: jobName, parameterName: 'productStoreId', parameterValue: orderRoutingGroup.productStoreId]"/>

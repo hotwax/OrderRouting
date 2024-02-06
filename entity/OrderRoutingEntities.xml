@@ -176,6 +176,10 @@ under the License.
         <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
         <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
         <field name="routingResult" type="text-long"><description>Result or outcome of the routing run.</description></field>
+        <index name="IDX_ORRN_ROUTE">
+            <index-field name="routingGroupId"/>
+            <index-field name="orderRoutingId"/>
+        </index>
     </entity>
 </entities>
 
