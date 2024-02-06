@@ -42,7 +42,13 @@
                 <default-field><link text="${groupName?:routingGroupId}" url="orderRoutingGroup" link-type="anchor"/></default-field>
             </field>
             <field name="productStoreId">
-                <header-field show-order-by="true"><text-find hide-options="true" size="20"/> </header-field>
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${productStoreId}" text="${storeName?:productStoreId} [${productStoreId}]">
+                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
                 <default-field>
                     <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
                 </default-field>

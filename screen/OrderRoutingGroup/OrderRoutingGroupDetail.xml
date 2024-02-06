@@ -14,12 +14,10 @@
         <actions><script>ec.service.job(jobName).run()</script></actions>
         <default-response url="."/>
     </transition>
-
     <transition name="updateRoutingGroup">
         <service-call name="update#co.hotwax.order.routing.OrderRoutingGroup"/>
         <default-response url="."/>
     </transition>
-
     <transition name="createOrderRouting">
         <service-call name="create#co.hotwax.order.routing.OrderRouting"/>
         <default-response url="."/>
@@ -28,7 +26,6 @@
         <service-call name="update#co.hotwax.order.routing.OrderRouting"/>
         <default-response url="."/>
     </transition>
-
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
         <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="routings">
@@ -76,7 +73,6 @@
                                     </drop-down>
                                 </default-field>
                             </field>
-<!--                            <field name="jobName"><default-field><display/></default-field></field>-->
                             <field name="createdByUser"><default-field><display/></default-field></field>
                             <field name="createdDate"><default-field><display/></default-field></field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
@@ -100,9 +96,7 @@
                                     <field name="jobName"><default-field><hidden/></default-field></field>
                                     <field name="description"><default-field><text-line/></default-field></field>
                                     <field name="cronExpression"><default-field tooltip="${cronExpressionDesc} ${TimeZone.getDefault().getID()} time"><text-line /></default-field></field>
-                                    <field name="nextExecutionTime"><conditional-field condition="nextExecutionTime">
-                                        <display/>
-                                    </conditional-field> </field>
+                                    <field name="nextExecutionTime"><conditional-field condition="nextExecutionTime"><display/></conditional-field></field>
                                     <field name="fromDate"><default-field><date-time/></default-field></field>
                                     <field name="thruDate"><default-field><date-time/></default-field></field>
                                     <field name="paused">
@@ -116,9 +110,6 @@
                                 </container-row>
                                 <section name="ActiveJobSection" condition="runLock?.jobRunId">
                                     <widgets>
-                                        <!--<container-row>
-                                            <row-col></row-col>
-                                        </container-row>-->
                                         <container-row>
                                             <row-col md="2"><label text="Active Job" type="strong"/></row-col>
                                             <row-col md="4">

@@ -55,14 +55,12 @@
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
             </econditions>
         </entity-find>
-
         <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderSortByList">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
             <econditions>
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </econditions>
-
         </entity-find>
     </actions>
     <widgets>
@@ -93,7 +91,6 @@
                                     </drop-down>
                                 </default-field>
                             </field>
-                            <!--                            <field name="jobName"><default-field><display/></default-field></field>-->
                             <field name="createdByUser"><default-field><display/></default-field></field>
                             <field name="createdDate"><default-field><display/></default-field></field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
@@ -119,7 +116,8 @@
                                                             </entity-find>
                                                         </entity-options>
                                                     </drop-down>
-                                                </default-field></field>
+                                                </default-field>
+                                            </field>
                                             <field name="operator"><default-field>
                                                 <drop-down>
                                                     <entity-options key="${enumCode}">
@@ -163,51 +161,54 @@
                                 <field name="fieldValue"><default-field><text-line/></default-field></field>
                                 <field name="sequenceNum"><default-field><text-line/></default-field></field>
                                 <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
-                                <field name="deleteLink"><default-field title=""><link url="deleteOrderFilterCondition" text="X" confirmation="Remove order filter condition?"
-                                                                                       parameter-map="[orderRoutingId:orderRoutingId, conditionSeqId:conditionSeqId]"/></default-field></field>
+                                <field name="deleteLink"><default-field title="">
+                                    <link url="deleteOrderFilterCondition" text="X" confirmation="Remove order filter condition?"
+                                          parameter-map="[orderRoutingId:orderRoutingId, conditionSeqId:conditionSeqId]"/></default-field>
+                                </field>
                             </form-list>
-                            </box-body>
-                            </container-box>
-                <container-box>
-                    <box-header title="Sort By"> </box-header>
-                    <box-toolbar>
-                        <container-dialog id="AddOrderSortBy" button-text="Add Order Sort By">
-                            <form-single name="CreateOrderSortBy" transition="createOrderFilterCondition">
-                                <field name="conditionTypeEnumId"><default-field><hidden default-value="ENTCT_SORT_BY"/></default-field></field>
-                                <field name="orderRoutingId"><default-field><hidden/></default-field></field>
-                                <field name="fieldName">
-                                    <default-field>
-                                        <drop-down>
-                                            <entity-options key="${enumCode}">
-                                                <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
-                                                    <econdition field-name="enumTypeId" value="ORD_SORT_PARAM_TYPE"/>
-                                                </entity-find>
-                                            </entity-options>
-                                        </drop-down>
-                                    </default-field></field>
-                                <field name="sequenceNum"><default-field><text-line/></default-field></field>
-                                <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
-                                <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
-                            </form-single>
-                        </container-dialog>
-                    </box-toolbar>
-                    <box-body>
+                        </box-body>
+                    </container-box>
+                    <container-box>
+                        <box-header title="Sort By"/>
+                        <box-toolbar>
+                            <container-dialog id="AddOrderSortBy" button-text="Add Order Sort By">
+                                <form-single name="CreateOrderSortBy" transition="createOrderFilterCondition">
+                                    <field name="conditionTypeEnumId"><default-field><hidden default-value="ENTCT_SORT_BY"/></default-field></field>
+                                    <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                    <field name="fieldName">
+                                        <default-field>
+                                            <drop-down>
+                                                <entity-options key="${enumCode}">
+                                                    <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                        <econdition field-name="enumTypeId" value="ORD_SORT_PARAM_TYPE"/>
+                                                    </entity-find>
+                                                </entity-options>
+                                            </drop-down>
+                                        </default-field></field>
+                                    <field name="sequenceNum"><default-field><text-line/></default-field></field>
+                                    <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
+                                    <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
+                                </form-single>
+                            </container-dialog>
+                        </box-toolbar>
+                        <box-body>
                             <form-list name="OrderSortBy" list="orderSortByList" list-entry="orderSortBy" transition="updateOrderFilterCondition" >
                                 <field name="orderRoutingId"><default-field><hidden/></default-field></field>
                                 <field name="conditionSeqId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName"><default-field><text-line/></default-field></field>
-<!--                                <field name="fieldValue"><default-field><text-line/></default-field></field>-->
                                 <field name="sequenceNum"><default-field><text-line/></default-field></field>
                                 <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
-                                <field name="deleteLink"><default-field title=""><link url="deleteOrderFilterCondition" text="X" confirmation="Remove order sort by?"
-                                                                                       parameter-map="[orderRoutingId:orderRoutingId, conditionSeqId:conditionSeqId]"/></default-field></field>
+                                <field name="deleteLink"><default-field title="">
+                                    <link url="deleteOrderFilterCondition" text="X" confirmation="Remove order sort by?"
+                                          parameter-map="[orderRoutingId:orderRoutingId, conditionSeqId:conditionSeqId]"/>
+                                </default-field></field>
                             </form-list>
-                    </box-body>
-                </container-box>
-                    </box-body>
-                </container-box>
-                <container-box>
-                    <box-header title="Rules"/>
+                        </box-body>
+                    </container-box>
+                </box-body>
+            </container-box>
+            <container-box>
+                <box-header title="Rules"/>
                     <box-toolbar>
                         <container-dialog id="AddOrderRoutingRule" button-text="Add Order Routing Rule">
                             <form-single name="CreateOrderRoutingRule" transition="createOrderRoutingRule" >

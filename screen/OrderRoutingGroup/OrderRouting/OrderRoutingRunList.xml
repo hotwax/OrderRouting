@@ -12,7 +12,6 @@
     </transition>
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true"/>
-
     </actions>
     <widgets>
         <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true" show-page-size="true">
@@ -43,7 +42,6 @@
                     <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
                 </default-field>
             </field>
-
             <field name="hasError"><default-field><display/></default-field></field>
             <field name="routingResult">
                 <default-field><display/></default-field>
@@ -58,7 +56,9 @@
             </field>
             <field name="executionTime">
                 <conditional-field condition="startDate &amp;&amp; endDate">
-                    <display text="${(groovy.time.TimeCategory.minus(endDate, startDate))}"/></conditional-field></field>
+                    <display text="${(groovy.time.TimeCategory.minus(endDate, startDate))}"/>
+                </conditional-field>
+            </field>
         </form-list>
     </widgets>
 </screen>
