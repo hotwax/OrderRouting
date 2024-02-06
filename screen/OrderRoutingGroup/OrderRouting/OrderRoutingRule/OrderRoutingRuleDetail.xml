@@ -7,11 +7,6 @@
     <transition name="orderRouting">
         <default-response url="../../../OrderRouting"/>
     </transition>
-    <!--<transition name="updateOrderRoutingRule">
-        <service-call name="update#co.hotwax.order.routing.OrderRouting"/>
-        <default-response url="."/>
-    </transition>-->
-
     <transition name="createOrderRoutingRuleInvCond">
         <service-call name="create#co.hotwax.order.routing.OrderRoutingRuleInvCond"/>
         <default-response url="."/>
@@ -50,10 +45,6 @@
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup">
             <field-map field-name="routingGroupId" from="orderRouting.routingGroupId"/>
         </entity-find-one>
-        <!--<entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="rules">
-            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
-            <econdition field-name="orderRoutingId" from="orderRoutingId"/>
-        </entity-find>-->
         <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryFilters">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
             <econditions>
@@ -155,6 +146,7 @@
                             <box-body>
                             <form-list name="OrderRoutingRuleInvCond" list="inventoryFilters" list-entry="inventoryFilter" transition="updateOrderRoutingRuleInvCond">
                                 <field name="routingRuleId"><default-field><hidden/></default-field></field>
+                                <field name="conditionSeqId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName">
                                     <default-field>
                                         <drop-down>
@@ -211,6 +203,7 @@
                     <box-body>
                             <form-list name="OrderRoutingRuleSortCond" list="inventorySortByList" list-entry="inventorySortBy" transition="updateOrderRoutingRuleInvCond" >
                                 <field name="routingRuleId"><default-field><hidden/></default-field></field>
+                                <field name="conditionSeqId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName"><default-field><text-line/></default-field></field>
 <!--                                <field name="fieldValue"><default-field><text-line/></default-field></field>-->
                                 <field name="sequenceNum"><header-field show-order-by="true"/><default-field><text-line/></default-field></field>
@@ -223,7 +216,7 @@
                     </box-body>
                 </container-box>
                 <container-box>
-                    <box-header title="Rules"/>
+                    <box-header title="Actions"/>
                     <box-toolbar>
                         <container-dialog id="AddOrderRoutingRuleAction" button-text="Add Order Routing Rule Action">
                             <form-single name="CreateOrderRoutingRuleAction" transition="createOrderRoutingRuleAction" >
@@ -246,8 +239,9 @@
                         </container-dialog>
                     </box-toolbar>
                     <box-body>
-                        <form-list name="OrderRoutingRuleActions" list="actions" list-entry="rule" transition="updateOrderRoutingRuleAction">
+                        <form-list name="OrderRoutingRuleActions" list="actions" list-entry="action" transition="updateOrderRoutingRuleAction">
                             <field name="routingRuleId"><default-field><hidden/></default-field></field>
+                            <field name="actionSeqId"><default-field><hidden/></default-field></field>
                             <field name="actionTypeEnumId"><default-field title="Action Type">
                                 <drop-down>
                                     <entity-options key="${enumId}">
@@ -261,8 +255,8 @@
                                 <default-field><text-line/></default-field>
                             </field>
                             <field name="createdDate"><default-field><hidden default-value="${ec.user.nowTimestamp}"/></default-field></field>
-                            <field name="submitButton"><default-field title="Add"><submit/></default-field></field>
-                            <field name="deleteLink"><default-field title=""><link url="deleteOrderRoutingRuleAction" text="X" confirmation="Remove order routing rule action?"
+                            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                            <field name="deleteLink"><default-field title=""><link url="deleteOrderRoutingRuleAction" icon="" text="X" confirmation="Remove order routing rule action?"
                                                                                    parameter-map="[routingRuleId:routingRuleId, actionSeqId:actionSeqId]"/></default-field></field>
                         </form-list>
                     </box-body>

@@ -139,6 +139,7 @@
                             <box-body>
                             <form-list name="OrderFilterCondition" list="orderFilters" list-entry="orderFilter" transition="updateOrderFilterCondition">
                                 <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                <field name="conditionSeqId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName">
                                     <default-field>
                                         <drop-down>
@@ -193,6 +194,7 @@
                     <box-body>
                             <form-list name="OrderSortBy" list="orderSortByList" list-entry="orderSortBy" transition="updateOrderFilterCondition" >
                                 <field name="orderRoutingId"><default-field><hidden/></default-field></field>
+                                <field name="conditionSeqId"><default-field><hidden/></default-field></field>
                                 <field name="fieldName"><default-field><text-line/></default-field></field>
 <!--                                <field name="fieldValue"><default-field><text-line/></default-field></field>-->
                                 <field name="sequenceNum"><default-field><text-line/></default-field></field>
@@ -242,9 +244,14 @@
                         <form-list name="OrderRoutingRule" list="rules" list-entry="rule" transition="updateOrderRoutingRule">
                             <field name="routingRuleId">
                                 <default-field>
-<!--                                    <dynamic-dialog id="rule_${routingRuleId}" button-text="${routingRuleId}" transition="orderRoutingRule" parameter-map="[routingRuleId:routingRuleId]"/>-->
+                                    <hidden/>
+                                </default-field>
+                            </field>
+                            <field name="routingRule">
+                                <default-field title="Routing Rule">
                                     <link url="orderRoutingRule" link-type="anchor" text="${routingRuleId}" parameter-map="[routingRuleId:routingRuleId, orderRoutingId:orderRoutingId]"/>
-                                </default-field></field>
+                                </default-field>
+                            </field>
                             <field name="ruleName"><default-field><text-line/></default-field></field>
                             <field name="assignmentEnumId"><default-field>
                                 <drop-down>
