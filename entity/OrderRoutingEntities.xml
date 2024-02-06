@@ -29,7 +29,7 @@ under the License.
         <field name="description" type="text-long"><description>Description or additional information about the routing group.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing group was created</description></field>
-        <field name="lastModifiedDate" type="date-time" enable-audit-log="true"><description>Date and time when the routing group was updated</description></field>
+        <field name="lastModifiedDate" type="date-time"><description>Date and time when the routing group was updated</description></field>
         <relationship type="one-nofk" fk-name="ORG_PROD_STR" related="org.apache.ofbiz.product.store.ProductStore" short-alias="productStore">
             <key-map field-name="productStoreId"/>
         </relationship>
