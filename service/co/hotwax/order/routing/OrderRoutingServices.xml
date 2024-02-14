@@ -419,7 +419,7 @@
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
-                    def comments;
+                    def comments='';
                     def routingRuleName = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : ${orderRouting.routingName} [${orderRouting.orderRoutingId}] : ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
