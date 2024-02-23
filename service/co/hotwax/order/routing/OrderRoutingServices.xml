@@ -272,7 +272,6 @@
                                         ec.message.clearAll()
                                     }
                                     if (!actionResult.runNextRule) {
-                                        //Break the outer loop as well if its only for single orderId
                                         runNextRouting = false
                                         break
                                     }
@@ -478,27 +477,25 @@
                         runNextRule = false
                     }
                 </script>
-            <!--TODO : Find better way to generate the oms token and oms base url -->
-            <entity-find-one entity-name="org.apache.ofbiz.common.property.SystemProperty" value-field="baseUrlProperty" cache="true">
-                <field-map field-name="systemResourceId" value="url"/>
-                <field-map field-name="systemPropertyId" value="content.url.prefix.secure"/>
-            </entity-find-one>
-            <script>
-                token = co.hotwax.order.routing.OrderRoutingHelper.getOmsJwtToken(ec.ecfi);
-            </script>
-            <if condition="!token">
-                <return error="true" message="Unable to generate oms token, check JWT configuration"/>
-            </if>
-            <set field="omsBaseUrl" from="baseUrlProperty?.systemPropertyValue"/>
-            <if condition="!omsBaseUrl">
-                <return error="true" message="OMS base url not found"/>
-            </if>
             <if condition="facilityAllocation">
                 <log message="Facility allocation for order Id [${orderId}:${shipGroupSeqId}${orderItemSeqId?':' + orderItemSeqId :''}]: ${facilityAllocation}, applied under the '${routingRule.ruleName} [${routingRule.routingRuleId}]' routing rule."/>
-                <!-- TODO: Handle the 500 status code, if OMS failed to respond, don't run the next rule -->
-                <service-call name="co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation" transaction-timeout="3600"
-                              in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
-                              ignore-error="true" out-map="outResult"/>
+                <script>
+                    try {
+                        outResult = ec.service.sync().name("co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation")
+                                .requireNewTransaction(true).transactionTimeout(3600)
+                                .parameters([orderId: orderId, facilityAllocation: facilityAllocation])
+                                .call()
+                        if (ec.message.hasError()) {
+                            ec.logger.warn("Ignoring facility allocation errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
+                            ec.message.clearErrors()
+                            ec.message.clearAll()
+                        }
+                    } catch (Throwable e) {
+                        ec.logger.error("Error while facility allocation: ${e.getMessage()}")
+                        ec.message.clearErrors()
+                        ec.message.clearAll()
+                    }
+                </script>
                 <log message="Facility allocation result: ${outResult}"/>
             <else>
                 <log message="No facility allocation found for orderId [${orderId}] for routing rule ${routingRule.ruleName} [${routingRule.routingRuleId}}"/>
