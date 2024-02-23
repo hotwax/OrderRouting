@@ -536,7 +536,7 @@
                     cronExecutionTime = org.moqui.impl.service.ScheduledJobRunner.getExecutionTime(schedule.cronExpression)
                     nextExecutionTime = cronExecutionTime.nextExecution(java.time.ZonedDateTime.now()).orElse(null)
                     if (nextExecutionTime != null) {
-                        schedule.nextExecutionDateTime = nextExecutionTime.toEpochSecond()
+                        schedule.nextExecutionDateTime = nextExecutionTime.toInstant().toEpochMilli()
                     }
                     schedule.executionTimeZone = TimeZone.getDefault().getID()
                     } catch (Exception e) {
