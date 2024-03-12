@@ -23,18 +23,13 @@
 
         </out-parameters>
         <actions>
-            <!-- TODO: Find better way to get the oms url-->
-            <entity-find-one entity-name="org.apache.ofbiz.common.property.SystemProperty" value-field="baseUrlProperty" cache="true">
-                <field-map field-name="systemResourceId" value="url"/>
-                <field-map field-name="systemPropertyId" value="content.url.prefix.secure"/>
-            </entity-find-one>
             <script>
+                omsBaseUrl = co.hotwax.order.routing.OrderRoutingHelper.getOmsInstanceUrl(ec.ecfi);
                 token = co.hotwax.order.routing.OrderRoutingHelper.getOmsJwtToken(ec.ecfi);
             </script>
             <if condition="!token">
                 <return error="true" message="Unable to generate oms token, check JWT configuration"/>
             </if>
-            <set field="omsBaseUrl" from="baseUrlProperty?.systemPropertyValue"/>
             <if condition="!omsBaseUrl">
                 <return error="true" message="OMS base url not found"/>
             </if>
