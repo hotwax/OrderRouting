@@ -4,7 +4,10 @@
 - Maarg instance should have write access to co.hotwax.order.routing.* entities 
 - moqui.service.message.SystemMessageRemote.remotePublicKey record should exists with systemMessageRemoteId="HC_OMS_CONFIG"
 
-``<moqui.service.message.SystemMessageRemote systemMessageRemoteId="HC_OMS_CONFIG" description="HotWax OMS server JWT token" remotePublicKey="<OMS JWT token>"/>``
+```bash
+    <moqui.service.message.SystemMessageRemote systemMessageRemoteId="HC_OMS_CONFIG" sendUrl=""
+            description="HotWax OMS server JWT token" remotePublicKey="<OMS JWT token>"/>
+```
 
 ### Order Routing Group
 - Product store id requried to setup order routing group
