@@ -85,7 +85,7 @@ public class OrderRoutingHelper {
         //TODO: For now just hardcode the SystemMessageRemote, need to find a better way to do this
         EntityValue omsInstance = ecfi.entityFacade.find("moqui.service.message.SystemMessageRemote")
                 .condition("systemMessageRemoteId", "HC_OMS_CONFIG").useCache(true).disableAuthz().one();
-        if (omsInstance != null) {
+        if (omsInstance != null && omsInstance.getString("sendUrl") != null) {
             return omsInstance.getString("sendUrl");
         } else {
             EntityValue omsInstanceProperty = ecfi.entityFacade.find("org.apache.ofbiz.common.property.SystemProperty")

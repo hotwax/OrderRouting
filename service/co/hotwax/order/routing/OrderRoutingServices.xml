@@ -113,7 +113,7 @@
                 <order-by field-name="sequenceNum"/>
             </entity-find>
             <if condition="!orderRoutings">
-                <return type="warning" message="No order routing configuration found for the specified routing group [${routingGroupId}]."/>
+                <return type="warning" message="No order routing configuration found for the specified routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
             </if>
             <log message="Started order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group."/>
             <iterate list="orderRoutings" entry="orderRouting">
