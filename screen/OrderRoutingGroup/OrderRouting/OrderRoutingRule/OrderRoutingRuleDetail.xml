@@ -91,7 +91,7 @@
                                     <drop-down>
                                         <entity-options key="${statusId}">
                                             <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
-                                                <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
+                                                <econdition field-name="statusTypeId" value="ORD_ROUT_RULE_STATUS"/>
                                             </entity-find>
                                         </entity-options>
                                     </drop-down>
