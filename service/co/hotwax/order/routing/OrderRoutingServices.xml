@@ -200,6 +200,9 @@
             <filter-map-list list="orderFilterConditions" to-list="sortFields">
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </filter-map-list>
+            <if condition="!sortFields">
+                <set field="sortFields" from="[[fieldName:'orderDate']]"/>
+            </if>
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
                 <econditions>
                     <econdition field-name="orderRoutingId" from="orderRoutingId"/>

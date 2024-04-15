@@ -1,0 +1,51 @@
+
+- System Message Remote association with OrderRouting or token mechanism - Done
+- Evaluate eligible inventory items against routing rule- Done
+- Execute action- Done
+- Add force routing run, ignore the order routing run check against- Done
+- clean#OrderRoutingRun - Done
+- Add support to run routing for single order/shipgroup - Done
+- Implement find order condition using OrderFilterCondition - Done
+- Discus with Aditya regarding not availalbe section in inventory rule - Done
+- Use CarrierShipkmentMeth.deliveryDays number to sort order list - Done
+- Need to check for mile/km - Done
+- Generate the sql condition based on condition operator - Done
+- ServiceJob get for order routing group - Done
+- Order filter promise date condition - Done
+- verify distance calculations- Done
+- JWT generation -done
+- Get facility end point - done
+- Api endpoint to schedule order routing group using service job -done
+- Add condition in run#OrderRoutingGroup, if group is active then only exeecute - Not needed
+- Add promise date condition while order fetch - Done
+- Brokering user in oms - Not needed now
+- Support to remove auto-cancel date from order item (OMS) - done
+- order facility change creation (OMS) - Done
+- API end pont for Service job run now option - Done
+- Run order routing for single order shipgroup - Donein
+- master child relationship for routing data model - Done
+- backend screen to view the routing group -Done
+- Check tabs section rendering moqui- Done
+- Add screen for order routing runs - Done
+- schedule purge order routing history job -Done
+- New queue for rejected order, unfillable parking - Done
+- Extent order facility change to store the routinggroupid, order routing id, and routing rule id with index  - Done
+- pass the routinggroup, routing id and rule in oms api call - Done
+- add last modified date on order routing - Done
+
+
+- Routing engine Logging - https://github.com/hotwax/OrderRouting/issues/2
+- authorization permission setup
+- null last while order by find order condition
+- Added support to get and set lat/long on order address if not availalbe while order import from shopify (OMS)
+- explore https://github.com/tailorsoft/ServiceJobMonitor
+- logic api_key support in oms
+- performance testing
+- test cases
+- Enable audit log for routing related entity entity- - https://github.com/hotwax/OrderRouting/issues/3
+- remote-rest service error message logging
+- order fitler order by condition
+- get the shipgroup based on shipping method while move item to virtual facility
+- order facility change creation verification
+- shipment total condition
+- error/success oder item count
