@@ -77,6 +77,9 @@
                 <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderRoutingGroupSchedule"/></method>
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/></method>
             </resource>
+            <resource name="clone">
+                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingGroup"/></method>
+            </resource>
             <resource name="routings">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
             </resource>
@@ -103,6 +106,9 @@
             <resource name="routingRuns">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRun" operation="list"/></method>
             </resource>
+            <resource name="clone">
+                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRouting"/></method>
+            </resource>
         </id>
     </resource>
     <resource name="rules">
@@ -123,6 +129,9 @@
                 <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="store"/></method>
                 <!--  -->
                 <method type="delete"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="delete"/></method>
+            </resource>
+            <resource name="clone">
+                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingRule"/></method>
             </resource>
         </id>
     </resource>
