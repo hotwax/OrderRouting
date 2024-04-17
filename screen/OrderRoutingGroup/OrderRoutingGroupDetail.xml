@@ -4,6 +4,8 @@
 
     <parameter name="routingGroupId" required="true"/>
     <transition name="jobRunList"><default-response url="../JobRuns/JobRunList"/></transition>
+    <transition name="serviceJobDetail">
+        <default-response url="//system/ServiceJob/Jobs/ServiceJobDetail"/></transition>
     <transition name="routingRunList"><default-response url="../OrderRouting/OrderRoutingRunList"/></transition>
     <transition name="orderRoutingDetail"><default-response url="../OrderRouting/OrderRoutingDetail"/></transition>
     <transition name="orderRoutingGroupSchedule">
@@ -26,12 +28,12 @@
         <service-call name="update#co.hotwax.order.routing.OrderRouting"/>
         <default-response url="."/>
     </transition>
+    <transition name="cloneOrderRoutingGroup">
+        <service-call name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingGroup"/>
+        <default-response url="." parameter-map="[routingGroupId:newRoutingGroupId]"/>
+    </transition>
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
-        <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="routings">
-            <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
-            <econdition field-name="routingGroupId" from="routingGroupId"/>
-        </entity-find>
         <entity-find-one entity-name="moqui.service.job.ServiceJobRunLock" value-field="runLock">
             <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
         </entity-find-one>
@@ -56,6 +58,11 @@
             <row-col>
                 <container-box>
                     <box-header title="Order Routing Group"/>
+                    <box-toolbar>
+                        <link url="cloneOrderRoutingGroup" text="Clone" confirmation="Are you sure to clone ${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}?">
+                            <parameter name="routingGroupId" from="orderRoutingGroup.routingGroupId"/>
+                        </link>
+                    </box-toolbar>
                     <box-body>
                         <form-single name="RoutingGroupForm" map="orderRoutingGroup" transition="updateRoutingGroup">
                             <field name="routingGroupId"><default-field><display/> </default-field></field>
@@ -93,7 +100,9 @@
                             <widgets>
                                 <form-single name="RoutingGroupScheduleForm" map="serviceJob" transition="orderRoutingGroupSchedule">
                                     <field name="routingGroupId"><default-field><hidden/></default-field></field>
-                                    <field name="jobName"><default-field><hidden/></default-field></field>
+                                    <field name="jobName">
+                                        <default-field><link url="serviceJobDetail" text="${jobName}" link-type="anchor" url-type="screen"/></default-field>
+                                    </field>
                                     <field name="description"><default-field><text-line/></default-field></field>
                                     <field name="cronExpression"><default-field tooltip="${cronExpressionDesc} ${TimeZone.getDefault().getID()} time"><text-line /></default-field></field>
                                     <field name="nextExecutionTime"><conditional-field condition="nextExecutionTime"><display/></conditional-field></field>
@@ -156,6 +165,10 @@
                     </box-toolbar>
                     <box-body>
                         <form-list name="OrderRouting" list="routings" list-entry="routing" transition="updateOrderRouting">
+                            <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="routings">
+                                <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
+                                <econdition field-name="routingGroupId" from="routingGroupId"/>
+                            </entity-find>
                             <field name="orderRoutingId">
                                 <default-field><hidden/></default-field>
                             </field>
