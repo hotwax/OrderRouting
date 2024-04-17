@@ -620,7 +620,6 @@
             <parameter name="copyOrderRoutingRules" default-value="true" type="Boolean">
                 <description>Parameter to check if the Order routing rule needs to be cloned, works only if copyOrderRoutings set to true.</description>
             </parameter>
-            <parameter name="newGroupName"/>
         </in-parameters>
         <out-parameters>
             <parameter name="newRoutingGroupId" required="true"/>
@@ -656,7 +655,9 @@
         <in-parameters>
             <parameter name="orderRoutingId" required="true"/>
             <parameter name="newRoutingGroupId" required="true"/>
-            <parameter name="copyOrderRoutingRules" default-value="true" type="Boolean"/>
+            <parameter name="copyOrderRoutingRules" default-value="true" type="Boolean">
+                <description>Parameter to check if the Order routing rule needs to be cloned.</description>
+            </parameter>
             <parameter name="newRoutingName"/>
         </in-parameters>
         <out-parameters>
@@ -757,6 +758,32 @@
                 </script>
                 <service-call name="create#co.hotwax.order.routing.OrderRoutingRuleAction" in-map="newOrderRoutingRuleAction"/>
             </iterate>
+        </actions>
+    </service>
+    <!-- Danger Zone-->
+    <!--TODO: Add permission  -->
+    <service verb="delete" noun="OrderRoutingGroup">
+        <in-parameters>
+            <parameter name="routingGroupId" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!ec.user.hasPermission('DELETE_ORDER_ROUTE')">
+                <return error="true" message="User does not have permission to delete order routing group."/>
+            </if>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="false"/>
+            <if condition="!orderRoutingGroup">
+                <log level="error" message="No orderRoutingGroup found for id ${routingGroupId}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
+                <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
+            </entity-find-one>
+            <if condition="serviceJob">
+                <service-call name="update#moqui.service.job.ServiceJob" in-map="[jobName: orderRoutingGroup.jobName, thruDate: ec.user.nowTimestamp, paused: 'Y']" disable-authz="true"/>
+            </if>
+            <script>
+                orderRoutingGroup.deleteWithCascade(['OrderRouting', 'OrderFilterCondition', 'OrderRoutingRule', 'OrderRoutingRuleInvCond', 'OrderRoutingRuleAction'] as Set, ['OrderRouting', 'OrderFilterCondition', 'OrderRoutingRule', 'OrderRoutingRuleInvCond', 'OrderRoutingRuleAction'] as Set)
+            </script>
         </actions>
     </service>
 </services>

@@ -8,6 +8,10 @@
         <service-call name="create#co.hotwax.order.routing.OrderRoutingGroup"/>
         <default-response url="."/>
     </transition>
+    <transition name="deleteOrderRoutingGroup">
+        <service-call name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRoutingGroup"/>
+        <default-response url="."/>
+    </transition>
 
     <widgets>
         <container-dialog id="AddOrderRoutingGroup" button-text="Add Order Routing Group">
@@ -39,7 +43,7 @@
             </row-actions>
             <field name="groupName">
                 <header-field show-order-by="case-insensitive"><text-find hide-options="true" size="20"/></header-field>
-                <default-field><link text="${groupName?:routingGroupId}" url="orderRoutingGroup" link-type="anchor"/></default-field>
+                <default-field><link text="${groupName?:routingGroupId} [${routingGroupId}]" url="orderRoutingGroup" link-type="anchor"/></default-field>
             </field>
             <field name="productStoreId">
                 <header-field show-order-by="true">
@@ -74,7 +78,10 @@
             </field>
             <field name="findButton">
                 <header-field title="Find"><submit/></header-field>
-                <default-field><display text=" "/></default-field>
+                <default-field title="">
+                    <link url="deleteOrderRoutingGroup" text="X" confirmation="Remove order routing group ${groupName}?"
+                            parameter-map="[routingGroupId:routingGroupId]" condition="ec.user.hasPermission('DELETE_ORDER_ROUTE')"/>
+                </default-field>
             </field>
         </form-list>
     </widgets>
