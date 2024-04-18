@@ -172,6 +172,7 @@
                             <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="routings">
                                 <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
                                 <econdition field-name="routingGroupId" from="routingGroupId"/>
+                                <order-by field-name="^sequenceNum, createdDate"/>
                             </entity-find>
                             <field name="orderRoutingId">
                                 <default-field><hidden/></default-field>

@@ -51,6 +51,7 @@
         <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="rules">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
             <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+            <order-by field-name="^sequenceNum, createdDate"/>
         </entity-find>
         <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilters">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
@@ -58,6 +59,7 @@
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
             </econditions>
+            <order-by field-name="^sequenceNum, createdDate"/>
         </entity-find>
         <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderSortByList">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
@@ -65,6 +67,7 @@
                 <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </econditions>
+            <order-by field-name="^sequenceNum, createdDate"/>
         </entity-find>
     </actions>
     <widgets>

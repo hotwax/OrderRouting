@@ -48,6 +48,7 @@
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
             </econditions>
+            <order-by field-name="^sequenceNum, createdDate"/>
         </entity-find>
         <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventorySortByList">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
@@ -55,12 +56,12 @@
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
                 <econdition field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </econditions>
+            <order-by field-name="^sequenceNum, createdDate"/>
         </entity-find>
         <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleAction" list="actions">
             <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
-            <econditions>
-                <econdition field-name="routingRuleId" from="routingRuleId"/>
-            </econditions>
+            <econdition field-name="routingRuleId" from="routingRuleId"/>
+            <order-by field-name="^sequenceNum, createdDate"/>
         </entity-find>
     </actions>
     <widgets>
