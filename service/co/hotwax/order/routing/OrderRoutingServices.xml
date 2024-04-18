@@ -811,7 +811,6 @@
         </actions>
     </service>
     <!-- Danger Zone-->
-    <!--TODO: Add permission  -->
     <service verb="delete" noun="OrderRoutingGroup">
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
@@ -834,6 +833,45 @@
             <script>
                 orderRoutingGroup.deleteWithCascade(null , ['co.hotwax.order.routing.OrderRouting', 'co.hotwax.order.routing.OrderFilterCondition', 'co.hotwax.order.routing.OrderRoutingRule', 'co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction'] as Set)
             </script>
+            <return message="Order routing group ${orderRoutingGroup.groupName?:''} [${routingGroupId}] delete successfully."/>
+        </actions>
+    </service>
+    <service verb="delete" noun="OrderRouting">
+        <in-parameters>
+            <parameter name="orderRoutingId" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!ec.user.hasPermission('DELETE_ORDER_ROUTE')">
+                <return error="true" message="User does not have permission to delete order routing."/>
+            </if>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="false"/>
+            <if condition="!orderRouting">
+                <log level="error" message="No order routing found for id ${orderRouting}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <script>
+                orderRouting.deleteWithCascade(null, ['co.hotwax.order.routing.OrderFilterCondition', 'co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction', 'co.hotwax.order.routing.OrderRoutingRule'] as Set)
+            </script>
+            <return message="Order routing ${orderRouting.routingName?:''} [${orderRoutingId}] delete successfully."/>
+        </actions>
+    </service>
+    <service verb="delete" noun="OrderRoutingRule">
+        <in-parameters>
+            <parameter name="routingRuleId" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!ec.user.hasPermission('DELETE_ORDER_ROUTE')">
+                <return error="true" message="User does not have permission to delete order routing rule."/>
+            </if>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="false"/>
+            <if condition="!orderRoutingRule">
+                <log level="error" message="No order routing rule found for id ${orderRouting}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <script>
+                orderRoutingRule.deleteWithCascade(null, ['co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction'] as Set)
+            </script>
+            <return message="Order routing rule ${orderRoutingRule.ruleName?:''} [${routingRuleId}] delete successfully."/>
         </actions>
     </service>
 </services>

@@ -79,7 +79,7 @@
             <field name="findButton">
                 <header-field title="Find"><submit/></header-field>
                 <default-field title="">
-                    <link url="deleteOrderRoutingGroup" text="X" confirmation="Remove order routing group ${groupName}?"
+                    <link url="deleteOrderRoutingGroup" text="X" confirmation="Remove order routing group ${groupName?:'' [${routingGroupId}]}?"
                             parameter-map="[routingGroupId:routingGroupId]" condition="ec.user.hasPermission('DELETE_ORDER_ROUTE')"/>
                 </default-field>
             </field>

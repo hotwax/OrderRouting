@@ -37,6 +37,10 @@
         <service-call name="update#co.hotwax.order.routing.OrderRoutingRule"/>
         <default-response url="."/>
     </transition>
+    <transition name="deleteOrderRoutingRule">
+        <service-call name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRoutingRule"/>
+        <default-response url="."/>
+    </transition>
     <transition name="routingRunList"><default-response url="../OrderRoutingRunList"/></transition>
 
     <actions>
@@ -280,6 +284,12 @@
                                 </default-field>
                             </field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+                            <field name="delete">
+                                <default-field title="">
+                                    <link url="deleteOrderRoutingRule" text="X" confirmation="Remove order routing rule ${ruleName?:''} [${routingRuleId}]?"
+                                            parameter-map="[routingRuleId:routingRuleId]" condition="ec.user.hasPermission('DELETE_ORDER_ROUTE')"/>
+                                </default-field>
+                            </field>
                         </form-list>
                     </box-body>
                 </container-box>

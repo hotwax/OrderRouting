@@ -32,6 +32,10 @@
         <service-call name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingGroup"/>
         <default-response url="." parameter-map="[routingGroupId:newRoutingGroupId]"/>
     </transition>
+    <transition name="deleteOrderRouting">
+        <service-call name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRouting"/>
+        <default-response url="."/>
+    </transition>
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
         <entity-find-one entity-name="moqui.service.job.ServiceJobRunLock" value-field="runLock">
@@ -204,6 +208,12 @@
                             <field name="routingRun"><default-field>
                                 <link url="routingRunList" text="Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId, orderRoutingId:orderRoutingId]"/>
                             </default-field></field>
+                            <field name="delete">
+                                <default-field title="">
+                                    <link url="deleteOrderRouting" text="X" confirmation="Remove order routing ${routingName?:''} [${orderRoutingId}]?"
+                                        parameter-map="[orderRoutingId:orderRoutingId]" condition="ec.user.hasPermission('DELETE_ORDER_ROUTE')"/>
+                                </default-field>
+                            </field>
                         </form-list>
                     </box-body>
                 </container-box>
