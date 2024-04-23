@@ -102,6 +102,9 @@ under the License.
         </member-entity>
         <alias-all entity-alias="PSFG"/>
         <alias-all entity-alias="FG"/>
+        <entity-condition>
+            <date-filter entity-alias="PSFG"/>
+        </entity-condition>
     </view-entity>
     <view-entity entity-name="StatusItemAndType" package="co.hotwax.common.status">
         <member-entity entity-alias="ST" entity-name="org.apache.ofbiz.common.status.StatusItem"/>
