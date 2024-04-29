@@ -121,7 +121,6 @@
                         in-map="[routingGroupId:routingGroupId, orderRoutingId: orderRouting.orderRoutingId,
                                 productStoreId: productStoreId, startDate:ec.user.nowTimestamp]"
                         out-map="routingRunResult"/>
-                <set field="runNextRouting" value="true" default-value="true" type="Boolean"/>
                 <script>
                    /*
                         Calling a service in a script with ignore-error="true".
@@ -133,8 +132,6 @@
                                 .requireNewTransaction(true)
                                 .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId])
                                 .call()
-
-                        runNextRouting = orderRoutingResult.runNextRouting
                     } catch (Throwable e) {
                         ec.logger.error("There is an issue with run#OrderRouting", e)
                     }
@@ -151,12 +148,10 @@
                     }
                     ec.message.clearAll();
                 </script>
+
                 <service-call name="update#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                         in-map="[routingRunId:routingRunResult.routingRunId,hasError:hasError, routingResult:routingResult, endDate:ec.user.nowTimestamp]"
                         out-map="routingRunResult"/>
-                <if condition="!runNextRouting">
-                    <break/>
-                </if>
             </iterate>
             <message type="success">Finished order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group.</message>
         </actions>
@@ -173,12 +168,7 @@
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
         </in-parameters>
-        <out-parameters>
-            <parameter name="runNextRouting" type="Boolean"/>
-        </out-parameters>
         <actions>
-            <!-- If an order is routed to a facility, all subsequent order routing run executions should be excluded-->
-            <set field="runNextRouting" value="true" type="Boolean"/>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
             <if condition="!orderRouting">
                 <return error="true" message="No order routing found for id ${orderRoutingId}"/>
@@ -275,7 +265,7 @@
                                         ec.message.clearAll()
                                     }
                                     if (!actionResult.runNextRule) {
-                                        runNextRouting = false
+                                        /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
                                         break
                                     }
                                 } else {
