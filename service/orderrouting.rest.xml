@@ -6,11 +6,11 @@
           It involves determining the most efficient and cost-effective way to fulfill customer orders based on various factors such as inventory levels, location of the products, shipping costs, and delivery times.">
 
     <resource name="login" require-authentication="anonymous-all">
-        <method type="post"><service name="co.hotwax.common.CommonServices.login#User"/></method>
+        <method type="post"><service name="co.hotwax.common.UserServices.login#User"/></method>
     </resource>
     <resource name="user">
         <resource name="profile">
-            <method type="get"><service name="co.hotwax.common.CommonServices.getUserProfile"/></method>
+            <method type="get"><service name="co.hotwax.common.UserServices.getUserProfile"/></method>
         </resource>
         <resource name="getAvailableTimeZones">
             <method type="get"><service name="co.hotwax.common.CommonServices.getAvailableTimeZones"/></method>
