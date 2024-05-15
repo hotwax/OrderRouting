@@ -339,6 +339,7 @@
             <set field="facilityParentTypeId" value="VIRTUAL_FACILITY"/>
             <set field="selectOrderItemSeqId" value="false" type="Boolean"/>
             <set field="orderFilterConditions" from="[]"/>
+            <set field="attemptedCount" value="0" type="Integer"/>
             <iterate list="filterConditions" entry="filterCondition">
                 <if condition='"promiseDaysCutoff".equals(filterCondition.fieldName)'>
                     <if condition="filterCondition.fieldValue">
@@ -374,6 +375,7 @@
                     con.createStatement().withCloseable({ statement ->
                         statement.executeQuery(writer.toString()).withCloseable({resultSet ->
                             while (resultSet.next()) {
+                                attemptedCount++;
                                 def orderItemSeqId=null;
                                 def selectedOrderId = resultSet.getString('ORDER_ID');
                                 def selectedShipGroupSeqId = resultSet.getString('SHIP_GROUP_SEQ_ID');
