@@ -157,7 +157,7 @@
         </actions>
     </service>
 
-    <service verb="run" noun="OrderRouting" transaction-timeout="36000">
+    <service verb="run" noun="OldOrderRouting" transaction-timeout="36000">
         <description>
             The service is to streamline the fulfillment process by intelligently routing orders through the system based on predefined conditions and rules.
             This service aims to optimize inventory distribution and order fulfillment efficiency by dynamically applying routing rules to each order's ship group,
@@ -285,6 +285,139 @@
         </actions>
     </service>
 
+    <service verb="run" noun="OrderRouting" transaction-timeout="36000">
+        <description>
+            The service is to streamline the fulfillment process by intelligently routing orders through the system based on predefined conditions and rules.
+            This service aims to optimize inventory distribution and order fulfillment efficiency by dynamically applying routing rules to each order's ship group,
+            ensuring that inventory allocation and subsequent actions are aligned with business logistics and inventory management strategies.
+        </description>
+        <in-parameters>
+            <parameter name="orderRoutingId" required="true"/>
+            <parameter name="orderId"/>
+            <parameter name="shipGroupSeqId"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
+            <if condition="!orderRouting">
+                <return error="true" message="No order routing found for id ${orderRoutingId}"/>
+            </if>
+            <if condition="!'ROUTING_ACTIVE'.equals(orderRouting.statusId)">
+                <return error="true" message="Order routing ${orderRouting.routingName} [${orderRoutingId}] is not active"/>
+            </if>
+            <entity-find-related-one value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingGroup" to-value-field="orderRoutingGroup" cache="true"/>
+            <log message="Started order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
+
+            <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
+                <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                <order-by field-name="sequenceNum"/>
+                <order-by field-name="createdDate DESC"/>
+            </entity-find>
+            <!-- Prepare the filter conditions for the order routing -->
+            <filter-map-list list="orderFilterConditions" to-list="filterConditions">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
+            </filter-map-list>
+            <!-- Prepare the order by for the order routing -->
+            <filter-map-list list="orderFilterConditions" to-list="sortFields">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
+            </filter-map-list>
+            <set field="orderSortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
+                <econditions>
+                    <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                    <econdition field-name="statusId" value="RULE_ACTIVE"/>
+                </econditions>
+                <order-by field-name="sequenceNum"/>
+            </entity-find>
+            <if condition="!orderRoutingRules">
+                <return error="true" message="No routing rule setup for order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
+            </if>
+
+            <set field="orderTypeId" value="SALES_ORDER"/>
+            <set field="productStoreId" from="orderRoutingGroup.productStoreId"/>
+            <set field="itemStatusId" value="ITEM_APPROVED"/>
+            <set field="orderStatusId" value="ORDER_APPROVED"/>
+            <set field="facilityParentTypeId" value="VIRTUAL_FACILITY"/>
+            <set field="selectOrderItemSeqId" value="false" type="Boolean"/>
+            <set field="orderFilterConditions" from="[]"/>
+            <iterate list="filterConditions" entry="filterCondition">
+                <if condition='"promiseDaysCutoff".equals(filterCondition.fieldName)'>
+                    <if condition="filterCondition.fieldValue">
+                        <!--
+                        When promiseDaysCutoff is configured, it acts as a constraint that prioritizes order items to be processed and allocated in a way that meets the delivery promise timeframe.
+                        The brokering process is executed at the individual order item level rather than at a more aggregated shipGroup level.
+                        -->
+                        <set field="selectOrderItemSeqId" value="true" type="Boolean"/>
+                        <script>
+                            promisedDatetime = java.time.ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long)
+                                    .with(java.time.LocalTime.MAX).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+                        </script>
+                        <set field="orderFilterConditions" from="orderFilterConditions + [fieldName: 'promisedDatetime', operator: filterCondition.operator, fieldValue: promisedDatetime]"/>
+                    </if>
+                <else-if condition='"facilityGroupId".equals(filterCondition.fieldName)'>
+                    <set field="facilityGroupCondition" from="filterCondition.fieldValue"/>
+                </else-if>
+                <else-if condition='"productCategoryId".equals(filterCondition.fieldName)'>
+                    <set field="productCategoryCondition" from="filterCondition"/>
+                </else-if>
+                <else>
+                    <set field="orderFilterConditions" from="orderFilterConditions + filterCondition"/>
+                </else>
+                </if>
+            </iterate>
+            <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
+            <log message="Fetching order with condition ${orderFilterConditions} for routing ${orderRouting.routingName} [${orderRoutingId}]"/>
+            <script>
+                    Writer writer = new StringWriter()
+                    ec.resourceFacade.template(templateLoc, writer)
+                    //ec.logger.info("Eligible orders sql: ${writer}")
+                    java.sql.Connection con = ec.getEntity().getConnection(orderRouting.getEntityDefinition().getEntityGroupName())
+                    con.createStatement().withCloseable({ statement ->
+                        statement.executeQuery(writer.toString()).withCloseable({resultSet ->
+                            while (resultSet.next()) {
+                ec.logger.info("=start==selectedOrderId===${selectedOrderId}=");
+                                def orderItemSeqId=null;
+                                def selectedOrderId = resultSet.getString('ORDER_ID');
+
+                                def selectedShipGroupSeqId = resultSet.getString('SHIP_GROUP_SEQ_ID');
+                                if (selectOrderItemSeqId) {
+                                    orderItemSeqId = resultSet.getString('ORDER_ITEM_SEQ_ID');
+                                }
+                                ruleIterator = orderRoutingRules.iterator()
+                                while (ruleIterator.hasNext()) {
+                                    def routingRule = ruleIterator.next()
+                                    ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
+                                            .requireNewTransaction(true)
+                                            .parameters([routingRuleId: routingRule.routingRuleId,
+                                                    orderId: selectedOrderId, shipGroupSeqId: selectedShipGroupSeqId, orderItemSeqId: orderItemSeqId])
+                                            .call()
+                                    if (!ec.message.hasError()) {
+                                        actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
+                                                .requireNewTransaction(true)
+                                                .parameters([orderId: selectedOrderId, shipGroupSeqId: selectedShipGroupSeqId,orderItemSeqId: orderItemSeqId,
+                                                        routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
+                                                .call()
+                                        if (ec.message.hasError()) {
+                                            ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
+                                            ec.message.clearAll()
+                                        }
+                                        if (!actionResult.runNextRule) {
+                                            /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
+                                            break
+                                        }
+                                    } else {
+                                        ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
+                                        ec.message.clearAll()
+                                    }
+                                }
+                            }
+                ec.logger.info("=end==selectedOrderId===${selectedOrderId}=");
+                        })
+                    })
+            </script>
+            <return message="Attempted ${attemptedCount} ${selectOrderItemSeqId?'item(s)':'ship group(s)'} for the '${orderRouting.routingName} [${orderRoutingId}] order routing"/>
+        </actions>
+    </service>
+
     <service verb="run" noun="OrderRoutingRule" transaction-timeout="36000">
         <description>
             To dynamically fetch and allocate inventory for order fulfillment based on specific routing rule configurations.
@@ -300,6 +433,7 @@
             <parameter name="suggestedFulfillmentLocations"/>
         </out-parameters>
         <actions>
+        <log message="==============begin==="/>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="true"/>
             <if condition="!orderRoutingRule">
                 <return error="true" message="No order routing found for id ${routingRuleId}"/>
@@ -340,7 +474,7 @@
                 try {
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
-                //ec.logger.info("======writer==${writer}==")
+                ec.logger.info("======writer==${writer}==")
                 java.sql.Connection con = ec.getEntity().getConnection(orderRoutingRule.getEntityDefinition().getEntityGroupName())
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
