@@ -108,7 +108,7 @@ x.*
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
           <#if invenoryGroupFiter?has_content>AND fgm.FACILITY_GROUP_ID <@buildSqlCondition value=invenoryGroupFiter /></#if> -- in ('${(invenoryGroupFiter.get("fieldValue"))!}') -- NEW facility group ids need to be passed for the groups on which routing is expected to be performed
           having
-          <#if distance?has_content>distance <@buildSqlCondition value=distance /> and </#if> -- >= ${(distance.get("fieldValue"))!0} -- TODO: Need to check for miles/km
+          <#if distance?has_content>distance <@buildSqlCondition value=distance /> and </#if> -- >= ${(distance.get("fieldValue"))!0}
           <#if !orderRoutingRule.assignmentEnumId?has_content || 'ORA_SINGLE' == orderRoutingRule.assignmentEnumId> rank_by_order_above_facility_threshold='Y' -- NEW for sorting facility having all the items above threshold
           <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId> case when rank_by_order_at_facility='Y' then item_at_facility_above_threshold='Y' end </#if>
           order by
