@@ -32,6 +32,8 @@
     <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PRIORITY" description="Order Priority" sequenceNum="20" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="priority"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PROMISE_DATE" description="Promise Date" sequenceNum="25" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="promiseDaysCutoff"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_SALES_CHANNEL" description="Sales channel" sequenceNum="5" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="salesChannelEnumId"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_ORIGIN_FAC_GRP" description="Origin facility group" sequenceNum="30" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="originFacilityGroupId"/>
+    <org.apache.ofbiz.common.enum.Enumeration enumId="OIP_PROD_CATEGORY" description="Product category" sequenceNum="35" enumTypeId="ORD_FILTER_PRM_TYPE" enumCode="productCategoryId"/>
 
     <org.apache.ofbiz.common.enum.EnumerationType enumTypeId="INV_FILTER_PRM_TYPE" description="Determine the input parameter or field to be considered in a inventory condition " parentTypeId="ORDER_ROUTING"/>
     <org.apache.ofbiz.common.enum.Enumeration enumId="IIP_FACILITY_GROUP" description="Facility group" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="facilityGroupId"/>

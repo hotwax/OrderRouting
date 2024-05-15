@@ -353,7 +353,7 @@
                         </script>
                         <set field="orderFilterConditions" from="orderFilterConditions + [fieldName: 'promisedDatetime', operator: filterCondition.operator, fieldValue: promisedDatetime]"/>
                     </if>
-                <else-if condition='"facilityGroupId".equals(filterCondition.fieldName)'>
+                <else-if condition='"originFacilityGroupId".equals(filterCondition.fieldName)'>
                     <set field="facilityGroupCondition" from="filterCondition.fieldValue"/>
                 </else-if>
                 <else-if condition='"productCategoryId".equals(filterCondition.fieldName)'>
