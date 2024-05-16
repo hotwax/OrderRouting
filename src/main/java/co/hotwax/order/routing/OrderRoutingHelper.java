@@ -10,16 +10,18 @@ import javax.cache.Cache;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class OrderRoutingHelper {
     protected static final Logger logger = LoggerFactory.getLogger(OrderRoutingHelper.class);
     protected static Cache<String, String> jwtCache;
-    public static String makeSqlWhere(EntityValue ev) {
+    public static String makeSqlWhere(Map<String, Object> ev) {
         @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
         StringBuilder sql = new StringBuilder();
         boolean valueDone = false;
         Object value = ev.get("fieldValue");
-        EntityCondition.ComparisonOperator operator = EntityConditionFactoryImpl.getComparisonOperator(ev.getString("operator"));
+        EntityCondition.ComparisonOperator operator = EntityConditionFactoryImpl.getComparisonOperator((String) ev.get("operator"));
         if (value == null) {
             if (operator == EntityCondition.EQUALS || operator == EntityCondition.LIKE || operator == EntityCondition.IN || operator == EntityCondition.BETWEEN) {
                 sql.append(" IS NULL");
@@ -67,7 +69,9 @@ public class OrderRoutingHelper {
         if (value instanceof CharSequence) {
             String valueStr = value.toString();
             // note: used to do this, now always put in List: if (valueStr.contains(","))
-            value = Arrays.asList(valueStr.split(","));
+            value = Arrays.stream(valueStr.split(","))
+                    .map(String::trim) // Trim each element
+                    .collect(Collectors.toList());
         }
         // TODO: any other useful types to convert?
         return value;
