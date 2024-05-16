@@ -398,24 +398,24 @@
                                             .ignorePreviousError(true)
                                             .call()
                                     if (ruleResult) {
-                                    if (!ec.message.hasError()) {
-                                        actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
-                                                .parameters([orderId: selectedOrderId, shipGroupSeqId: selectedShipGroupSeqId,orderItemSeqId: orderItemSeqId,
-                                                        routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
-                                                .ignorePreviousError(true)
-                                                .call()
-                                        if (ec.message.hasError()) {
-                                            ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
+                                        if (!ec.message.hasError()) {
+                                            actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
+                                                    .parameters([orderId: selectedOrderId, shipGroupSeqId: selectedShipGroupSeqId,orderItemSeqId: orderItemSeqId,
+                                                            routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
+                                                    .ignorePreviousError(true)
+                                                    .call()
+                                            if (ec.message.hasError()) {
+                                                ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
+                                                ec.message.clearAll()
+                                            }
+                                            if (!actionResult?.runNextRule) {
+                                                /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
+                                                break
+                                            }
+                                        } else {
+                                            ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
                                             ec.message.clearAll()
                                         }
-                                        if (!actionResult?.runNextRule) {
-                                            /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
-                                            break
-                                        }
-                                    } else {
-                                        ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
-                                        ec.message.clearAll()
-                                    }
                                     }
                                 }
                             }
