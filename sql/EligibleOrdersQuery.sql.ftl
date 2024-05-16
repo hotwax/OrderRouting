@@ -2,13 +2,13 @@
   ${fieldName} ${Static["co.hotwax.order.routing.OrderRoutingHelper"].makeSqlWhere(filterCodnition)!}
 </#macro>
 SELECT
-  ORDER_ID'orderId',
-  SHIP_GROUP_SEQ_ID'shipGroupSeqId'
+  orderId,
+  shipGroupSeqId
   <#if selectOrderItemSeqId>,ORDER_ITEM_SEQ_ID'orderItemSeqId' <#--conditional field to select --></#if>
 from
   (SELECT
-    OH.ORDER_ID,
-    OIS.SHIP_GROUP_SEQ_ID,
+    OH.ORDER_ID'orderId',
+    OIS.SHIP_GROUP_SEQ_ID'shipGroupSeqId',
     OI.ORDER_ITEM_SEQ_ID,
     OH.PRODUCT_STORE_ID,
     OH.STATUS_ID,
