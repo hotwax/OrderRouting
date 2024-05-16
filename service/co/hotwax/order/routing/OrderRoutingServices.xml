@@ -355,7 +355,7 @@
                         <set field="orderFilterConditions" from="orderFilterConditions + [fieldName: 'promisedDatetime', operator: filterCondition.operator, fieldValue: promisedDatetime]"/>
                     </if>
                 <else-if condition='"originFacilityGroupId".equals(filterCondition.fieldName)'>
-                    <set field="facilityGroupCondition" from="filterCondition.fieldValue"/>
+                    <set field="facilityGroupCondition" from="filterCondition"/>
                 </else-if>
                 <else-if condition='"productCategoryId".equals(filterCondition.fieldName)'>
                     <set field="productCategoryCondition" from="filterCondition"/>
@@ -367,20 +367,29 @@
             </iterate>
             <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
             <log message="Fetching order with condition ${orderFilterConditions} for routing ${orderRouting.routingName} [${orderRoutingId}]"/>
-            <script>
+            <script><![CDATA[
                     Writer writer = new StringWriter()
                     ec.resourceFacade.template(templateLoc, writer)
                     //ec.logger.info("Eligible orders sql: ${writer}")
-                    java.sql.Connection con = ec.getEntity().getConnection(orderRouting.getEntityDefinition().getEntityGroupName())
-                    con.createStatement().withCloseable({ statement ->
-                        statement.executeQuery(writer.toString()).withCloseable({resultSet ->
-                            while (resultSet.next()) {
+                    /**
+                      Note:
+                        We can use statement.executeQuery as well.
+                        However, using `requireNewTransaction` causes issues with `ResultSet` objects.
+                        When `requireNewTransaction` is used, the `ResultSet` gets closed prematurely.
+                        To avoid this issue, `ignorePreviousError` is used, which prevents the `ResultSet`
+                        from being closed, allowing for continued data processing without interruption.
+                     */
+                    def fieldList =['orderId', 'shipGroupSeqId'];
+                    if (selectOrderItemSeqId) {
+                        fieldList.add('orderItemSeqId')
+                    }
+                    try (eli = ec.entityFacade.sqlFind(writer.toString(), null, "co.hotwax.order.OrderItemsQueue", ['orderId', 'shipGroupSeqId'])) {
+                        EntityValue nextValue
+                            while ((nextValue = (EntityValue) eli.next()) != null) {
                                 attemptedCount++;
-                                def orderItemSeqId=null;
-                                def selectedOrderId = resultSet.getString('ORDER_ID');
-                                def selectedShipGroupSeqId = resultSet.getString('SHIP_GROUP_SEQ_ID');
+                                def orderItemSeqId = null;
                                 if (selectOrderItemSeqId) {
-                                    orderItemSeqId = resultSet.getString('ORDER_ITEM_SEQ_ID');
+                                  orderItemSeqId = nextValue.orderItemSeqId
                                 }
                                 ruleIterator = orderRoutingRules.iterator()
                                 while (ruleIterator.hasNext()) {
@@ -394,15 +403,14 @@
 
                                     ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
                                             .parameters([routingRuleId: routingRule.routingRuleId,
-                                                    orderId: selectedOrderId, shipGroupSeqId: selectedShipGroupSeqId, orderItemSeqId: orderItemSeqId])
-                                            .ignorePreviousError(true)
+                                                    orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId, orderItemSeqId: orderItemSeqId])
+                                            .requireNewTransaction(true)
                                             .call()
-                                    if (ruleResult) {
                                         if (!ec.message.hasError()) {
                                             actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
-                                                    .parameters([orderId: selectedOrderId, shipGroupSeqId: selectedShipGroupSeqId,orderItemSeqId: orderItemSeqId,
+                                                    .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId,
                                                             routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
-                                                    .ignorePreviousError(true)
+                                                    .requireNewTransaction(true)
                                                     .call()
                                             if (ec.message.hasError()) {
                                                 ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
@@ -416,12 +424,10 @@
                                             ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
                                             ec.message.clearAll()
                                         }
-                                    }
                                 }
                             }
-                        })
-                    })
-            </script>
+                    }
+            ]]></script>
             <return message="Attempted ${attemptedCount} ${selectOrderItemSeqId?'item(s)':'ship group(s)'} for the '${orderRouting.routingName} [${orderRoutingId}] order routing"/>
         </actions>
     </service>

@@ -2,9 +2,9 @@
   ${fieldName} ${Static["co.hotwax.order.routing.OrderRoutingHelper"].makeSqlWhere(filterCodnition)!}
 </#macro>
 SELECT
-  ORDER_ID,
-  SHIP_GROUP_SEQ_ID
-  <#if selectOrderItemSeqId>,ORDER_ITEM_SEQ_ID <#--conditional field to select --></#if>
+  ORDER_ID'orderId',
+  SHIP_GROUP_SEQ_ID'shipGroupSeqId'
+  <#if selectOrderItemSeqId>,ORDER_ITEM_SEQ_ID'orderItemSeqId' <#--conditional field to select --></#if>
 from
   (SELECT
     OH.ORDER_ID,
@@ -40,8 +40,8 @@ WHERE
     AND ITEM_STATUS_ID = '${itemStatusId!''}'
     AND FACILITY_PARENT_TYPE_ID = '${facilityParentTypeId!''}'
     <#if orderId?has_content>
-      AND ORDER_ID= '${orderId}'
-      <#if shipGroupSeqId?has_content> AND SHIP_GROUP_SEQ_ID = ${shipGroupSeqId}</#if>
+      AND orderId= '${orderId}'
+      <#if shipGroupSeqId?has_content> AND shipGroupSeqId = ${shipGroupSeqId}</#if>
     </#if>
     <#if orderFilterConditions?has_content>
       <#list orderFilterConditions as filterCondition>
@@ -50,9 +50,9 @@ WHERE
     </#if>
   )
 GROUP BY
-  ORDER_ID,
-  SHIP_GROUP_SEQ_ID
-  <#if selectOrderItemSeqId>, ORDER_ITEM_SEQ_ID</#if> <#-- If items are filtered using promisedDatetime, we need to include orderItemSeqId in the GROUP BY clause -->
+  orderId,
+  shipGroupSeqId
+  <#if selectOrderItemSeqId>, orderItemSeqId</#if> <#-- If items are filtered using promisedDatetime, we need to include orderItemSeqId in the GROUP BY clause -->
 HAVING
   COUNT(ORDER_ITEM_SEQ_ID) > '0'
 ORDER BY
