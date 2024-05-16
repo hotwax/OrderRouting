@@ -368,65 +368,55 @@
             <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
             <log message="Fetching order with condition ${orderFilterConditions} for routing ${orderRouting.routingName} [${orderRoutingId}]"/>
             <script><![CDATA[
-                    Writer writer = new StringWriter()
-                    ec.resourceFacade.template(templateLoc, writer)
-                    //ec.logger.info("Eligible orders sql: ${writer}")
-                    /**
-                      Note:
+                Writer writer = new StringWriter()
+                ec.resourceFacade.template(templateLoc, writer)
+                //ec.logger.info("Eligible orders sql: ${writer}")
+                /** Note:
                         We can use statement.executeQuery as well.
                         However, using `requireNewTransaction` causes issues with `ResultSet` objects.
                         When `requireNewTransaction` is used, the `ResultSet` gets closed prematurely.
-                        To avoid this issue, `ignorePreviousError` is used, which prevents the `ResultSet`
-                        from being closed, allowing for continued data processing without interruption.
-                     */
-                    def fieldList =['orderId', 'shipGroupSeqId'];
-                    if (selectOrderItemSeqId) {
-                        fieldList.add('orderItemSeqId')
-                    }
-                    try (eli = ec.entityFacade.sqlFind(writer.toString(), null, "co.hotwax.order.OrderItemsQueue", ['orderId', 'shipGroupSeqId'])) {
-                        EntityValue nextValue
-                            while ((nextValue = (EntityValue) eli.next()) != null) {
-                                attemptedCount++;
-                                def orderItemSeqId = null;
-                                if (selectOrderItemSeqId) {
-                                  orderItemSeqId = nextValue.orderItemSeqId
+                 */
+                def fieldList =['orderId', 'shipGroupSeqId'];
+                if (selectOrderItemSeqId) {
+                    fieldList.add('orderItemSeqId')
+                }
+                try (eli = ec.entityFacade.sqlFind(writer.toString(), null, "co.hotwax.order.OrderItemsQueue", fieldList)) {
+                    EntityValue nextValue
+                    while ((nextValue = (EntityValue) eli.next()) != null) {
+                        attemptedCount++;
+                        def orderItemSeqId = null;
+                        if (selectOrderItemSeqId) {
+                          orderItemSeqId = nextValue.orderItemSeqId
+                        }
+                        ruleIterator = orderRoutingRules.iterator()
+                        while (ruleIterator.hasNext()) {
+                            def routingRule = ruleIterator.next()
+                            ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
+                                    .parameters([routingRuleId: routingRule.routingRuleId,
+                                            orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId, orderItemSeqId: orderItemSeqId])
+                                    .requireNewTransaction(true)
+                                    .call()
+                            if (!ec.message.hasError()) {
+                                actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
+                                        .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId,
+                                                routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
+                                        .requireNewTransaction(true)
+                                        .call()
+                                if (ec.message.hasError()) {
+                                    ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
+                                    ec.message.clearAll()
                                 }
-                                ruleIterator = orderRoutingRules.iterator()
-                                while (ruleIterator.hasNext()) {
-                                    def routingRule = ruleIterator.next()
-                                    /**
-                                     Note: The use of `requireNewTransaction` causes issues with `ResultSet` objects.
-                                     When `requireNewTransaction` is used, the `ResultSet` gets closed prematurely.
-                                     To avoid this issue, `ignorePreviousError` is used, which prevents the `ResultSet`
-                                     from being closed, allowing for continued data processing without interruption.
-                                    */
-
-                                    ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
-                                            .parameters([routingRuleId: routingRule.routingRuleId,
-                                                    orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId, orderItemSeqId: orderItemSeqId])
-                                            .requireNewTransaction(true)
-                                            .call()
-                                        if (!ec.message.hasError()) {
-                                            actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
-                                                    .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId,
-                                                            routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
-                                                    .requireNewTransaction(true)
-                                                    .call()
-                                            if (ec.message.hasError()) {
-                                                ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
-                                                ec.message.clearAll()
-                                            }
-                                            if (!actionResult?.runNextRule) {
-                                                /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
-                                                break
-                                            }
-                                        } else {
-                                            ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
-                                            ec.message.clearAll()
-                                        }
+                                if (!actionResult?.runNextRule) {
+                                    /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
+                                    break
                                 }
+                            } else {
+                                ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
+                                ec.message.clearAll()
                             }
+                        }
                     }
+                }
             ]]></script>
             <return message="Attempted ${attemptedCount} ${selectOrderItemSeqId?'item(s)':'ship group(s)'} for the '${orderRouting.routingName} [${orderRoutingId}] order routing"/>
         </actions>
