@@ -70,7 +70,7 @@
         <id name="routingGroupId">
             <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="one" masterName="default" /></method>
             <method type="post"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="store" masterName="default"/></method>
-            <method type="delete"><service name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRoutingGroup"/></method>
+            <method type="delete"><service name="co.hotwax.order.routing.CommonServices.delete#OrderRoutingGroup"/></method>
             <resource name="runNow">
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.scheduleNow#OrderRoutingGroup"/></method>
             </resource>
@@ -79,7 +79,7 @@
                 <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/></method>
             </resource>
             <resource name="clone">
-                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingGroup"/></method>
+                <method type="post"><service name="co.hotwax.order.routing.CommonServices.clone#OrderRoutingGroup"/></method>
             </resource>
             <resource name="routings">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRouting" operation="list"/></method>
@@ -111,7 +111,7 @@
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRun" operation="list"/></method>
             </resource>
             <resource name="clone">
-                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRouting"/></method>
+                <method type="post"><service name="co.hotwax.order.routing.CommonServices.clone#OrderRouting"/></method>
             </resource>
         </id>
     </resource>
@@ -135,7 +135,7 @@
                 <method type="delete"><entity name="co.hotwax.order.routing.OrderRoutingRuleAction" operation="delete"/></method>
             </resource>
             <resource name="clone">
-                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingRule"/></method>
+                <method type="post"><service name="co.hotwax.order.routing.CommonServices.clone#OrderRoutingRule"/></method>
             </resource>
         </id>
     </resource>

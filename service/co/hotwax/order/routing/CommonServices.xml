@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://moqui.org/xsd/service-definition-3.xsd">
+    <!-- Cloning services -->
+    <service verb="clone" noun="OrderRoutingGroup">
+        <in-parameters>
+            <parameter name="routingGroupId" required="true"/>
+            <parameter name="newGroupName"/>
+            <parameter name="sequenceNum">
+                <description>Order routing group sequence. By default, it will be added as the last one. </description>
+            </parameter>
+            <parameter name="copyOrderRoutings" default-value="true" type="Boolean">
+                <description>Parameter to check if the Order routing needs to be cloned.</description>
+            </parameter>
+            <parameter name="copyOrderRoutingRules" default-value="true" type="Boolean">
+                <description>Parameter to check if the Order routing rule needs to be cloned, works only if copyOrderRoutings set to true.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="newRoutingGroupId" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="false"/>
+            <if condition="!orderRoutingGroup">
+                <log level="error" message="No orderRoutingGroup found for id ${routingGroupId}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <!-- Create new OrderRoutingGroup -->
+            <if condition="!sequenceNum">
+                <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" list="orderRoutingGroups">
+                    <econdition field-name="productStoreId" from="orderRoutingGroup.productStoreId"/>
+                    <econdition field-name="sequenceNum" operator="is-not-null"/>
+                    <order-by field-name="-sequenceNum"/>
+                </entity-find>
+                <set field="sequenceNum" from="orderRoutingGroups?(orderRoutingGroups.first().sequenceNum +1 ): 1"/>
+            </if>
+            <set field="newRoutingGroup" from="orderRoutingGroup.getValueMap()" />
+            <script>
+                newRoutingGroup.remove("routingGroupId");
+                newRoutingGroup.remove("jobName");
+                newRoutingGroup.remove("lastUpdatedStamp");
+            </script>
+            <set field="newRoutingGroup.groupName" from="newGroupName" default-value="copy of ${orderRoutingGroup.groupName}"/>
+            <set field="newRoutingGroup.sequenceNum" from="sequenceNum"/>
+            <set field="newRoutingGroup.createdByUser" from="ec.user.getUsername()"/>
+            <set field="newRoutingGroup.createdDate" from="ec.user.nowTimestamp"/>
+            <set field="newRoutingGroup.lastModifiedDate" from="ec.user.nowTimestamp"/>
+            <service-call name="create#co.hotwax.order.routing.OrderRoutingGroup" in-map="newRoutingGroup" out-map="resultMap"/>
+            <set field="newRoutingGroupId" from="resultMap.routingGroupId"/>
+
+            <!-- Get associated OrderRouting -->
+            <if condition="copyOrderRoutings">
+                <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="orderRoutings">
+                    <econdition field-name="routingGroupId"/>
+                </entity-find>
+                <iterate list="orderRoutings" entry="orderRouting">
+                    <service-call name="co.hotwax.order.routing.CommonServices.clone#OrderRouting"
+                                  in-map="[orderRoutingId: orderRouting.orderRoutingId, newRoutingGroupId:newRoutingGroupId, copyOrderRoutingRules: copyOrderRoutingRules, sequenceNum:orderRouting.sequenceNum]" />
+                </iterate>
+            </if>
+        </actions>
+    </service>
+    <service verb="clone" noun="OrderRouting">
+        <in-parameters>
+            <parameter name="orderRoutingId" required="true"/>
+            <parameter name="newRoutingGroupId" required="true"/>
+            <parameter name="copyOrderRoutingRules" default-value="true" type="Boolean">
+                <description>Parameter to check if the Order routing rule needs to be cloned.</description>
+            </parameter>
+            <parameter name="newRoutingName"/>
+            <parameter name="sequenceNum">
+                <description>Order routing group sequence. By default, it will be added as the last one. </description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="newOrderRoutingId" required="true"/>
+        </out-parameters>
+        <actions>
+            <!-- Create new OrderRouting -->
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="false"/>
+            <if condition="!orderRouting">
+                <log level="error" message="No orderRouting found for id ${orderRoutingId}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <if condition="!sequenceNum">
+                <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="orderRoutings">
+                    <econdition field-name="routingGroupId" from="orderRouting.routingGroupId"/>
+                    <econdition field-name="sequenceNum" operator="is-not-null"/>
+                    <order-by field-name="-sequenceNum"/>
+                </entity-find>
+                <set field="sequenceNum" from="orderRoutings?(orderRoutings.first().sequenceNum +1): 1"/>
+            </if>
+            <set field="newOrderRouting" from="orderRouting.getValueMap()" />
+            <script>
+                newOrderRouting.remove("orderRoutingId");
+                newOrderRouting.remove("lastUpdatedStamp");
+            </script>
+            <set field="newOrderRouting.statusId" value="ROUTING_DRAFT"/>
+            <set field="newOrderRouting.routingGroupId" from="newRoutingGroupId"/>
+            <set field="newOrderRouting.routingName" from="newRoutingName" default-value="${orderRouting.routingName}"/>
+            <set field="newOrderRouting.sequenceNum" from="sequenceNum"/>
+            <set field="newOrderRouting.createdDate" from="ec.user.nowTimestamp"/>
+            <set field="newOrderRouting.createdByUser" from="ec.user.getUsername()"/>
+            <service-call name="create#co.hotwax.order.routing.OrderRouting" in-map="newOrderRouting" out-map="resultMap"/>
+            <set field="newOrderRoutingId" from="resultMap.orderRoutingId"/>
+
+            <!-- clone#OrderFilterCondition -->
+            <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
+                <econdition field-name="orderRoutingId"/>
+            </entity-find>
+            <iterate list="orderFilterConditions" entry="orderFilterCondition">
+                <set field="newOrderFilterCondition" from="orderFilterCondition.getValueMap()" />
+                <set field="newOrderFilterCondition.orderRoutingId" from="newOrderRoutingId"/>
+                <set field="newOrderFilterCondition.createdDate" from="ec.user.nowTimestamp"/>
+                <script>
+                    newOrderFilterCondition.remove("conditionSeqId");
+                    newOrderFilterCondition.remove("lastUpdatedStamp");
+                </script>
+                <service-call name="create#co.hotwax.order.routing.OrderFilterCondition" in-map="newOrderFilterCondition"/>
+            </iterate>
+
+            <!-- Get associated OrderRoutingRule -->
+            <if condition="copyOrderRoutingRules">
+                <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
+                    <econdition field-name="orderRoutingId"/>
+                </entity-find>
+                <iterate list="orderRoutingRules" entry="orderRoutingRule">
+                    <service-call name="co.hotwax.order.routing.CommonServices.clone#OrderRoutingRule"
+                                  in-map="[routingRuleId: orderRoutingRule.routingRuleId, newOrderRoutingId: newOrderRoutingId, sequenceNum:orderRoutingRule.sequenceNum]" />
+                </iterate>
+            </if>
+        </actions>
+    </service>
+    <service verb="clone" noun="OrderRoutingRule">
+        <in-parameters>
+            <parameter name="routingRuleId" required="true"/>
+            <parameter name="newOrderRoutingId" required="true"/>
+            <parameter name="newRuleName"/>
+            <parameter name="sequenceNum">
+                <description>Order routing group sequence. By default, it will be added as the last one. </description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="newRoutingRuleId" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="false"/>
+            <if condition="!orderRoutingRule">
+                <log level="error" message="No order routing rule found for id ${routingRuleId}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <if condition="!sequenceNum">
+                <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
+                    <econdition field-name="orderRoutingId" from="orderRoutingRule.orderRoutingId"/>
+                    <econdition field-name="sequenceNum" operator="is-not-null"/>
+                    <order-by field-name="-sequenceNum"/>
+                </entity-find>
+                <set field="sequenceNum" from="orderRoutingRules?(orderRoutingRules.first().sequenceNum +1) : 1"/>
+            </if>
+            <!-- Create new OrderRoutingRule -->
+            <set field="newOrderRoutingRule" from="orderRoutingRule.getValueMap()" />
+            <script>
+                newOrderRoutingRule.remove("routingRuleId");
+                newOrderRoutingRule.remove("lastUpdatedStamp");
+            </script>
+            <set field="newOrderRoutingRule.statusId" value="RULE_DRAFT"/>
+            <set field="newOrderRoutingRule.orderRoutingId" from="newOrderRoutingId"/>
+            <set field="newOrderRoutingRule.ruleName" from="newRuleName" default-value="${orderRoutingRule.ruleName}"/>
+            <set field="newOrderRoutingRule.sequenceNum" from="sequenceNum"/>
+            <set field="newOrderRoutingRule.createdDate" from="ec.user.nowTimestamp"/>
+            <set field="newOrderRoutingRule.createdByUser" from="ec.user.getUsername()"/>
+            <service-call name="create#co.hotwax.order.routing.OrderRoutingRule" in-map="newOrderRoutingRule" out-map="resultMap"/>
+            <set field="newRoutingRuleId" from="resultMap.routingRuleId"/>
+            <!-- clone#OrderRoutingRuleInvCond -->
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="orderRoutingRuleInvCondList">
+                <econdition field-name="routingRuleId"/>
+            </entity-find>
+            <iterate list="orderRoutingRuleInvCondList" entry="orderRoutingRuleInvCond">
+                <set field="newOrderRoutingRuleInvCond" from="orderRoutingRuleInvCond.getValueMap()" />
+                <set field="newOrderRoutingRuleInvCond.routingRuleId" from="newRoutingRuleId"/>
+                <set field="newOrderRoutingRuleInvCond.createdDate" from="ec.user.nowTimestamp"/>
+                <script>
+                    newOrderRoutingRuleInvCond.remove("conditionSeqId");
+                    newOrderRoutingRuleInvCond.remove("lastUpdatedStamp");
+                </script>
+                <service-call name="create#co.hotwax.order.routing.OrderRoutingRuleInvCond" in-map="newOrderRoutingRuleInvCond"/>
+            </iterate>
+
+            <!-- clone#OrderRoutingRuleAction -->
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleAction" list="orderRoutingRuleActionList">
+                <econdition field-name="routingRuleId"/>
+            </entity-find>
+            <iterate list="orderRoutingRuleActionList" entry="orderRoutingRuleAction">
+                <set field="newOrderRoutingRuleAction" from="orderRoutingRuleAction.getValueMap()" />
+                <set field="newOrderRoutingRuleAction.routingRuleId" from="newRoutingRuleId"/>
+                <set field="newOrderRoutingRuleAction.createdDate" from="ec.user.nowTimestamp"/>
+                <script>
+                    newOrderRoutingRuleAction.remove("actionSeqId");
+                    newOrderRoutingRuleAction.remove("lastUpdatedStamp");
+                </script>
+                <service-call name="create#co.hotwax.order.routing.OrderRoutingRuleAction" in-map="newOrderRoutingRuleAction"/>
+            </iterate>
+        </actions>
+    </service>
+    <!-- Danger Zone-->
+    <service verb="delete" noun="OrderRoutingGroup">
+        <in-parameters>
+            <parameter name="routingGroupId" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!ec.user.hasPermission('DELETE_ORDER_ROUTE')">
+                <return error="true" message="User does not have permission to delete order routing group."/>
+            </if>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="false"/>
+            <if condition="!orderRoutingGroup">
+                <log level="error" message="No orderRoutingGroup found for id ${routingGroupId}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
+                <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
+            </entity-find-one>
+            <if condition="serviceJob">
+                <service-call name="update#moqui.service.job.ServiceJob" in-map="[jobName: orderRoutingGroup.jobName, thruDate: ec.user.nowTimestamp, paused: 'Y']" disable-authz="true"/>
+            </if>
+            <script>
+                orderRoutingGroup.deleteWithCascade(null , ['co.hotwax.order.routing.OrderRouting', 'co.hotwax.order.routing.OrderFilterCondition', 'co.hotwax.order.routing.OrderRoutingRule', 'co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction'] as Set)
+            </script>
+            <return message="Order routing group ${orderRoutingGroup.groupName?:''} [${routingGroupId}] delete successfully."/>
+        </actions>
+    </service>
+    <service verb="delete" noun="OrderRouting">
+        <in-parameters>
+            <parameter name="orderRoutingId" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!ec.user.hasPermission('DELETE_ORDER_ROUTE')">
+                <return error="true" message="User does not have permission to delete order routing."/>
+            </if>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="false"/>
+            <if condition="!orderRouting">
+                <log level="error" message="No order routing found for id ${orderRouting}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <script>
+                orderRouting.deleteWithCascade(null, ['co.hotwax.order.routing.OrderFilterCondition', 'co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction', 'co.hotwax.order.routing.OrderRoutingRule'] as Set)
+            </script>
+            <return message="Order routing ${orderRouting.routingName?:''} [${orderRoutingId}] delete successfully."/>
+        </actions>
+    </service>
+    <service verb="delete" noun="OrderRoutingRule">
+        <in-parameters>
+            <parameter name="routingRuleId" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!ec.user.hasPermission('DELETE_ORDER_ROUTE')">
+                <return error="true" message="User does not have permission to delete order routing rule."/>
+            </if>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="false"/>
+            <if condition="!orderRoutingRule">
+                <log level="error" message="No order routing rule found for id ${orderRouting}"/>
+                <return error="true" type="warning"/>
+            </if>
+            <script>
+                orderRoutingRule.deleteWithCascade(null, ['co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction'] as Set)
+            </script>
+            <return message="Order routing rule ${orderRoutingRule.ruleName?:''} [${routingRuleId}] delete successfully."/>
+        </actions>
+    </service>
+</services>
