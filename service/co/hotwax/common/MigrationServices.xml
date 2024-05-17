@@ -21,7 +21,7 @@
                 <entity-find-count entity-name="co.hotwax.order.routing.OrderRoutingGroup" count-field="groupCount">
                     <econdition field-name="routingGroupId" from="orderRoutingGroup.routingGroupId"/>
                 </entity-find-count>
-                <if condition="groupCount == 0">
+                <if condition="groupCount > 0">
                     <log message="Routing group id ${orderRoutingGroup.routingGroupId} already migrated"/>
                     <continue/>
                 </if>
