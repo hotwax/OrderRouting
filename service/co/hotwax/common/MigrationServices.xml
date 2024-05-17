@@ -46,7 +46,7 @@
                                 org.moqui.entity.EntityDataLoader edl = ec.entity.makeDataLoader()
                                 valueList.each { it._entity = "orderRoutingGroup" }
                                 jsonText = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(valueList));
-                                ec.logger.info("===valueList====${jsonText}=");
+                                //ec.logger.info("===valueList====${jsonText}=");
                                 edl.jsonText(jsonText)
                                 messages = []
                                 edl.load(messages)
