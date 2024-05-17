@@ -91,7 +91,7 @@
                                 <default-field>
                                     <drop-down>
                                         <entity-options key="${statusId}">
-                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
+                                            <entity-find entity-name="moqui.basic.StatusItem" cache="true">
                                                 <econdition field-name="statusTypeId" value="ORDER_ROUTING_STATUS"/>
                                             </entity-find>
                                         </entity-options>
@@ -118,7 +118,7 @@
                                                 <default-field>
                                                     <drop-down>
                                                         <entity-options key="${enumCode}">
-                                                            <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                            <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                                                 <econdition field-name="enumTypeId" value="ORD_FILTER_PRM_TYPE"/>
                                                             </entity-find>
                                                         </entity-options>
@@ -128,7 +128,7 @@
                                             <field name="operator"><default-field>
                                                 <drop-down>
                                                     <entity-options key="${enumCode}">
-                                                        <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                        <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                                             <econdition field-name="enumTypeId" value="COMPARISON_OPERATOR"/>
                                                         </entity-find>
                                                     </entity-options>
@@ -149,7 +149,7 @@
                                     <default-field>
                                         <drop-down>
                                             <entity-options key="${enumCode}">
-                                                <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                                     <econdition field-name="enumTypeId" value="ORD_FILTER_PRM_TYPE"/>
                                                 </entity-find>
                                             </entity-options>
@@ -159,7 +159,7 @@
                                 <field name="operator"><default-field>
                                     <drop-down>
                                         <entity-options key="${enumCode}">
-                                            <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                            <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                                 <econdition field-name="enumTypeId" value="COMPARISON_OPERATOR"/>
                                             </entity-find>
                                         </entity-options>
@@ -186,7 +186,7 @@
                                         <default-field>
                                             <drop-down>
                                                 <entity-options key="${enumCode}">
-                                                    <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                                    <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                                         <econdition field-name="enumTypeId" value="ORD_SORT_PARAM_TYPE"/>
                                                     </entity-find>
                                                 </entity-options>
@@ -224,7 +224,7 @@
                                 <field name="assignmentEnumId"><default-field title="Assignment Type">
                                     <drop-down>
                                         <entity-options key="${enumId}">
-                                            <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                            <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                                 <econdition field-name="enumTypeId" value="ORD_ROU_ASSIGN_TYPE"/>
                                             </entity-find>
                                         </entity-options>
@@ -233,7 +233,7 @@
                                 <field name="statusId"><default-field title="Status">
                                     <drop-down>
                                         <entity-options key="${statusId}">
-                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
+                                            <entity-find entity-name="moqui.basic.StatusItem" cache="true">
                                                 <econdition field-name="statusTypeId" value="ORD_ROUT_RULE_STATUS"/>
                                             </entity-find>
                                         </entity-options>
@@ -264,7 +264,7 @@
                             <field name="assignmentEnumId"><default-field>
                                 <drop-down>
                                     <entity-options key="${enumId}">
-                                        <entity-find entity-name="org.apache.ofbiz.common.enum.Enumeration" cache="true">
+                                        <entity-find entity-name="moqui.basic.Enumeration" cache="true">
                                             <econdition field-name="enumTypeId" value="ORD_ROU_ASSIGN_TYPE"/>
                                         </entity-find>
                                     </entity-options>
@@ -279,7 +279,7 @@
                                 <default-field>
                                     <drop-down>
                                         <entity-options key="${statusId}">
-                                            <entity-find entity-name="org.apache.ofbiz.common.status.StatusItem" cache="true">
+                                            <entity-find entity-name="moqui.basic.StatusItem" cache="true">
                                                 <econdition field-name="statusTypeId" value="ORD_ROUT_RULE_STATUS"/>
                                             </entity-find>
                                         </entity-options>

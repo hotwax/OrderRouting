@@ -71,8 +71,8 @@ under the License.
         <alias entity-alias="OI" name="orderItemSeqId"/>
         <alias entity-alias="OI" name="orderItemCount" field="orderItemSeqId" function="count"/>
     </view-entity>
-
-    <view-entity entity-name="EnumerationAndType" package="co.hotwax.common.enum">
+       <!-- moqui.basic.EnumerationAndType-->
+    <!--<view-entity entity-name="EnumerationAndType" package="co.hotwax.common.enum">
         <member-entity entity-alias="ENUM" entity-name="org.apache.ofbiz.common.enum.Enumeration"/>
         <member-entity entity-alias="TYPE" entity-name="org.apache.ofbiz.common.enum.EnumerationType" join-from-alias="ENUM" join-optional="true">
             <key-map field-name="enumTypeId"/>
@@ -82,7 +82,7 @@ under the License.
             <exclude field="description"/>
         </alias-all>
         <alias name="typeDescription" field="description" entity-alias="TYPE"/>
-    </view-entity>
+    </view-entity>-->
     <view-entity entity-name="FacilityAndType" package="co.hotwax.facility">
         <member-entity entity-alias="FAC" entity-name="org.apache.ofbiz.product.facility.Facility"/>
         <member-entity entity-alias="TYPE" entity-name="org.apache.ofbiz.product.facility.FacilityType" join-from-alias="FAC" join-optional="true">
@@ -107,8 +107,8 @@ under the License.
         </entity-condition>
     </view-entity>
     <view-entity entity-name="StatusItemAndType" package="co.hotwax.common.status">
-        <member-entity entity-alias="ST" entity-name="org.apache.ofbiz.common.status.StatusItem"/>
-        <member-entity entity-alias="TYPE" entity-name="org.apache.ofbiz.common.status.StatusType" join-from-alias="ST" join-optional="true">
+        <member-entity entity-alias="ST" entity-name="moqui.basic.StatusItem"/>
+        <member-entity entity-alias="TYPE" entity-name="moqui.basic.StatusType" join-from-alias="ST" join-optional="true">
             <key-map field-name="statusTypeId"/>
         </member-entity>
         <alias-all entity-alias="ST"/>
