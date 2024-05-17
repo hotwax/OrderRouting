@@ -1,3 +1,4 @@
+<@compress single_line=single_line!false>
 <#macro buildSqlCondition fieldName filterCodnition>
   ${fieldName} ${Static["co.hotwax.order.routing.OrderRoutingHelper"].makeSqlWhere(filterCodnition)!}
 </#macro>
@@ -63,3 +64,4 @@ ORDER BY
   <#else>
     orderDate ASC
   </#if>
+</@compress>

@@ -365,6 +365,7 @@
                 </else>
                 </if>
             </iterate>
+            <set field="single_line" value="true" type="Boolean"/>
             <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
             <log message="Fetching order with condition ${orderFilterConditions} for routing ${orderRouting.routingName} [${orderRoutingId}]"/>
             <script><![CDATA[

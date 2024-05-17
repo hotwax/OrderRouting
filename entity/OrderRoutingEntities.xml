@@ -49,6 +49,16 @@ under the License.
         <master name="schedule">
             <detail relationship="schedule"/>
         </master>
+        <master name="raw">
+            <detail relationship="routings">
+                <detail relationship="orderFilters"/>
+                <detail relationship="rules">
+                    <detail relationship="inventoryFilters"/>
+                    <detail relationship="actions"/>
+                </detail>
+            </detail>
+            <detail relationship="schedule"/>
+        </master>
         <!--CreateByUser relationship not added, due to different databases -->
     </entity>
     <entity entity-name="OrderRouting" package="co.hotwax.order.routing" group="ofbiz_transactional" short-alias="orderRouting">

@@ -87,6 +87,9 @@
             <resource name="routingRuns">
                 <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingRun" operation="list"/></method>
             </resource>
+            <resource name="raw">
+                <method type="get"><entity name="co.hotwax.order.routing.OrderRoutingGroup" operation="one" masterName="raw"/></method>
+            </resource>
         </id>
     </resource>
     <resource name="routings">
