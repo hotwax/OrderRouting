@@ -76,4 +76,3 @@ curl -X GET http://localhost:8080/rest/someEndpoint \
 -b cookie.txt
 ```
 **Note**: Replace `YOUR_USERNAME`, `YOUR_PASSWORD`, and `YOUR_CSRF_TOKEN` with your actual username, password, and CSRF token, respectively. The method of extracting the CSRF token may vary depending on the tools and programming language you are using. The provided examples use common command-line tools.
-

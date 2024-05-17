@@ -37,9 +37,9 @@
         <method type="get"><entity name="co.hotwax.common.status.StatusItemAndType" operation="list"/></method>
     </resource>
     <resource name="enums" description="Get the enumerations">
-        <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="list"/></method>
+        <method type="get"><entity name="moqui.basic.EnumerationAndType" operation="list"/></method>
         <id name="enumId">
-            <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="one"/></method>
+            <method type="get"><entity name="moqui.basic.EnumerationAndType" operation="one"/></method>
         </id>
     </resource>
     <resource name="facilities" description="Get the facilities">

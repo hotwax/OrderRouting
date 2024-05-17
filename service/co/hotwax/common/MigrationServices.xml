@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://moqui.org/xsd/service-definition-3.xsd">
+
+    <service verb="migrate" noun="OrderRoutingDataModel">
+        <in-parameters>
+            <parameter name="routingGroupId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="groupMigrated" />
+        </out-parameters>
+        <actions>
+            <script>
+                import groovy.json.JsonSlurper;
+                import org.moqui.impl.context.TransactionFacadeImpl
+            </script>
+            <set field="groupMigrated" value="0" type="Long"/>
+            <entity-find entity-name="co.hotwax.ofbiz.order.routing.OrderRoutingGroup" list="orderRoutingGroups">
+                <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
+            </entity-find>
+            <iterate list="orderRoutingGroups" entry="orderRoutingGroup">
+                <entity-find-count entity-name="co.hotwax.order.routing.OrderRoutingGroup" count-field="groupCount">
+                    <econdition field-name="routingGroupId" from="orderRoutingGroup.routingGroupId"/>
+                </entity-find-count>
+                <if condition="groupCount == 0">
+                    <log message="Routing group id ${orderRoutingGroup.routingGroupId} already migrated"/>
+                    <continue/>
+                </if>
+                <log message="Migrating orderRoutingGroup ${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}]"/>
+                <log message="Migrating orderRoutingGroup "/>
+                <script><![CDATA[
+                groupMigrated++;
+                    TransactionFacadeImpl tfi = ec.transactionFacade
+                    boolean suspendedTransaction = false
+                    try {
+                        if (tfi.isTransactionInPlace()) suspendedTransaction = tfi.suspend()
+                        boolean beganTransaction = tfi.begin(null)
+                        try {
+                            valueList = [];
+                            Object masterData = ec.entityFacade.rest("get", ["co.hotwax.ofbiz.order.routing.OrderRoutingGroup"], [master:'migration', routingGroupId:orderRoutingGroup.routingGroupId], false)
+                            if (masterData != null && (masterData instanceof Map)) {
+                                valueList.add(masterData);
+                            } else {
+                                valueList = masterData;
+                            }
+                            if (valueList) {
+                                org.moqui.entity.EntityDataLoader edl = ec.entity.makeDataLoader()
+                                valueList.each { it._entity = "orderRoutingGroup" }
+                                jsonText = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(valueList));
+                                ec.logger.info("===valueList====${jsonText}=");
+                                edl.jsonText(jsonText)
+                                messages = []
+                                edl.load(messages)
+                                ec.logger.info("Migrated dada ${messages}")
+                            }
+                        } catch (Throwable t) {
+                            //tfi.rollback(beganTransaction, "Error saving Migration service", t)
+                            throw t
+                        } finally {
+                            tfi.commit(beganTransaction)
+                        }
+                    } finally {
+                        if (suspendedTransaction) tfi.resume()
+                    }
+                ]]></script>
+            </iterate>
+        </actions>
+    </service>
+</services>
