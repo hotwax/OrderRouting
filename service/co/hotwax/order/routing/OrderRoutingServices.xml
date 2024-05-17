@@ -736,4 +736,82 @@
             </if>
         </actions>
     </service>
+
+    <service verb="get" noun="OrderFilterSql">
+        <description>
+            This service will return the eligible orders sql for order routing
+        </description>
+        <in-parameters>
+            <parameter name="orderRoutingId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="statusId"/>
+            <parameter name="sql" allow-html="any"/>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
+            <if condition="!orderRouting">
+                <return error="true" message="No order routing found for id ${orderRoutingId}"/>
+            </if>
+            <set field="statusId" from="orderRouting.statusId"/>
+            <entity-find-related-one value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingGroup" to-value-field="orderRoutingGroup" cache="true"/>
+            <log message="Started order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
+
+            <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
+                <econdition field-name="orderRoutingId" from="orderRoutingId"/>
+                <order-by field-name="sequenceNum"/>
+                <order-by field-name="createdDate DESC"/>
+            </entity-find>
+            <!-- Prepare the filter conditions for the order routing -->
+            <filter-map-list list="orderFilterConditions" to-list="filterConditions">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
+            </filter-map-list>
+            <!-- Prepare the order by for the order routing -->
+            <filter-map-list list="orderFilterConditions" to-list="sortFields">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
+            </filter-map-list>
+            <set field="orderSortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
+
+            <set field="orderTypeId" value="SALES_ORDER"/>
+            <set field="productStoreId" from="orderRoutingGroup.productStoreId"/>
+            <set field="itemStatusId" value="ITEM_APPROVED"/>
+            <set field="orderStatusId" value="ORDER_APPROVED"/>
+            <set field="facilityParentTypeId" value="VIRTUAL_FACILITY"/>
+            <set field="selectOrderItemSeqId" value="false" type="Boolean"/>
+            <set field="orderFilterConditions" from="[]"/>
+            <set field="attemptedCount" value="0" type="Integer"/>
+            <iterate list="filterConditions" entry="filterCondition">
+                <if condition='"promiseDaysCutoff".equals(filterCondition.fieldName)'>
+                    <if condition="filterCondition.fieldValue">
+                        <!--
+                        When promiseDaysCutoff is configured, it acts as a constraint that prioritizes order items to be processed and allocated in a way that meets the delivery promise timeframe.
+                        The brokering process is executed at the individual order item level rather than at a more aggregated shipGroup level.
+                        -->
+                        <set field="selectOrderItemSeqId" value="true" type="Boolean"/>
+                        <script>
+                            promisedDatetime = java.time.ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long)
+                            .with(java.time.LocalTime.MAX).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+                        </script>
+                        <set field="orderFilterConditions" from="orderFilterConditions + [fieldName: 'promisedDatetime', operator: filterCondition.operator, fieldValue: promisedDatetime]"/>
+                    </if>
+                    <else-if condition='"originFacilityGroupId".equals(filterCondition.fieldName)'>
+                        <set field="facilityGroupCondition" from="filterCondition"/>
+                    </else-if>
+                    <else-if condition='"productCategoryId".equals(filterCondition.fieldName)'>
+                        <set field="productCategoryCondition" from="filterCondition"/>
+                    </else-if>
+                    <else>
+                        <set field="orderFilterConditions" from="orderFilterConditions + filterCondition"/>
+                    </else>
+                </if>
+            </iterate>
+            <set field="single_line" value="true" type="Boolean"/>
+            <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
+            <script><![CDATA[
+                Writer writer = new StringWriter()
+                ec.resourceFacade.template(templateLoc, writer)
+                sql = writer.toString();
+            ]]></script>
+        </actions>
+    </service>
 </services>
