@@ -21,7 +21,8 @@ from
     OIS.FACILITY_ID AS facilityId,
     OIS.SHIPMENT_METHOD_TYPE_ID as shipmentMethodTypeId,
     OH.PRIORITY as priority,
-    OIS.SHIP_AFTER_DATE AS shipAfterDate,
+    OI.SHIP_AFTER_DATE AS shipAfterDate,
+    OI.SHIP_BEFORE_DATE AS shipBeforeDate,
     OH.ORDER_DATE AS orderDate,
     CSM.DELIVERY_DAYS AS deliveryDays
   FROM
