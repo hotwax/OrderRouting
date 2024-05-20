@@ -38,7 +38,7 @@
         <default-response url="."/>
     </transition>
     <transition name="deleteOrderRoutingRule">
-        <service-call name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRoutingRule"/>
+        <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRoutingRule"/>
         <default-response url="."/>
     </transition>
     <transition name="routingRunList"><default-response url="../OrderRoutingRunList"/></transition>

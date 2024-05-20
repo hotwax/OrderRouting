@@ -29,11 +29,11 @@
         <default-response url="."/>
     </transition>
     <transition name="cloneOrderRoutingGroup">
-        <service-call name="co.hotwax.order.routing.OrderRoutingServices.clone#OrderRoutingGroup"/>
+        <service-call name="co.hotwax.order.routing.CommonServices.clone#OrderRoutingGroup"/>
         <default-response url="." parameter-map="[routingGroupId:newRoutingGroupId]"/>
     </transition>
     <transition name="deleteOrderRouting">
-        <service-call name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRouting"/>
+        <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRouting"/>
         <default-response url="."/>
     </transition>
     <actions>

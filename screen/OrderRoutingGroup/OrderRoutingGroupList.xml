@@ -9,7 +9,7 @@
         <default-response url="."/>
     </transition>
     <transition name="deleteOrderRoutingGroup">
-        <service-call name="co.hotwax.order.routing.OrderRoutingServices.delete#OrderRoutingGroup"/>
+        <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRoutingGroup"/>
         <default-response url="."/>
     </transition>
 
