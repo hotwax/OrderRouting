@@ -70,7 +70,6 @@
     <moqui.basic.StatusItem statusId="ROUTING_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORDER_ROUTING_STATUS"/>
     <moqui.basic.StatusItem statusId="ROUTING_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORDER_ROUTING_STATUS"/>
 
-
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_DRAFT" toStatusId="ROUTING_ACTIVE" transitionName="Active"/>
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_DRAFT" toStatusId="ROUTING_ARCHIVED" transitionName="Archive"/>
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ACTIVE" toStatusId="ROUTING_ARCHIVED" transitionName="Archive"/>

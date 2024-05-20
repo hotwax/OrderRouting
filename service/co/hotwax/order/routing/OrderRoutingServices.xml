@@ -9,13 +9,19 @@
             <script>
                 import org.moqui.context.ExecutionContext
                 import org.moqui.entity.EntityCondition
-                ExecutionContext ec = context.ec
                 Calendar basisCal = ec.user.getCalendarSafe()
                 basisCal.add(Calendar.DAY_OF_YEAR, (int) - daysToKeep)
                 basisTimestamp = new Timestamp(basisCal.getTimeInMillis())
-                recordsRemoved = ec.entity.find("moqui.service.job.ServiceJobRun")
-                        .condition("startTime", EntityCondition.LESS_THAN, basisTimestamp).disableAuthz().deleteAll()
             </script>
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
+                <econdition field-name="startDate" operator="less-equals" from="basisTimestamp"/>
+                <use-iterator/>
+            </entity-find>
+            <set field="recordsRemoved" value="0" type="Long"/>
+            <iterate list="routingRuns" entry="routingRun">
+                <service-call name="delete#co.hotwax.order.routing.OrderRoutingRun" in-map="[routingRunId:routingRun.routingRunId]" transaction="force-new" ignore-error="true"/>
+                <script>recordsRemoved++</script>
+            </iterate>
             <log message="Removed ${recordsRemoved} OrderRoutingRun records."/>
         </actions>
     </service>
@@ -445,7 +451,7 @@
             <if condition="!'RULE_ACTIVE'.equals(orderRoutingRule.statusId)">
                 <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${routingRuleId}] is not active"/>
             </if>
-            <log message="Executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
+            <log message="Executing order routing rule ${orderRoutingRule.ruleName?:''} [${routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}"/>
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
                 <econdition field-name="routingRuleId" from="routingRuleId"/>
@@ -471,6 +477,7 @@
             <order-map-list list="sortFields">
                 <order-by field-name="sequenceNum"/>
             </order-map-list>
+            <set field="productStore" from="ec.entity.getEntityDefinition('org.apache.ofbiz.product.store.ProductStore')"/>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
             <set field="suggestedFulfillmentLocations" from="[]"/>
@@ -479,7 +486,7 @@
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
                 //ec.logger.info("======writer==${writer}==")
-                java.sql.Connection con = ec.getEntity().getConnection(orderRoutingRule.getEntityDefinition().getEntityGroupName())
+                java.sql.Connection con = ec.getEntity().getConnection(productStore.getEntityGroupName())
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
                         while (resultSet.next()) {

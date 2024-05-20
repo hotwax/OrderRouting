@@ -55,7 +55,12 @@ GROUP BY
   orderId,
   shipGroupSeqId
   <#if selectOrderItemSeqId>, orderItemSeqId</#if> <#-- If items are filtered using promisedDatetime, we need to include orderItemSeqId in the GROUP BY clause -->
-HAVING
+  <#if orderSortByList?has_content>,
+    <#list orderSortByList as orderSortBy>
+      ${orderSortBy!}<#sep>,
+    </#list>
+    </#if>
+ HAVING
   COUNT(ORDER_ITEM_SEQ_ID) > '0'
 ORDER BY
   <#if orderSortByList?has_content>
