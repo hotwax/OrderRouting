@@ -70,11 +70,25 @@
     <moqui.basic.StatusItem statusId="ROUTING_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORDER_ROUTING_STATUS"/>
     <moqui.basic.StatusItem statusId="ROUTING_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORDER_ROUTING_STATUS"/>
 
+
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_DRAFT" toStatusId="ROUTING_ACTIVE" transitionName="Active"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_DRAFT" toStatusId="ROUTING_ARCHIVED" transitionName="Archive"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ACTIVE" toStatusId="ROUTING_ARCHIVED" transitionName="Archive"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ACTIVE" toStatusId="ROUTING_DRAFT" transitionName="Draft"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ARCHIVED" toStatusId="ROUTING_DRAFT" transitionName="Draft"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ARCHIVED" toStatusId="ROUTING_ACTIVE" transitionName="Active"/>
+
     <moqui.basic.StatusType statusTypeId="ORD_ROUT_RULE_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Rule Status" hasTable="N"/>
     <moqui.basic.StatusItem statusId="RULE_DRAFT" description="Draft" sequenceId="01" statusCode="DRAFT" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <moqui.basic.StatusItem statusId="RULE_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <moqui.basic.StatusItem statusId="RULE_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORD_ROUT_RULE_STATUS"/>
 
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_DRAFT" toStatusId="ROUTING_ACTIVE" transitionName="Active"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_DRAFT" toStatusId="RULE_ARCHIVED" transitionName="Archive"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_ACTIVE" toStatusId="RULE_DRAFT" transitionName="Draft"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_ACTIVE" toStatusId="RULE_ARCHIVED" transitionName="Archive"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_ARCHIVED" toStatusId="RULE_DRAFT" transitionName="Draft"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_ARCHIVED" toStatusId="RULE_ACTIVE" transitionName="Active"/>
 
     <artifactGroups artifactGroupId="ORDER_ROUTING_API" description="Commerce Order Routing API (via root resource)">
         <artifacts artifactTypeEnumId="AT_REST_PATH" inheritAuthz="Y" artifactName="/order-routing"/>
@@ -85,11 +99,6 @@
     <moqui.service.message.SystemMessageRemote systemMessageRemoteId="HC_OMS_CONFIG"
                                                description="HotWax OMS server JWT token"
                                                remotePublicKey=""/>
-
-    <moqui.service.job.ServiceJob jobName="Order_Routing_" paused="Y" description="Service job for order routing group Morning order routing group [MORNING_ORDER_GROUP]" serviceName="co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingGroup">
-        <parameters parameterName="routingGroupId" parameterValue="MORNING_ORDER_GROUP"/>
-        <parameters parameterName="productStoreId" parameterValue="STORE"/>
-    </moqui.service.job.ServiceJob>
 
     <!-- Service job data to purge order routing runs data older than 30 days -->
     <moqui.service.job.ServiceJob jobName="clean_Routing_Runs" description="Clean Order Routing runs"

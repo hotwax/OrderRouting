@@ -154,4 +154,9 @@
         <parameters parameterName="routingGroupId" parameterValue="PRE_ORDER_GROUP"/>
         <parameters parameterName="productStoreId" parameterValue="STORE"/>
     </moqui.service.job.ServiceJob>
+
+    <moqui.service.job.ServiceJob jobName="Order_Routing_MORNING_ORDER_GROUP" paused="Y" description="Service job for order routing group Morning order routing group [MORNING_ORDER_GROUP]" serviceName="co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingGroup">
+        <parameters parameterName="routingGroupId" parameterValue="MORNING_ORDER_GROUP"/>
+        <parameters parameterName="productStoreId" parameterValue="STORE"/>
+    </moqui.service.job.ServiceJob>
 </entity-facade-xml>
