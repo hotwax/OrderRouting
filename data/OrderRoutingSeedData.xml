@@ -82,7 +82,7 @@
     <moqui.basic.StatusItem statusId="RULE_ACTIVE" description="Active" sequenceId="02" statusCode="ACTIVE" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <moqui.basic.StatusItem statusId="RULE_ARCHIVED" description="Archived" sequenceId="02" statusCode="ARCHIVED" statusTypeId="ORD_ROUT_RULE_STATUS"/>
 
-    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_DRAFT" toStatusId="ROUTING_ACTIVE" transitionName="Active"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_DRAFT" toStatusId="RULE_ACTIVE" transitionName="Active"/>
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_DRAFT" toStatusId="RULE_ARCHIVED" transitionName="Archive"/>
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_ACTIVE" toStatusId="RULE_DRAFT" transitionName="Draft"/>
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="RULE_ACTIVE" toStatusId="RULE_ARCHIVED" transitionName="Archive"/>
