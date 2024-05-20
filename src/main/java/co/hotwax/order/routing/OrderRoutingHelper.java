@@ -76,6 +76,7 @@ public class OrderRoutingHelper {
         // TODO: any other useful types to convert?
         return value;
     }
+    @Deprecated
     public static String getOmsJwtToken(ExecutionContextFactoryImpl ecfi) {
         //TODO: For now just hardcode the SystemMessageRemote, need to find a better way to do this
         EntityValue tokenSysMessage = ecfi.entityFacade.find("moqui.service.message.SystemMessageRemote")
@@ -85,6 +86,7 @@ public class OrderRoutingHelper {
         }
         return null;
     }
+    @Deprecated
     public static String getOmsInstanceUrl(ExecutionContextFactoryImpl ecfi) {
         //TODO: For now just hardcode the SystemMessageRemote, need to find a better way to do this
         EntityValue omsInstance = ecfi.entityFacade.find("moqui.service.message.SystemMessageRemote")

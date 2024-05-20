@@ -24,8 +24,8 @@
         </out-parameters>
         <actions>
             <script>
-                omsBaseUrl = co.hotwax.order.routing.OrderRoutingHelper.getOmsInstanceUrl(ec.ecfi);
-                token = co.hotwax.order.routing.OrderRoutingHelper.getOmsJwtToken(ec.ecfi);
+                omsBaseUrl = co.hotwax.util.MaargUtil.getOmsInstanceUrl(ec.ecfi);
+                token = co.hotwax.util.MaargUtil.getOmsJwtToken(ec.ecfi);
             </script>
             <if condition="!token">
                 <return error="true" message="Unable to generate oms token, check JWT configuration"/>
