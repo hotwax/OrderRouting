@@ -1,3 +1,4 @@
+<@compress single_line=true>
 <#macro buildSqlCondition value>
  ${Static["co.hotwax.order.routing.OrderRoutingHelper"].makeSqlWhere(value)!}
 </#macro>
@@ -123,3 +124,4 @@ x.*
      ) as y
 where y.retained=1 and y.allocated_ord_qty <= y.ship_group_total_qty and y.facility_exhausted='N'
 order by y.row_num
+</@compress>
