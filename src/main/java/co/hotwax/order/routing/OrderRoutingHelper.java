@@ -76,30 +76,4 @@ public class OrderRoutingHelper {
         // TODO: any other useful types to convert?
         return value;
     }
-    @Deprecated
-    public static String getOmsJwtToken(ExecutionContextFactoryImpl ecfi) {
-        //TODO: For now just hardcode the SystemMessageRemote, need to find a better way to do this
-        EntityValue tokenSysMessage = ecfi.entityFacade.find("moqui.service.message.SystemMessageRemote")
-                .condition("systemMessageRemoteId", "HC_OMS_CONFIG").useCache(true).disableAuthz().one();
-        if (tokenSysMessage != null) {
-            return tokenSysMessage.getString("remotePublicKey");
-        }
-        return null;
-    }
-    @Deprecated
-    public static String getOmsInstanceUrl(ExecutionContextFactoryImpl ecfi) {
-        //TODO: For now just hardcode the SystemMessageRemote, need to find a better way to do this
-        EntityValue omsInstance = ecfi.entityFacade.find("moqui.service.message.SystemMessageRemote")
-                .condition("systemMessageRemoteId", "HC_OMS_CONFIG").useCache(true).disableAuthz().one();
-        if (omsInstance != null && omsInstance.getString("sendUrl") != null) {
-            return omsInstance.getString("sendUrl");
-        } else {
-            EntityValue omsInstanceProperty = ecfi.entityFacade.find("org.apache.ofbiz.common.property.SystemProperty")
-                    .condition("systemResourceId", "url").condition("systemPropertyId" , "content.url.prefix.secure").useCache(true).disableAuthz().one();
-            if (omsInstanceProperty != null) {
-                return omsInstanceProperty.getString("systemPropertyValue");
-            }
-        }
-        return null;
-    }
 }
