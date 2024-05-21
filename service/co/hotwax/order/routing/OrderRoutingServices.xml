@@ -163,134 +163,6 @@
         </actions>
     </service>
 
-    <service verb="run" noun="OldOrderRouting" transaction-timeout="36000">
-        <description>
-            The service is to streamline the fulfillment process by intelligently routing orders through the system based on predefined conditions and rules.
-            This service aims to optimize inventory distribution and order fulfillment efficiency by dynamically applying routing rules to each order's ship group,
-            ensuring that inventory allocation and subsequent actions are aligned with business logistics and inventory management strategies.
-        </description>
-        <in-parameters>
-            <parameter name="orderRoutingId" required="true"/>
-            <parameter name="orderId"/>
-            <parameter name="shipGroupSeqId"/>
-        </in-parameters>
-        <actions>
-            <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
-            <if condition="!orderRouting">
-                <return error="true" message="No order routing found for id ${orderRoutingId}"/>
-            </if>
-            <if condition="!'ROUTING_ACTIVE'.equals(orderRouting.statusId)">
-                <return error="true" message="Order routing ${orderRouting.routingName} [${orderRoutingId}] is not active"/>
-            </if>
-            <entity-find-related-one value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingGroup" to-value-field="orderRoutingGroup" cache="true"/>
-            <log message="Started order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
-            <entity-find entity-name="co.hotwax.order.routing.OrderFilterCondition" list="orderFilterConditions">
-                <econdition field-name="orderRoutingId" from="orderRoutingId"/>
-                <order-by field-name="sequenceNum"/>
-            </entity-find>
-            <!-- Prepare the filter conditions for the order routing -->
-            <filter-map-list list="orderFilterConditions" to-list="filterConditions">
-                <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
-            </filter-map-list>
-            <!-- Prepare the order by for the order routing -->
-            <filter-map-list list="orderFilterConditions" to-list="sortFields">
-                <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
-            </filter-map-list>
-            <if condition="!sortFields">
-                <set field="sortFields" from="[[fieldName:'orderDate']]"/>
-            </if>
-            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
-                <econditions>
-                    <econdition field-name="orderRoutingId" from="orderRoutingId"/>
-                    <econdition field-name="statusId" value="RULE_ACTIVE"/>
-                </econditions>
-                <order-by field-name="sequenceNum"/>
-            </entity-find>
-            <if condition="!orderRoutingRules">
-                <return error="true" message="No routing rule setup for order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
-            </if>
-            <script>
-                import org.moqui.entity.EntityListIterator
-                import org.moqui.entity.EntityFind;
-                import org.moqui.impl.entity.EntityConditionFactoryImpl
-                import java.time.format.DateTimeFormatter;
-
-                EntityFind orderFind = ec.entity.find("co.hotwax.order.OrderItemsQueue")
-                // Prepare the default base condition to get the eligible orderItemShipGroup
-                orderFind.condition("productStoreId", orderRoutingGroup?.productStoreId)
-                orderFind.condition("itemStatusId", "ITEM_APPROVED")
-                orderFind.condition("parentTypeId", "VIRTUAL_FACILITY")
-                orderFind.condition("orderItemCount", org.moqui.entity.EntityCondition.GREATER_THAN, "0")
-
-                if (orderId) {
-                    orderFind.condition("orderId", orderId)
-                    if (shipGroupSeqId) orderFind.condition("shipGroupSeqId", shipGroupSeqId)
-                }
-                selectFields = ["orderId", "shipGroupSeqId"];
-                filterConditions.each { filterCondition ->
-                    if ("promiseDaysCutoff".equals(filterCondition.fieldName)) {
-                        if (filterCondition.fieldValue) {
-                            /*
-                            When promiseDaysCutoff is configured, it acts as a constraint that prioritizes order items to be processed and allocated in a way that meets the delivery promise timeframe.
-                            The brokering process is executed at the individual order item level rather than at a more aggregated shipGroup level.
-                            */
-                            selectFields.add("orderItemSeqId")
-                            promisedDatetime = ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long).with(java.time.LocalTime.MAX).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-                            orderFind.condition('promisedDatetime', EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), promisedDatetime)
-                        }
-                    } else {
-                        orderFind.condition(filterCondition.fieldName, EntityConditionFactoryImpl.stringComparisonOperatorMap.get(filterCondition.operator), filterCondition.fieldValue)
-                    }
-                }
-
-                sortFields.each { sortField ->
-                    orderFind.orderBy(sortField.fieldName)
-                }
-                orderFind.selectFields(selectFields)
-                attemptedCount = orderFind.count()
-                ec.logger.info("Fetching order with condition ${orderFind} for routing ${orderRouting.routingName} [${orderRoutingId}]")
-                try (EntityListIterator eli = orderFind.iterator()) {
-                    while ((shipGroup = eli.next()) != null) {
-                        try {
-                            ruleIterator = orderRoutingRules.iterator()
-                            while (ruleIterator.hasNext()) {
-                                routingRule = ruleIterator.next()
-                                ruleResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingRule")
-                                        .requireNewTransaction(true)
-                                        .parameters([routingRuleId: routingRule.routingRuleId,
-                                                orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId, orderItemSeqId: shipGroup.orderItemSeqId])
-                                        .call()
-                                if (!ec.message.hasError()) {
-                                    actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
-                                            .requireNewTransaction(true)
-                                            .parameters([orderId: shipGroup.orderId, shipGroupSeqId: shipGroup.shipGroupSeqId,orderItemSeqId: shipGroup.orderItemSeqId,
-                                                    routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
-                                            .call()
-                                    if (ec.message.hasError()) {
-                                        ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
-                                        ec.message.clearAll()
-                                    }
-                                    if (!actionResult.runNextRule) {
-                                        /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
-                                        break
-                                    }
-                                } else {
-                                    ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
-                                    ec.message.clearAll()
-                                }
-                            }
-                        } catch (Throwable e) {
-                            ec.logger.error("There is an issue with run#OrderRoutingRule", e)
-                        }
-                    }
-                } catch (Exception e) {
-                    ec.logger.error(e.getMessage())
-                }
-            </script>
-            <return message="Attempted ${attemptedCount} ${selectFields.contains('orderItemSeqId')?'item(s)':'ship group(s)'} for the '${orderRouting.routingName} [${orderRoutingId}] order routing"/>
-        </actions>
-    </service>
-
     <service verb="run" noun="OrderRouting" transaction-timeout="36000">
         <description>
             The service is to streamline the fulfillment process by intelligently routing orders through the system based on predefined conditions and rules.
@@ -823,6 +695,8 @@
     </service>
     <service verb="get" noun="OrderRoutingRuleSql">
         <description>
+            The Routing Rule ID SQL Query Service is designed to generate SQL queries that fetch inventory allocation based on specific routing rule IDs.
+            This service helps in retrieving accurate inventory data by applying predefined routing rules.
         </description>
         <in-parameters>
             <parameter name="routingRuleId" required="true"/>
