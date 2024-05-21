@@ -446,7 +446,7 @@
         <actions>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="true"/>
             <if condition="!orderRoutingRule">
-                <return error="true" message="No order routing found for id ${routingRuleId}"/>
+                <return error="true" message="No order routing rule found for id ${routingRuleId}"/>
             </if>
             <if condition="!'RULE_ACTIVE'.equals(orderRoutingRule.statusId)">
                 <return error="true" message="Order routing ${orderRoutingRule.ruleName} [${routingRuleId}] is not active"/>
@@ -819,6 +819,61 @@
                 ec.resourceFacade.template(templateLoc, writer)
                 sql = writer.toString();
             ]]></script>
+        </actions>
+    </service>
+    <service verb="get" noun="OrderRoutingRuleSql">
+        <description>
+        </description>
+        <in-parameters>
+            <parameter name="routingRuleId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="statusId"/>
+            <parameter name="sql" allow-html="any"/>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule" cache="true"/>
+            <if condition="!orderRoutingRule">
+                <return error="true" message="No order routing rule found for id ${routingRuleId}"/>
+            </if>
+            <set field="statusId" from="orderRoutingRule.statusId"/>
+
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="inventoryConditions">
+                <econdition field-name="routingRuleId" from="routingRuleId"/>
+                <order-by field-name="sequenceNum"/>
+            </entity-find>
+            <set field="inventoryFilterMap" from="[:]" />
+            <filter-map-list list="inventoryConditions" to-list="filterConditions">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_FILTER"/>
+            </filter-map-list>
+            <iterate list="filterConditions" entry="filterCondition">
+                <script>
+                    inventoryFilterMap.put(filterCondition.fieldName, filterCondition)
+                </script>
+            </iterate>
+            <set field="conversionFactor" value="0.000621371"/>
+            <set field="measurementSystem" from="inventoryFilterMap?.measurementSystem?.fieldValue" default-value="IMPERIAL"/>
+            <if condition="measurementSystem.equals('METRIC')">
+                <set field="conversionFactor" value="0.0001"/>
+            </if>
+            <filter-map-list list="inventoryConditions" to-list="sortFields">
+                <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
+            </filter-map-list>
+            <order-map-list list="sortFields">
+                <order-by field-name="sequenceNum"/>
+            </order-map-list>
+            <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
+            <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
+            <set field="suggestedFulfillmentLocations" from="[]"/>
+            <script>
+                try {
+                    Writer writer = new StringWriter()
+                    ec.resourceFacade.template(templateLoc, writer)
+                    sql = writer.toString();
+                } catch (Exception e) {
+                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getMessage()}")
+                }
+            </script>
         </actions>
     </service>
 </services>
