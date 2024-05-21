@@ -104,7 +104,7 @@ x.*
           and ifnull(PFI.ALLOW_BROKERING,'Y') = 'Y' group by PFI.FACILITY_ID, PFI.LAST_INVENTORY_COUNT,MINIMUM_STOCK having inventoryForAllocation > 0 order by PRODUCT_COUNT DESC, inventoryForAllocation DESC) inv_count on pf.facility_id = inv_count.facility_id
           inner join product_store_facility psf on oh.product_store_id = psf.product_store_id and psf.facility_id = f.facility_id
           <#if invenoryGroupFiter?has_content>inner join (select fg.FACILITY_GROUP_TYPE_ID,fgrm.FACILITY_ID, fgrm.FACILITY_GROUP_ID,fgrm.SEQUENCE_NUM from facility_group_member fgrm inner join facility_group fg on fgrm.FACILITY_GROUP_ID=fg.FACILITY_GROUP_ID and fg.FACILITY_GROUP_TYPE_ID='BROKERING_GROUP' and (fgrm.THRU_DATE > now() or fgrm.THRU_DATE is null)) fgm on f.FACILITY_ID=fgm.FACILITY_ID</#if>
-          where oh.ORDER_ID='${orderId}' and oi.SHIP_GROUP_SEQ_ID = '${shipGroupSeqId}' <#if orderItemSeqId?has_content> and oi.order_Item_Seq_Id = '${orderItemSeqId}'</#if>
+          where oh.ORDER_ID='${orderId!"<orderId>"}' and oi.SHIP_GROUP_SEQ_ID = '${shipGroupSeqId!"<shipGroupSeqId>"}' <#if orderItemSeqId?has_content> and oi.order_Item_Seq_Id = '${orderItemSeqId}'</#if>
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
           <#if invenoryGroupFiter?has_content>AND fgm.FACILITY_GROUP_ID <@buildSqlCondition value=invenoryGroupFiter /></#if> <#-- NEW facility group ids need to be passed for the groups on which routing is expected to be performed -->
