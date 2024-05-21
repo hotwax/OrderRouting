@@ -20,7 +20,7 @@
             <parameter name="orderId" required="true"/>
         </in-parameters>
         <out-parameters>
-
+            <parameter name="result"/>
         </out-parameters>
         <actions>
             <script>
@@ -35,7 +35,7 @@
             </if>
             <service-call name="co.hotwax.order.routing.InventoryReservationServices.run#OmsFacilityAllocation" transaction-timeout="3600"
                            in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
-                           out-map="outResult"/>
+                           out-map="result"/>
         </actions>
     </service>
 </services>
