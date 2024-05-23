@@ -87,7 +87,6 @@
             <if condition="orderRoutingGroup.productStoreId != productStoreId">
                 <return error="true" message="Order routing group ${orderRoutingGroup.groupName} [${routingGroupId}] is not associated with productStoreId [${productStoreId}]."/>
             </if>
-            <!--TODO: Need to check if we really want to add below check, as we are using service semaphore to avoid simultaneous run -->
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
                 <econditions>
                     <econdition field-name="productStoreId" from="orderRoutingGroup.productStoreId"/>
@@ -96,19 +95,12 @@
                 <order-by field-name="-startDate"/>
             </entity-find>
             <set field="routingRun" from="routingRuns?routingRuns[0]: null"/>
-            <!-- If an routing run is in execution, don't run the rule -->
+            <!-- If an routing run is in execution, Expire the current run the rule -->
             <if condition="routingRun">
-                <if condition="forceRun">
                     <service-call name="update#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                             in-map="[routingRunId:routingRun.routingRunId,hasError:'Y',
                                     routingResult:'Start a new force order routing run, bringing the current routing run to an end',
                                     endDate:ec.user.nowTimestamp]" out-map="routingRunResult"/>
-                    <else>
-                        <return error="true" message="Routing run [${routingRun.routingRunId}] for productStoreId [${orderRoutingGroup.productStoreId}]
-                                already in execution since ${routingRun.startDate}"/>
-                    </else>
-                </if>
-
             </if>
             <!-- Get the all active routing for order routing group -->
             <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="orderRoutings">
