@@ -95,7 +95,7 @@
                 <order-by field-name="-startDate"/>
             </entity-find>
             <set field="routingRun" from="routingRuns?routingRuns[0]: null"/>
-            <!-- If an routing run is in execution, Expire the current run the rule -->
+            <!-- If an routing run is in execution, Expire the current run -->
             <if condition="routingRun">
                     <service-call name="update#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                             in-map="[routingRunId:routingRun.routingRunId,hasError:'Y',
