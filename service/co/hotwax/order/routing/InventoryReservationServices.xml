@@ -24,7 +24,7 @@
         </out-parameters>
         <actions>
             <!-- In case of schedule job run no user logged in, use system user to get the token-->
-            <set field="userName" from="ec.user.username" default-value="system"/>
+            <set field="userName" from="ec.user.username" default-value="${System.getProperty('default.brokering.user')}"/>
             <script>
                 omsBaseUrl = co.hotwax.util.MaargUtil.getOmsInstanceUrl(ec.ecfi);
                 token = co.hotwax.util.MaargUtil.getOmsJwtToken(ec.ecfi, userName);
