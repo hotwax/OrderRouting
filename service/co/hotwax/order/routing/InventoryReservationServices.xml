@@ -23,9 +23,11 @@
             <parameter name="result"/>
         </out-parameters>
         <actions>
+            <!-- In case of schedule job run no user logged in, use system user to get the token-->
+            <set field="userName" from="ec.user.username" default-value="system"/>
             <script>
                 omsBaseUrl = co.hotwax.util.MaargUtil.getOmsInstanceUrl(ec.ecfi);
-                token = co.hotwax.util.MaargUtil.getOmsJwtToken(ec.ecfi);
+                token = co.hotwax.util.MaargUtil.getOmsJwtToken(ec.ecfi, userName);
             </script>
             <if condition="!token">
                 <return error="true" message="Unable to generate oms token, check JWT configuration"/>
