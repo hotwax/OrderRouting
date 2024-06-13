@@ -78,6 +78,7 @@
                 validate the routing group and product store association
             -->
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
+
             <if condition="!orderRoutingGroup">
                 <return error="true" message="Order routing not found for ${routingGroupId}"/>
             </if>
@@ -87,6 +88,16 @@
             <if condition="orderRoutingGroup.productStoreId != productStoreId">
                 <return error="true" message="Order routing group ${orderRoutingGroup.groupName} [${routingGroupId}] is not associated with productStoreId [${productStoreId}]."/>
             </if>
+            <entity-find-one entity-name="org.apache.ofbiz.product.store.ProductStore" value-field="productStore">
+                <field-map field-name="productStoreId" from="orderRoutingGroup.productStoreId"/>
+            </entity-find-one>
+            <if condition="!productStore">
+                <return error="true" message="ProductStore ${orderRoutingGroup.productStoreId} not found."/>
+            </if>
+            <if condition="productStore.enableBrokering == 'N'">
+                <return error="true" message="Routing is disabled for productStore ${productStore.storeName} [${orderRoutingGroup.productStoreId}]. "/>
+            </if>
+
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
                 <econditions>
                     <econdition field-name="productStoreId" from="orderRoutingGroup.productStoreId"/>
