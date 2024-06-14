@@ -75,9 +75,9 @@
                             <field name="sequenceNum"><default-field><text-line size="60"/></default-field></field>
                             <field name="productStoreId">
                                 <default-field>
-                                    <drop-down allow-empty="false" allow-multiple="false">
+                                    <drop-down>
                                         <entity-options key="${productStoreId}"
-                                                        text="${storeName}">
+                                                        text="${storeName} [${productStoreId}]">
                                             <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" distinct="true" cache="true">
                                                 <select-field field-name="productStoreId"/><order-by field-name="storeName"/></entity-find>
                                         </entity-options>
