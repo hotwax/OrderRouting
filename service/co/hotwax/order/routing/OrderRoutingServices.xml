@@ -380,7 +380,7 @@
                     })
                 })
                 } catch (Exception e) {
-                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getMessage()}")
+                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e}")
                 }
             </script>
         </actions>
@@ -687,7 +687,7 @@
                     </else>
                 </if>
             </iterate>
-            <set field="single_line" value="true" type="Boolean"/>
+            <set field="single_line" value="false" type="Boolean"/>
             <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
             <script><![CDATA[
                 Writer writer = new StringWriter()
