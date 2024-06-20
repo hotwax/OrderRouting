@@ -40,6 +40,7 @@
     <moqui.basic.Enumeration enumId="IIP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="distance"/>
     <moqui.basic.Enumeration enumId="IIP_BRK_SFTY_STOCK" description="Brokering safety stock" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="brokeringSafetyStock"/>
     <moqui.basic.Enumeration enumId="IIP_MSMNT_SYSTEM" description="Systems of measurement" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="measurementSystem"/>
+    <moqui.basic.Enumeration enumId="IIP_SPLIT_ITEM_GROUP" description="Split order item group" sequenceNum="6" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="splitOrderItemGroup"/>
 
     <moqui.basic.EnumerationType enumTypeId="ORD_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
     <moqui.basic.Enumeration enumId="OSP_SHIP_BY" description="Ship by" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipBeforeDate"/><!-- OrderItem.shipBeforeDate -->

@@ -5,6 +5,12 @@
 <#assign invenoryGroupFiter = inventoryFilterMap.get("facilityGroupId")! />
 <#assign brokeringSafetyStock = inventoryFilterMap.get("brokeringSafetyStock")! />
 <#assign distance = inventoryFilterMap.get("distance")! />
+<#assign splitOrderItemGroup = inventoryFilterMap.get("splitOrderItemGroup")! />
+<#assign splitGroupItem = true />
+<#if (splitOrderItemGroup?has_content && "N" == splitOrderItemGroup.fieldValue!) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
+  <#assign splitGroupItem = false />
+</#if>
+
 select
     y.ORDER_ID,
     y.ORDER_ITEM_SEQ_ID,
@@ -78,19 +84,25 @@ concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)) as item,
 case when x.order_id is null and x.ORDER_ITEM_SEQ_ID is null then 'Y' else 'N' end as backordered,
 x.*
       from
-          (select oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,<#if invenoryGroupFiter?has_content>fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,</#if>f.facility_type_id,
+          (select oh.order_id,oi.ORDER_ITEM_SEQ_ID,oi.product_id,<#if !splitGroupItem>oiga.ORDER_ITEM_GROUP_SEQ_ID,</#if><#if invenoryGroupFiter?has_content>fgm.SEQUENCE_NUM as facilitySequence,fgm.FACILITY_GROUP_ID,</#if>f.facility_type_id,
           ifnull(ST_Distance_Sphere(point(fpa.LONGITUDE, fpa.LATITUDE),point(opa.LONGITUDE,opa.LATITUDE)), 0) * ${conversionFactor} as distance,
           pf.last_inventory_count as ATP,pf.minimum_stock, (ifnull(pf.last_inventory_count,0)-ifnull(pf.MINIMUM_STOCK,0)) as total_inv,round(ifnull(pf.last_inventory_count, 0)/(oi.quantity-ifnull(oi.cancel_quantity,0))*100,2) as availablity_pct,pf.facility_id,pf.ALLOW_BROKERING,
           (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id = 'ITEM_APPROVED' and ship_group_seq_id = oisg.ship_group_seq_id  group by order_id) as ship_group_total_qty,
           oi.quantity-ifnull(oi.cancel_quantity,0) as item_qty,oisg.carrier_party_id,
           fpa.postal_code as origin_postal_code,opa.postal_code as destination_postal_code,f.maximum_order_limit,foc.entry_date,foc.last_order_count, inv_count.inventoryForAllocation,
-          ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id where oi1.order_id=oh.ORDER_ID and oi1.ship_group_seq_id=oisg.ship_group_seq_id  and pf1.facility_id=pf.facility_id and (ifnull(pf1.last_inventory_count,0)-ifnull(pf1.MINIMUM_STOCK,0)) < oi1.quantity-ifnull(oi1.cancel_quantity,0) and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility,
-          ifnull((select 'N' from order_item oi1 inner join product_facility pf1 on oi1.product_id=pf1.product_id where oi1.order_id=oh.ORDER_ID and oi1.ship_group_seq_id=oisg.ship_group_seq_id and pf1.facility_id=pf.facility_id <#if brokeringSafetyStock?has_content> and (ifnull(pf1.last_inventory_count,0)-ifnull(pf1.MINIMUM_STOCK,0)) < ${(brokeringSafetyStock.fieldValue)!0}</#if> and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_above_facility_threshold,
+          ifnull((select distinct 'N' from order_item oi1 LEFT join product_facility pf1 on oi1.product_id=pf1.product_id and pf1.facility_id=pf.FACILITY_ID where oi1.order_id=oh.ORDER_ID and oi1.ship_group_seq_id=oisg.ship_group_seq_id and ((ifnull(pf1.last_inventory_count,0)-ifnull(pf1.MINIMUM_STOCK,0)) < oi1.quantity-ifnull(oi1.cancel_quantity,0) or pf1.FACILITY_ID is null) AND ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility,<#-- revised -->
+          <#if !splitGroupItem>ifnull((select distinct 'N' from order_item_group_assoc oiga1 inner join order_item oi1 on oiga1.ORDER_ID = oi1.ORDER_ID and oiga1.ORDER_ITEM_SEQ_ID = oi1.ORDER_ITEM_SEQ_ID left join product_facility pf1 on oi1.product_id=pf1.product_id and pf1.facility_id=pf.FACILITY_ID
+          where oiga1.order_id=oiga.ORDER_ID and oi1.order_id=oi.ORDER_ID and oiga1.ORDER_ITEM_GROUP_SEQ_ID=oiga.ORDER_ITEM_GROUP_SEQ_ID and ((ifnull(pf1.last_inventory_count, 0)-ifnull(pf1.MINIMUM_STOCK,0)) < oi1.quantity-ifnull(oi1.cancel_quantity,0) <#if brokeringSafetyStock?has_content> or case when (ifnull(pf1.last_inventory_count, 0)-ifnull(pf1.MINIMUM_STOCK,0)) >= oi1.quantity-ifnull(oi1.cancel_quantity,0) then (ifnull(pf1.last_inventory_count, 0)-ifnull(pf1.MINIMUM_STOCK,0)) < ${(brokeringSafetyStock.fieldValue)!0} end </#if> or pf1.FACILITY_ID is null) and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,oiga1.ORDER_ITEM_GROUP_SEQ_ID),'Y') as rank_by_order_item_grp_at_facility_threshold, </#if> <#-- NEW Rank order item if its order item group's all items are available at facility above threshold -->
+          ifnull((select distinct 'N' from order_item oi1 LEFT join product_facility pf1 on oi1.product_id=pf1.product_id and pf1.facility_id=pf.FACILITY_ID where oi1.order_id=oh.ORDER_ID and oi1.ship_group_seq_id=oisg.ship_group_seq_id <#if brokeringSafetyStock?has_content> and ((ifnull(pf1.last_inventory_count,0)-ifnull(pf1.MINIMUM_STOCK,0)) < ${(brokeringSafetyStock.fieldValue)!0} OR pf1.FACILITY_ID is null) </#if> AND ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_above_facility_threshold,  <#-- revised -->
           ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id and (ifnull(pf2.LAST_INVENTORY_COUNT,0)-ifnull(pf2.MINIMUM_STOCK,0)) > 0 and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' where oi2.order_id=oh.ORDER_ID and oi2.ship_group_seq_id=oisg.ship_group_seq_id and pf2.facility_id=pf.facility_id and (ifnull(pf2.last_inventory_count,0)-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID = 'ITEM_APPROVED' group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt,
           ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id <#if brokeringSafetyStock?has_content> and (ifnull(pf2.LAST_INVENTORY_COUNT,0)-ifnull(pf2.MINIMUM_STOCK,0)) <@buildSqlCondition value=brokeringSafetyStock /> </#if> and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' where oi2.order_id=oh.ORDER_ID and oi2.ship_group_seq_id=oisg.ship_group_seq_id and pf2.facility_id=pf.facility_id and (ifnull(pf2.last_inventory_count,0)-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID = 'ITEM_APPROVED' group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt_above_threshold,
           ifnull((select 'Y' from order_item oi3 where oi3.order_id=oi.ORDER_ID and oi3.order_item_seq_id=oi.order_item_seq_id <#if brokeringSafetyStock?has_content> and (ifnull(pf.last_inventory_count,0)-ifnull(pf.MINIMUM_STOCK,0)) <@buildSqlCondition value=brokeringSafetyStock /> </#if> and (ifnull(pf.last_inventory_count,0)-ifnull(pf.MINIMUM_STOCK,0)) >= oi3.quantity-ifnull(oi3.cancel_quantity,0) and oi3.STATUS_ID = 'ITEM_APPROVED'),'N') as item_at_facility_above_threshold
           from order_header oh
           inner join order_item oi on oh.order_id=oi.order_id and oi.status_id = 'ITEM_APPROVED' and oh.STATUS_ID = 'ORDER_APPROVED'
+          <#if !splitGroupItem>
+          left join order_item_group_assoc oiga on oi.ORDER_ID=oiga.ORDER_ID and oi.ORDER_ITEM_SEQ_ID=oiga.ORDER_ITEM_SEQ_ID
+          inner join order_item_group oig on oiga.order_id = oig.order_id and oig.order_item_group_type_id = "BROKERING_ITEM_GRP"
+          </#if>
           left join order_item_ship_group oisg on oisg.order_id=oh.order_id and oisg.ship_group_seq_id=oi.ship_group_seq_id
           inner join postal_address opa on opa.contact_mech_id=oisg.contact_mech_id
           left join product_facility pf on oi.product_id=pf.product_id and (ifnull(pf.LAST_INVENTORY_COUNT,0)-ifnull(pf.MINIMUM_STOCK,0)) > 0 and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y'
@@ -118,6 +130,7 @@ x.*
             <#if 'ORA_SINGLE' == orderRoutingRule.assignmentEnumId> rank_by_order_at_facility='Y' <#-- NEW for sorting facility having all the items above threshold -->
             <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId> rank_by_order_at_facility='Y' OR rank_by_order_at_facility='N'</#if>
           </#if>
+          <#if !splitGroupItem> AND rank_by_order_item_grp_at_facility_threshold = 'Y' </#if><#-- NEW NEW for filtering item if its order item group's items are available at facility above threshold -->
           order by
           <#if inventorySortByList?has_content>
               <#list inventorySortByList as inventorySortBy>
