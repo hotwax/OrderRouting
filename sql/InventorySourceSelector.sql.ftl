@@ -1,4 +1,4 @@
-<@compress single_line=false>
+<@compress single_line=true>
 <#macro buildSqlCondition value>
  ${Static["co.hotwax.order.routing.OrderRoutingHelper"].makeSqlWhere(value)!}
 </#macro>
