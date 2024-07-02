@@ -42,6 +42,12 @@
             <method type="get"><entity name="moqui.basic.EnumerationAndType" operation="one"/></method>
         </id>
     </resource>
+    <resource name="omsenums" description="Get the OMS enumerations">
+        <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="list"/></method>
+        <id name="enumId">
+            <method type="get"><entity name="co.hotwax.common.enum.EnumerationAndType" operation="one"/></method>
+        </id>
+    </resource>
     <resource name="facilities" description="Get the facilities">
         <method type="get"><entity name="co.hotwax.facility.FacilityAndType" operation="list"/></method>
         <id name="facilityId">
