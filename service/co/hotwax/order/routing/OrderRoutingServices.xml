@@ -281,7 +281,7 @@
                                     .call()
                             if (!ec.message.hasError()) {
                                 actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
-                                        .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId, changeReasonEnumId: changeReasonEnumId
+                                        .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId, changeReasonEnumId: changeReasonEnumId,
                                                 routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
                                         .requireNewTransaction(true)
                                         .call()
