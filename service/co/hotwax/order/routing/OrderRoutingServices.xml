@@ -62,7 +62,7 @@
             <parameter name="productStoreId" required="true"/>
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
-            <parameter name="forceRun" type="Boolean" default-value="false"/>
+            <parameter name="changeReasonEnumId"/>
             <!--
             In order to leverage the Service semaphore capabilities provided by the framework, we have chosen to include productStoreId as an input parameter.
             While productStoreId already exists in the OrderRoutingGroup entity,
@@ -176,6 +176,7 @@
             <parameter name="orderRoutingId" required="true"/>
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
+            <parameter name="changeReasonEnumId"/>
         </in-parameters>
         <actions>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
@@ -280,7 +281,7 @@
                                     .call()
                             if (!ec.message.hasError()) {
                                 actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
-                                        .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId,
+                                        .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId, changeReasonEnumId: changeReasonEnumId
                                                 routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
                                         .requireNewTransaction(true)
                                         .call()
@@ -395,6 +396,7 @@
             <parameter name="orderId" required="true"/>
             <parameter name="shipGroupSeqId" required="true"/>
             <parameter name="orderItemSeqId"/>
+            <parameter name="changeReasonEnumId"/>
             <parameter name="routingRuleId" required="true"/>
             <parameter name="suggestedFulfillmentLocations" type="List"/>
         </in-parameters>
@@ -452,7 +454,7 @@
                             comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
-                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName,
+                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
                         }
                     }
@@ -481,7 +483,7 @@
                             }
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
-                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName,
+                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId?:"UNFILLABLE",
                                     items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
                         }
