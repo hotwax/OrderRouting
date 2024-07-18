@@ -448,18 +448,24 @@
                     //prepare map for brokered items
                     def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [] ;
                     if (suggestedFulfillmentLocations) {
+                        if (!changeReasonEnumId) {
+                            changeReasonEnumId = "BROKERED";
+                        }
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
                             comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
-                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
+                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId,
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
                         }
                     }
                     def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
                     if (unfillableItemSeqIds) {
+                        if (!changeReasonEnumId) {
+                            changeReasonEnumId = "BROKERED";
+                        }
                         if (suggestedFulfillmentLocations) {
                             comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
                         }
@@ -483,7 +489,7 @@
                             }
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
-                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId?:"UNFILLABLE",
+                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId,
                                     items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
                         }
