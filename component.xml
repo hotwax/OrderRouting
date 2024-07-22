@@ -19,7 +19,7 @@ under the License.
 -->
 
 <component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-3.xsd"
-        name="order-routing" version="1.1.0">
+        name="order-routing" version="1.2.1">
     <!-- no dependencies -->
     <depends-on name="maarg-util"/>
 </component>
