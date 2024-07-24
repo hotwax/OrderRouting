@@ -3,28 +3,25 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
         default-menu-include="false" standalone="true">
 
-    <parameter name="routingGroupId" required="true"/>
-    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroupDetail"/></transition>
+    <parameter name="routingGroupId"/>
+    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
     <transition name="jobRunDetail"><default-response url="//system/ServiceJob/JobRuns/JobRunDetail"/></transition>
     <transition name="serviceJobDetail">
         <default-response url="//system/ServiceJob/Jobs/ServiceJobDetail"/></transition>
     <transition name="userAccountDetail"><default-response url="//system/Security/UserAccount/UserAccountDetail"/></transition>
-    <actions>
-        <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true"/>
-        <set field="jobName" from="orderRoutingGroup.jobName"/>
-    </actions>
     <widgets>
-        <form-list name="JobRunList" list="jobRunList" skip-form="true" header-dialog="true">
-            <entity-find entity-name="moqui.service.job.ServiceJobRun" list="jobRunList" use-clone="true">
-                <search-form-inputs default-order-by="-startTime">
-                </search-form-inputs>
+        <form-list name="JobRunList" list="jobRunList" list-entry="jobRun" skip-form="true" header-dialog="true">
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroupJobRun" list="jobRunList">
+                <search-form-inputs default-order-by="-startTime"/>
+                <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
+                <select-field field-name="routingGroupId,errors,messages"/>
             </entity-find>
             <field name="jobRunId"><header-field show-order-by="true"><text-find size="10" hide-options="true"/></header-field>
                 <default-field><link url="jobRunDetail" text="${jobRunId}" link-type="anchor"/></default-field></field>
-            <field name="orderRoutingId">
+            <field name="groupName">
                 <header-field show-order-by="true" title="Group Name"/>
-                <default-field><link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" link-type="anchor"/></default-field></field>
-            <field name="jobName">
+                <default-field><link url="orderRoutingGroup" text="${groupName?:routingGroupId}" link-type="anchor" parameter-map="[routingGroupId: jobRun.routingGroupId]"/></default-field></field>
+            <!--<field name="jobName">
                 <header-field show-order-by="case-insensitive">
                     <drop-down allow-empty="true">
                         <entity-options key="${jobName}" text="${jobName}">
@@ -34,18 +31,12 @@
                     </drop-down>
                 </header-field>
                 <default-field><link url="serviceJobDetail" text="${jobName}" link-type="anchor" url-type="screen"/></default-field>
-            </field>
+            </field>-->
             <field name="userId"><header-field title="User"><text-find size="10" hide-options="true"/></header-field><default-field>
                 <display-entity entity-name="moqui.security.UserAccount" text="${username} - ${userFullName}"/>
                 <link url="userAccountDetail" text="${userId}" link-type="anchor" condition="userId"/>
             </default-field></field>
 
-            <field name="hasError">
-                <header-field>
-                    <drop-down allow-empty="true"><option key="Y"/><option key="N"/></drop-down>
-                </header-field>
-                <default-field><display/></default-field>
-            </field>
             <field name="startTime">
                 <header-field show-order-by="true"><date-period/></header-field>
                 <default-field><display format="yyyy-MM-dd HH:mm:ss"/></default-field>
@@ -57,6 +48,15 @@
             <field name="executionTime">
                 <conditional-field condition="endTime &amp;&amp; startTime">
                     <display text="${(groovy.time.TimeCategory.minus(endTime, startTime))}"/></conditional-field>
+            </field>
+            <field name="hasError">
+                <header-field>
+                    <drop-down allow-empty="true"><option key="Y"/><option key="N"/></drop-down>
+                </header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="message">
+                <default-field><display text="${errors?:messages}"/></default-field>
             </field>
             <field name="findButton">
                 <header-field title="Find"><submit/></header-field><default-field>

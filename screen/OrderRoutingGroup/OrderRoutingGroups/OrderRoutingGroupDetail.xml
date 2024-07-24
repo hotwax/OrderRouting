@@ -3,10 +3,10 @@
         default-menu-title="Order Routing Group" default-menu-index="1" default-menu-include="false">
 
     <parameter name="routingGroupId" required="true"/>
-    <transition name="jobRunList"><default-response url="../JobRuns/JobRunList"/></transition>
+    <transition name="OrderRoutingGroupRuns"><default-response url="../../OrderRoutingGroupRuns/OrderRoutingGroupRunList"/></transition>
     <transition name="serviceJobDetail">
         <default-response url="//system/ServiceJob/Jobs/ServiceJobDetail"/></transition>
-    <transition name="routingRunList"><default-response url="../OrderRouting/OrderRoutingRunList"/></transition>
+    <transition name="routingRunList"><default-response url="../../OrderRoutingRuns/OrderRoutingRunList"/></transition>
     <transition name="orderRoutingDetail"><default-response url="../OrderRouting/OrderRoutingDetail"/></transition>
     <transition name="orderRoutingGroupSchedule">
         <service-call name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule"/>
@@ -84,7 +84,7 @@
                         <link url="runJob" text="Run now" confirmation="Are you sure to run order routing group now?" condition="serviceJob != null">
                             <parameter name="jobName" from="orderRoutingGroup.jobName"/>
                         </link>
-                        <link url="jobRunList" text="Group Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId]" condition="serviceJob != null"/>
+                        <link url="OrderRoutingGroupRuns" text="Group Runs" parameter-map="[routingGroupId:orderRoutingGroup.routingGroupId]" condition="serviceJob != null"/>
                     </box-toolbar>
                     <box-body>
                         <section name="ScheduleJob">

@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing Group List" default-menu-include="false">
+        default-menu-title="Order Routing Groups" default-menu-include="false">
 
-    <parameter name="routingGroupId" required="true"/>
+    <parameter name="routingGroupId"/>
     <parameter name="orderRoutingId"/>
-    <transition name="orderRoutingGroup"><default-response url="../OrderRoutingGroupDetail"/></transition>
-    <transition name="orderRouting"><default-response url="../OrderRoutingDetail"/></transition>
-    <transition name="orderRoutingGroup">
-        <default-response url="../../OrderRoutingGroupDetail"/>
-    </transition>
-    <actions>
-        <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true"/>
-    </actions>
+    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
+    <transition name="orderRouting"><default-response url="../../OrderRoutingGroups/OrderRouting/OrderRoutingDetail"/></transition>
     <widgets>
         <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true" show-page-size="true">
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="orderRoutingRuns">
                 <search-form-inputs default-order-by="-startDate"/>
+                <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
                 <econdition field-name="orderRoutingId" from="orderRoutingId" ignore-if-empty="true"/>
             </entity-find>
             <row-actions>
                 <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true">
-                    <field-map field-name="orderRoutingId" from="orderRoutingId"/>
+                    <field-map field-name="orderRoutingId" from="orderRoutingRun.orderRoutingId"/>
+                </entity-find-one>
+                <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true">
+                    <field-map field-name="routingGroupId" from="orderRoutingRun.routingGroupId"/>
                 </entity-find-one>
             </row-actions>
             <field name="routingRunId">
@@ -30,12 +28,12 @@
             </field>
             <field name="routingGroupId">
                 <default-field>
-                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" parameter-map="[routingGroupId: routingGroupId]" link-type="anchor"/>
+                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" parameter-map="[routingGroupId: orderRoutingRun.routingGroupId]" link-type="anchor"/>
             </default-field></field>
             <field name="orderRoutingId">
                 <header-field show-order-by="true"/>
                 <default-field>
-                <link url="orderRouting" text="${orderRouting.routingName?:orderRouting.orderRoutingId}" parameter-map="[routingGroupId: routingGroupId, orderRoutingId:orderRoutingId]" link-type="anchor"/>
+                <link url="orderRouting" text="${orderRouting.routingName?:orderRouting.orderRoutingId}" parameter-map="[routingGroupId: orderRoutingRun.routingGroupId, orderRoutingId:orderRoutingRun.orderRoutingId]" link-type="anchor"/>
             </default-field></field>
             <field name="productStoreId">
                 <default-field>

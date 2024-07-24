@@ -41,7 +41,7 @@
         <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRoutingRule"/>
         <default-response url="."/>
     </transition>
-    <transition name="routingRunList"><default-response url="../OrderRoutingRunList"/></transition>
+    <transition name="routingRunList"><default-response url="../../../OrderRoutingRuns/OrderRoutingRunList"/></transition>
 
     <actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting"/>
