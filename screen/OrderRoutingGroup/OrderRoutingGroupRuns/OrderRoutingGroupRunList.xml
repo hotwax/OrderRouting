@@ -10,17 +10,36 @@
         <default-response url="//system/ServiceJob/Jobs/ServiceJobDetail"/></transition>
     <transition name="userAccountDetail"><default-response url="//system/Security/UserAccount/UserAccountDetail"/></transition>
     <widgets>
-        <form-list name="JobRunList" list="jobRunList" list-entry="jobRun" skip-form="true" header-dialog="true">
+        <form-list name="JobRunList" list="jobRunList" skip-form="true" header-dialog="true">
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroupJobRun" list="jobRunList">
                 <search-form-inputs default-order-by="-startTime"/>
                 <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
-                <select-field field-name="routingGroupId,errors,messages"/>
+                <select-field field-name="groupName,errors,messages"/>
             </entity-find>
             <field name="jobRunId"><header-field show-order-by="true"><text-find size="10" hide-options="true"/></header-field>
                 <default-field><link url="jobRunDetail" text="${jobRunId}" link-type="anchor"/></default-field></field>
-            <field name="groupName">
-                <header-field show-order-by="true" title="Group Name"/>
-                <default-field><link url="orderRoutingGroup" text="${groupName?:routingGroupId}" link-type="anchor" parameter-map="[routingGroupId: jobRun.routingGroupId]"/></default-field></field>
+            <field name="routingGroupId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${routingGroupId}" text="${groupName?:routingGroupId} [${routingGroupId}]">
+                            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field><link url="orderRoutingGroup" text="${groupName?:routingGroupId}" link-type="anchor" parameter-map="[routingGroupId: routingGroupId]"/></default-field>
+            </field>
+            <field name="productStoreId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${productStoreId}" text="${storeName?:productStoreId} [${productStoreId}]">
+                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field>
+                    <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
+                </default-field>
+            </field>
             <!--<field name="jobName">
                 <header-field show-order-by="case-insensitive">
                     <drop-down allow-empty="true">
