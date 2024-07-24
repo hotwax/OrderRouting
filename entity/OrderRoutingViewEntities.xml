@@ -129,4 +129,15 @@ under the License.
             <exclude field="sequenceNum"/>
         </alias-all>
     </view-entity>
+
+    <view-entity entity-name="OrderRoutingGroupJobRun" package="co.hotwax.order.routing">
+        <member-entity entity-alias="ORGRP" entity-name="co.hotwax.order.routing.OrderRoutingGroup"/>
+        <member-entity entity-alias="SJR" entity-name="moqui.service.job.ServiceJobRun" join-from-alias="ORGRP">
+            <key-map field-name="jobName"/>
+        </member-entity>
+        <alias-all entity-alias="ORGRP">
+            <exclude field="jobName"/>
+        </alias-all>
+        <alias-all entity-alias="SJR"/>
+    </view-entity>
 </entities>

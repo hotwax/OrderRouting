@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Order Routing Groups" default-menu-include="false">
+
+    <parameter name="routingGroupId"/>
+    <parameter name="orderRoutingId"/>
+    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
+    <transition name="orderRouting"><default-response url="../../OrderRoutingGroups/OrderRouting/OrderRoutingDetail"/></transition>
+    <widgets>
+        <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true"
+                header-dialog="true">
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="orderRoutingRuns">
+                <search-form-inputs default-order-by="-startDate"/>
+                <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
+                <econdition field-name="orderRoutingId" from="orderRoutingId" ignore-if-empty="true"/>
+            </entity-find>
+            <row-actions>
+                <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true">
+                    <field-map field-name="orderRoutingId" from="orderRoutingRun.orderRoutingId"/>
+                </entity-find-one>
+                <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup" cache="true">
+                    <field-map field-name="routingGroupId" from="orderRoutingRun.routingGroupId"/>
+                </entity-find-one>
+            </row-actions>
+            <field name="routingRunId">
+                <header-field show-order-by="true"/>
+                <default-field><display/></default-field>
+            </field>
+            <field name="routingGroupId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${routingGroupId}" text="${groupName?:routingGroupId} [${routingGroupId}]">
+                            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field>
+                <link url="orderRoutingGroup" text="${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}" parameter-map="[routingGroupId: orderRoutingRun.routingGroupId]" link-type="anchor"/>
+            </default-field></field>
+            <field name="orderRoutingId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${orderRoutingId}" text="${routingName?:orderRoutingId} [${orderRoutingId}]">
+                            <entity-find entity-name="co.hotwax.order.routing.OrderRouting" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field>
+                <link url="orderRouting" text="${orderRouting.routingName?:orderRouting.orderRoutingId}" parameter-map="[routingGroupId: orderRoutingRun.routingGroupId, orderRoutingId:orderRoutingRun.orderRoutingId]" link-type="anchor"/>
+            </default-field></field>
+            <field name="productStoreId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${productStoreId}" text="${storeName?:productStoreId} [${productStoreId}]">
+                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field>
+                    <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
+                </default-field>
+            </field>
+            <field name="hasError"><default-field><display/></default-field></field>
+            <field name="routingResult">
+                <default-field><display/></default-field>
+            </field>
+            <field name="startDate">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="endDate">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="executionTime">
+                <conditional-field condition="startDate &amp;&amp; endDate">
+                    <display text="${(groovy.time.TimeCategory.minus(endDate, startDate))}"/>
+                </conditional-field>
+            </field>
+            <field name="findButton">
+                <header-field title="Find"><submit/></header-field><default-field>
+                <display text=" "/></default-field>
+            </field>
+        </form-list>
+    </widgets>
+</screen>
