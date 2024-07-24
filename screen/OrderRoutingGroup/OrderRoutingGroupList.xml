@@ -39,7 +39,7 @@
                     <field-map field-name="jobName" from="jobName"/>
                 </entity-find-one>
                 <if condition="serviceJob &amp;&amp; serviceJob.cronExpression">
-                    <set field="cronDescription" from="org.moqui.impl.service.ScheduledJobRunner.getCronDescription(serviceJob.cronExpression, ec.user.getLocale(), false)"/>
+                    <set field="cronDescription" from="co.hotwax.util.MaargUtil.getCronDescription(serviceJob.cronExpression, ec.user.getLocale())"/>
                 </if>
             </row-actions>
             <field name="groupName">
@@ -63,6 +63,10 @@
             <field name="cronExpression">
                 <header-field show-order-by="false"></header-field>
                 <default-field title="Frequency"><display text="${cronDescription?:''}"/></default-field>
+            </field>
+            <field name="nextExecutionTime">
+                <header-field show-order-by="false"></header-field>
+                <default-field><display text="${co.hotwax.util.MaargUtil.getNextExecutionTime(serviceJob?.cronExpression, ec.user.getTimeZone())?:''}"/></default-field>
             </field>
             <field name="sequenceNum">
                 <header-field show-order-by="true"></header-field>

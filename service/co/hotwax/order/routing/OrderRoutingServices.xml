@@ -550,9 +550,8 @@
                 <script>
                     schedule = serviceJob.getMap()
                     try {
-                    schedule.cronDescription = org.moqui.impl.service.ScheduledJobRunner.getCronDescription(schedule.cronExpression, ec.user.getLocale(), true)
-                    cronExecutionTime = org.moqui.impl.service.ScheduledJobRunner.getExecutionTime(schedule.cronExpression)
-                    nextExecutionTime = cronExecutionTime.nextExecution(java.time.ZonedDateTime.now()).orElse(null)
+                    schedule.cronDescription = co.hotwax.util.MaargUtil.getCronDescription(schedule.cronExpression, ec.user.getLocale())
+                    nextExecutionTime = co.hotwax.util.MaargUtil.getNextExecutionTime(serviceJob?.cronExpression, TimeZone.getDefault())
                     if (nextExecutionTime != null) {
                         schedule.nextExecutionDateTime = nextExecutionTime.toInstant().toEpochMilli()
                     }
@@ -585,12 +584,14 @@
                 <return message="No productStore associated with routing group ${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}]/"/>
             </if>
             <if condition="cronExpression">
+                <!--validate cron expression -->
                 <script>
                     try {
-                        cronDescription = org.moqui.impl.service.ScheduledJobRunner.getCronDescription(cronExpression, ec.user.getLocale(), false)
+                        cron = org.moqui.impl.service.ScheduledJobRunner.getCron(cronExpression)
+                        cron.validate()
                     } catch (Exception e) {
-                        ec.logger.error("Error getting cron description: ${e.getMessage()}")
-                        ec.message.addError("Error getting cron description: ${e.getMessage()}")
+                        ec.logger.error("Invalid cron expression : ${e.getMessage()}")
+                        ec.message.addError("Invalid cron expression 2: ${e.getMessage()}")
                         return
                     }
                 </script>
