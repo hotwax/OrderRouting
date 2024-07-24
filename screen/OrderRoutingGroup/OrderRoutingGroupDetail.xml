@@ -44,18 +44,6 @@
         <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
             <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
         </entity-find-one>
-        <script>
-            if (serviceJob?.cronExpression) {
-                try {
-                    cronExpressionDesc = org.moqui.impl.service.ScheduledJobRunner.getCronDescription(serviceJob?.cronExpression, ec.user.getLocale(), true)
-                    cronExecutionTime = org.moqui.impl.service.ScheduledJobRunner.getExecutionTime(serviceJob?.cronExpression)
-                    nextExecutionTime = cronExecutionTime.nextExecution(java.time.ZonedDateTime.now()).orElse(null).toInstant().atZone(ec.user.getTimeZone().toZoneId())
-                } catch (Exception e) {
-                    ec.logger.error("Error getting cron description: ${e.getMessage()}")
-                    cronExpressionDesc = e.getMessage()
-                }
-            }
-        </script>
     </actions>
     <widgets>
         <container-row>
@@ -108,8 +96,10 @@
                                         <default-field><link url="serviceJobDetail" text="${jobName}" link-type="anchor" url-type="screen"/></default-field>
                                     </field>
                                     <field name="description"><default-field><text-line/></default-field></field>
-                                    <field name="cronExpression"><default-field tooltip="${cronExpressionDesc} ${TimeZone.getDefault().getID()} time"><text-line /></default-field></field>
-                                    <field name="nextExecutionTime"><conditional-field condition="nextExecutionTime"><display/></conditional-field></field>
+                                    <field name="cronExpression"><default-field tooltip="${co.hotwax.util.MaargUtil.getCronDescription(serviceJob?.cronExpression, ec.user.getLocale())?:''}"><text-line /></default-field></field>
+                                    <field name="nextExecutionTime"><conditional-field condition="serviceJob.cronExpression">
+                                        <display text="${co.hotwax.util.MaargUtil.getNextExecutionTime(serviceJob?.cronExpression, ec.user.getTimeZone())?:''}"/>
+                                    </conditional-field></field>
                                     <field name="fromDate"><default-field><date-time/></default-field></field>
                                     <field name="thruDate"><default-field><date-time/></default-field></field>
                                     <field name="paused">
