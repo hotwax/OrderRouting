@@ -454,7 +454,7 @@
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
-                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]"
+                            comments = "${orderRoutingGroup.groupName} : Inventory found at single location for ${routingRule.ruleName}"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
                             facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId,
@@ -467,7 +467,7 @@
                             changeReasonEnumId = "UNFILLABLE";
                         }
                         if (suggestedFulfillmentLocations) {
-                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
+                            comments = "${orderRoutingGroup.groupName}: Inventory not found for ${routingRule.ruleName}."
                         }
                         // If unfillable items are found, check for actions.
                         if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
