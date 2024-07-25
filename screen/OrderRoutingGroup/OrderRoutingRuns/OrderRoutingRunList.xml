@@ -78,6 +78,14 @@
                     <display text="${(groovy.time.TimeCategory.minus(endDate, startDate))}"/>
                 </conditional-field>
             </field>
+            <field name="orderItemCount">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="brokeredItemCount">
+                <header-field show-order-by="true"></header-field>
+                <default-field><display/></default-field>
+            </field>
             <field name="findButton">
                 <header-field title="Find"><submit/></header-field><default-field>
                 <display text=" "/></default-field>

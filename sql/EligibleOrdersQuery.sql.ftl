@@ -1,11 +1,15 @@
-<@compress single_line=single_line!false>
+<@compress single_line=true>
 <#macro buildSqlCondition fieldName filterCodnition>
   ${fieldName} ${Static["co.hotwax.order.routing.OrderRoutingHelper"].makeSqlWhere(filterCodnition)!}
 </#macro>
 SELECT
+  <#if queryCount!false>
+    count( distinct orderId, ORDER_ITEM_SEQ_ID)'itemCount'
+  <#else>
   orderId,
   shipGroupSeqId
   <#if selectOrderItemSeqId>,ORDER_ITEM_SEQ_ID'orderItemSeqId' <#--conditional field to select --></#if>
+  </#if>
 from
   (SELECT
     OH.ORDER_ID'orderId',
@@ -54,6 +58,7 @@ WHERE
       </#list>
     </#if>
   )
+<#if !queryCount!false>
 GROUP BY
   orderId,
   shipGroupSeqId
@@ -73,4 +78,6 @@ ORDER BY
   <#else>
     orderDate ASC
   </#if>
+</#if>
+
 </@compress>

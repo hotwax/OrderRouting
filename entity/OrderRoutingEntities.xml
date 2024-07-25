@@ -184,6 +184,8 @@ under the License.
         <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
         <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
         <field name="routingResult" type="text-long"><description>Result or outcome of the routing run.</description></field>
+        <field name="orderItemCount" type="number-integer"><description>Store the attempted order item count.</description></field>
+        <field name="brokeredItemCount" type="number-integer"><description>Store the brokered order item count.</description></field>
         <index name="IDX_ORRN_ROUTE">
             <index-field name="routingGroupId"/>
             <index-field name="orderRoutingId"/>
