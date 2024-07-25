@@ -8,7 +8,7 @@
         <default-response url="../../OrderRoutingGroupDetail"/>
     </transition>
     <transition name="orderRoutingRule">
-        <default-response url="../OrderRoutingRule"/>
+        <default-response url="../../OrderRouting/OrderRoutingRuleDetail"/>
     </transition>
 
     <transition name="updateOrderRouting">

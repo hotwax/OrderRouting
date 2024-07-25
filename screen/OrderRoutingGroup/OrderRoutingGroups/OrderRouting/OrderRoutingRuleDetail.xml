@@ -5,7 +5,7 @@
     <parameter name="routingRuleId" required="true"/>
 
     <transition name="orderRouting">
-        <default-response url="../../../OrderRouting"/>
+        <default-response url="../../OrderRouting/OrderRoutingDetail"/>
     </transition>
     <transition name="createOrderRoutingRuleInvCond">
         <service-call name="create#co.hotwax.order.routing.OrderRoutingRuleInvCond"/>
