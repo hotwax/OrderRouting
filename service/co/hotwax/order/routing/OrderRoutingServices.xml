@@ -130,6 +130,7 @@
                         in-map="[routingGroupId:routingGroupId, orderRoutingId: orderRouting.orderRoutingId,
                                 productStoreId: productStoreId, startDate:ec.user.nowTimestamp]"
                         out-map="routingRunResult"/>
+                <set field="attemptedItemCount" type="Long"/>
                 <script>
                    /*
                         Calling a service in a script with ignore-error="true".
@@ -139,8 +140,11 @@
                     try {
                         def orderRoutingResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRouting")
                                 .requireNewTransaction(true)
-                                .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId])
+                                .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId,
+                                        routingRunId: routingRunResult.routingRunId])
                                 .call()
+                        attemptedItemCount = orderRoutingResult.attemptedItemCount
+                        brokeredItemCount = orderRoutingResult.brokeredItemCount
                     } catch (Throwable e) {
                         ec.logger.error("There is an issue with run#OrderRouting", e)
                     }
@@ -159,7 +163,8 @@
                 </script>
 
                 <service-call name="update#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
-                        in-map="[routingRunId:routingRunResult.routingRunId,hasError:hasError, routingResult:routingResult, endDate:ec.user.nowTimestamp]"
+                        in-map="[routingRunId:routingRunResult.routingRunId,hasError:hasError, routingResult:routingResult,
+                                endDate:ec.user.nowTimestamp, orderItemCount: attemptedItemCount, brokeredItemCount: brokeredItemCount]"
                         out-map="routingRunResult"/>
             </iterate>
             <message type="success">Finished order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group.</message>
@@ -177,7 +182,12 @@
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
             <parameter name="changeReasonEnumId"/>
+            <parameter name="routingRunId"/>
         </in-parameters>
+        <out-parameters>
+            <parameter name="attemptedItemCount" type="Long"/>
+            <parameter name="brokeredItemCount" type="Long"/>
+        </out-parameters>
         <actions>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting" cache="true"/>
             <if condition="!orderRouting">
@@ -247,11 +257,25 @@
                 </else>
                 </if>
             </iterate>
-            <set field="single_line" value="true" type="Boolean"/>
+            <set field="queryCount" value="true" type="Boolean"/>
             <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
+            <set field="productStore" from="ec.entity.getEntityDefinition('org.apache.ofbiz.product.store.ProductStore')"/>
+            <set field="attemptedItemCount" value="0" type="Long"/>
+            <set field="brokeredItemCount" value="0" type="Long"/>
             <log message="Fetching order with condition ${orderFilterConditions} for routing ${orderRouting.routingName} [${orderRoutingId}]"/>
             <script><![CDATA[
+                Writer countWriter = new StringWriter()
+                ec.resourceFacade.template(templateLoc, countWriter)
+                //ec.logger.info("Eligible orders count sql: ${countWriter}")
+                ec.getEntity().getConnection(productStore.getEntityGroupName()).withCloseable ({ java.sql.Connection con ->
+                    con.createStatement().withCloseable({ statement ->
+                        statement.executeQuery(countWriter.toString()).withCloseable({resultSet ->
+                            if (resultSet.next()) { attemptedItemCount = resultSet.getLong(1) }
+                        })
+                    })
+                })
                 Writer writer = new StringWriter()
+                queryCount = false;
                 ec.resourceFacade.template(templateLoc, writer)
                 //ec.logger.info("Eligible orders sql: ${writer}")
                 /** Note:
@@ -282,13 +306,14 @@
                             if (!ec.message.hasError()) {
                                 actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
                                         .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId, changeReasonEnumId: changeReasonEnumId,
-                                                routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations])
+                                                routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations, routingRunId: routingRunId])
                                         .requireNewTransaction(true)
                                         .call()
                                 if (ec.message.hasError()) {
                                     ec.logger.warn("Ignoring order routing actions errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
                                     ec.message.clearAll()
                                 }
+                                brokeredItemCount += actionResult?.brokeredItemCount ?: 0
                                 if (!actionResult?.runNextRule) {
                                     /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
                                     break
@@ -362,7 +387,8 @@
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
                 //ec.logger.info("======writer==${writer}==")
-                java.sql.Connection con = ec.getEntity().getConnection(productStore.getEntityGroupName())
+                //java.sql.Connection con = ec.getEntity().getConnection(productStore.getEntityGroupName())
+                ec.getEntity().getConnection(productStore.getEntityGroupName()).withCloseable ({ java.sql.Connection con ->
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
                         while (resultSet.next()) {
@@ -379,6 +405,7 @@
                             ])
                         }
                     })
+                })
                 })
                 } catch (Exception e) {
                     ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e}")
@@ -397,15 +424,17 @@
             <parameter name="shipGroupSeqId" required="true"/>
             <parameter name="orderItemSeqId"/>
             <parameter name="changeReasonEnumId"/>
+            <parameter name="routingRunId"/>
             <parameter name="routingRuleId" required="true"/>
             <parameter name="suggestedFulfillmentLocations" type="List"/>
         </in-parameters>
         <out-parameters>
             <parameter name="runNextRule" type="Boolean"/>
-            <parameter name="facilityAllocation" type="List"/>
+            <parameter name="brokeredItemCount" type="Long"/>
         </out-parameters>
         <actions>
             <set field="runNextRule" value="true" type="Boolean"/>
+            <set field="brokeredItemCount" value="0" type="Long"/>
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="routingRule" cache="true"/>
             <entity-find-related-one value-field="routingRule" relationship-name="co.hotwax.order.routing.OrderRouting" to-value-field="orderRouting" cache="true"/>
             <entity-find-related-one value-field="orderRouting" relationship-name="co.hotwax.order.routing.OrderRoutingGroup" to-value-field="orderRoutingGroup" cache="true"/>
@@ -448,6 +477,7 @@
                     //prepare map for brokered items
                     def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [] ;
                     if (suggestedFulfillmentLocations) {
+                        brokeredItemCount = suggestedFulfillmentLocations.size();
                         if (!changeReasonEnumId) {
                             changeReasonEnumId = "BROKERED";
                         }
@@ -458,7 +488,8 @@
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
                             facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId,
-                                    routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
+                                    routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
+                                    routingRunId: routingRunId])
                         }
                     }
                     def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
@@ -491,7 +522,8 @@
                         if (queue || autoCancelDate || clearAutoCancelDate) {
                             facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId,
                                     items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
-                                    routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId])
+                                    routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
+                                    routingRunId: routingRunId])
                         }
                     } else {
                         //If all items allocated no need to run next rule
@@ -696,7 +728,6 @@
                     </else>
                 </if>
             </iterate>
-            <set field="single_line" value="false" type="Boolean"/>
             <set field="templateLoc" value="component://order-routing/sql/EligibleOrdersQuery.sql.ftl"/>
             <script><![CDATA[
                 Writer writer = new StringWriter()
