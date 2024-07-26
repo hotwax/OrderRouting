@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing" default-menu-index="1" default-menu-include="false">
+        default-menu-title="${orderRouting?orderRouting.routingName:''} :${orderRoutingId}" default-menu-index="1" default-menu-include="false">
 
     <parameter name="orderRoutingId" required="true"/>
-
     <transition name="orderRoutingGroup">
         <default-response url="../../OrderRoutingGroupDetail"/>
     </transition>
@@ -43,8 +42,13 @@
     </transition>
     <transition name="routingRunList"><default-response url="../../../OrderRoutingRuns/OrderRoutingRunList"/></transition>
 
-    <actions>
+    <pre-actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting"/>
+    </pre-actions>
+    <actions>
+        <if condition="!orderRouting || !orderRoutingId">
+            <return message="No order routing found for ID ${orderRoutingId}" error="true"/>
+        </if>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup">
             <field-map field-name="routingGroupId" from="orderRouting.routingGroupId"/>
         </entity-find-one>

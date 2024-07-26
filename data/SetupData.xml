@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-facade-xml type="ext-seed">
-    <moqui.screen.SubscreensItem screenLocation="component://webroot/screen/webroot/apps.xml"
-                             subscreenName="OrderRouting" subscreenLocation="component://order-routing/screen/OrderRoutingGroup.xml"
-                             menuTitle="Order Routing Setup" menuIndex="9" menuInclude="Y"/>
-
     <artifactGroups artifactGroupId="ORDER_ROUTE_APP" description="Order routing app">
         <artifacts artifactName="component://order-routing/screen/OrderRoutingGroup.xml" artifactTypeEnumId="AT_XML_SCREEN" inheritAuthz="Y"/>
         <!-- Full permissions for the ADMIN user group -->

@@ -463,7 +463,7 @@
 
                     facilityAllocation = [];
                     def comments='';
-                    def routingRuleName = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : ${orderRouting.routingName} [${orderRouting.orderRoutingId}] : ${routingRule.ruleName} [${routingRule.routingRuleId}]"
+                    def routingRuleName = "${orderRoutingGroup.groupName} : ${orderRouting.routingName} : ${routingRule.ruleName}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
                         // SQL will not return results if items are not available at a single location.

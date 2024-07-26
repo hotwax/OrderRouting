@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-include="false" standalone="true">
+        default-menu-include="false" standalone="true" default-menu-title="Group Runs">
 
     <parameter name="routingGroupId"/>
     <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
