@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing Group" default-menu-index="1" default-menu-include="false">
+        default-menu-title="${orderRoutingGroup?orderRoutingGroup.groupName:''} : ${routingGroupId}" default-menu-index="1" default-menu-include="false">
 
     <parameter name="routingGroupId" required="true"/>
     <transition name="OrderRoutingGroupRuns"><default-response url="../../OrderRoutingGroupRuns/OrderRoutingGroupRunList"/></transition>
@@ -36,8 +36,13 @@
         <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRouting"/>
         <default-response url="."/>
     </transition>
-    <actions>
+    <pre-actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
+    </pre-actions>
+    <actions>
+        <if condition="!orderRoutingGroup || !routingGroupId">
+            <return message="No order routing group found for ID ${routingGroupId}" error="true"/>
+        </if>
         <entity-find-one entity-name="moqui.service.job.ServiceJobRunLock" value-field="runLock">
             <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
         </entity-find-one>

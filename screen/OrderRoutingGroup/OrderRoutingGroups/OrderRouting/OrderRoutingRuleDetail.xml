@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
-        default-menu-title="Order Routing Rule" default-menu-index="1" default-menu-include="false">
+        default-menu-title="Routing rule" default-menu-index="1" default-menu-include="false">
 
     <parameter name="routingRuleId" required="true"/>
 
@@ -36,9 +36,13 @@
         <service-call name="update#co.hotwax.order.routing.OrderRoutingRule"/>
         <default-response url="."/>
     </transition>
-
-    <actions>
+    <pre-actions>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingRule" value-field="orderRoutingRule"/>
+    </pre-actions>
+    <actions>
+        <if condition="!orderRoutingRule || !routingRuleId">
+            <return message="No order routing group found for ID ${routingRuleId}" error="true"/>
+        </if>
         <entity-find-one entity-name="co.hotwax.order.routing.OrderRouting" value-field="orderRouting">
             <field-map field-name="orderRoutingId" from="orderRoutingRule.orderRoutingId"/>
         </entity-find-one>
