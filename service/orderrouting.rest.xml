@@ -122,6 +122,9 @@
             <resource name="sql">
                 <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#OrderFilterSql"/></method>
             </resource>
+            <resource name="orderCount">
+                <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#RoutingOrderCount"/></method>
+            </resource>
         </id>
     </resource>
     <resource name="rules">
