@@ -124,13 +124,16 @@
             <if condition="!orderRoutings">
                 <return type="warning" message="No order routing configuration found for the specified routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
             </if>
+            <set field="groupItemCount" value="0" type="Long"/>
+            <set field="groupBrokeredItemCount"  value="0" type="Long"/>
             <log message="Started order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group."/>
             <iterate list="orderRoutings" entry="orderRouting">
                 <service-call name="create#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                         in-map="[routingGroupId:routingGroupId, orderRoutingId: orderRouting.orderRoutingId,
                                 productStoreId: productStoreId, startDate:ec.user.nowTimestamp]"
                         out-map="routingRunResult"/>
-                <set field="attemptedItemCount" type="Long"/>
+                <set field="attemptedItemCount" value="0" type="Long"/>
+                <set field="brokeredItemCount" value="0" type="Long"/>
                 <script>
                    /*
                         Calling a service in a script with ignore-error="true".
@@ -145,6 +148,8 @@
                                 .call()
                         attemptedItemCount = orderRoutingResult.attemptedItemCount
                         brokeredItemCount = orderRoutingResult.brokeredItemCount
+                        groupItemCount += attemptedItemCount
+                        groupBrokeredItemCount +=brokeredItemCount
                     } catch (Throwable e) {
                         ec.logger.error("There is an issue with run#OrderRouting", e)
                     }
@@ -167,7 +172,7 @@
                                 endDate:ec.user.nowTimestamp, orderItemCount: attemptedItemCount, brokeredItemCount: brokeredItemCount]"
                         out-map="routingRunResult"/>
             </iterate>
-            <message type="success">Finished order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group.</message>
+            <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${attemptedItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
         </actions>
     </service>
 

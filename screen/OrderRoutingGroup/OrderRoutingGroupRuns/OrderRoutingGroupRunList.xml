@@ -75,7 +75,7 @@
                 <default-field><display/></default-field>
             </field>
             <field name="message">
-                <default-field><display text="${errors?:messages}"/></default-field>
+                <default-field><display text="${errors?:messages?: ''}"/></default-field>
             </field>
             <field name="findButton">
                 <header-field title="Find"><submit/></header-field><default-field>
