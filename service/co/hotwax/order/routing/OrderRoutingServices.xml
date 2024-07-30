@@ -172,7 +172,7 @@
                                 endDate:ec.user.nowTimestamp, orderItemCount: attemptedItemCount, brokeredItemCount: brokeredItemCount]"
                         out-map="routingRunResult"/>
             </iterate>
-            <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${attemptedItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
+            <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${groupItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
         </actions>
     </service>
 
