@@ -8,8 +8,8 @@
 <#assign splitOrderItemGroup = inventoryFilterMap.get("splitOrderItemGroup")! />
 <#assign ignoreFacilityOrderLimit = false />
 <#assign ignoreFacilityOrderLimitCond = inventoryFilterMap.get("ignoreFacilityOrderLimit")! />
-<#if (ignoreFacilityOrderLimit?has_content && ignoreFacilityOrderLimit.fieldValue?has_content)>
-  <#assign ignoreFacilityOrderLimit = ignoreFacilityOrderLimit.getBoolean(fieldValue) />
+<#if (ignoreFacilityOrderLimitCond?has_content && ignoreFacilityOrderLimitCond.fieldValue?has_content)>
+  <#assign ignoreFacilityOrderLimit = ignoreFacilityOrderLimitCond.getBoolean(fieldValue) />
 </#if>
 <#assign splitGroupItem = true />
 <#if (splitOrderItemGroup?has_content && "N" == splitOrderItemGroup.fieldValue!) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
@@ -40,7 +40,7 @@ from (select
           @rn := @rn+1 as row_num,
 case when locate(concat(x.facility_id,"-",x.product_id),@fpuim) = 0 then x.total_inv else substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) end as unalloc_inv,ifnull(x.last_order_count,0) +1 as u,
 @rtd :=case
-when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null)))</#if> or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
+when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))</#if>) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
 (case when @oh !=x.ORDER_ID then (case when x.total_inv < x.item_qty then round(x.total_inv,0) else round(x.item_qty,0) end )
 when @oh=x.order_id and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)),@ps)=0 and locate(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@ps)= 0 and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@s)=0 then (case when x.total_inv >= x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) then x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) else x.total_inv end)
 when @oh=x.order_id and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)),@ps) !=0 and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@s)=0 then (case when x.total_inv >= x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) then x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) else x.total_inv end)
@@ -62,7 +62,7 @@ as facility_order_map,
 ifnull(x.last_order_count,0)+round((char_length(@fom) - char_length(REPLACE(@fom,x.FACILITY_ID,'')))/char_length(x.FACILITY_ID)) as allocated_ord_cnt,
 <#if !ignoreFacilityOrderLimit>case when ((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null) then 'N' else 'Y' end <#else>'N'</#if> as facility_exhausted,
 @ps := case
-when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null)))</#if> or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
+when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))</#if>) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
 (case
 when @oh !=x.ORDER_ID then (case when x.total_inv < x.item_qty then concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.total_inv,0)) else 0 end)
 when @oh=x.order_id and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@s) !=0 then @ps
@@ -72,7 +72,7 @@ else @ps end)
 else @ps end
 as partial_alloc_item,
 @s := case
-when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null)))</#if> or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
+when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))</#if>) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
 (case
 when @oh != x.order_id and x.total_inv < x.item_qty then 0
 when @oh != x.order_id and x.total_inv >= x.item_qty then concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID)
@@ -94,7 +94,7 @@ x.*
           pf.last_inventory_count as ATP,pf.minimum_stock, (ifnull(pf.last_inventory_count,0)-ifnull(pf.MINIMUM_STOCK,0)) as total_inv,round(ifnull(pf.last_inventory_count, 0)/(oi.quantity-ifnull(oi.cancel_quantity,0))*100,2) as availablity_pct,pf.facility_id,pf.ALLOW_BROKERING,
           (select sum(QUANTITY-ifnull(CANCEL_QUANTITY,0)) from order_item where order_id=oh.ORDER_ID and status_id = 'ITEM_APPROVED' and ship_group_seq_id = oisg.ship_group_seq_id  group by order_id) as ship_group_total_qty,
           oi.quantity-ifnull(oi.cancel_quantity,0) as item_qty,oisg.carrier_party_id,
-          fpa.postal_code as origin_postal_code,opa.postal_code as destination_postal_code,f.maximum_order_limit,<#if !ignoreFacilityOrderLimit>foc.entry_date,foc.last_order_count,</#if> inv_count.inventoryForAllocation,
+          fpa.postal_code as origin_postal_code,opa.postal_code as destination_postal_code,f.maximum_order_limit,foc.entry_date,foc.last_order_count, inv_count.inventoryForAllocation,
           ifnull((select distinct 'N' from order_item oi1 LEFT join product_facility pf1 on oi1.product_id=pf1.product_id and pf1.facility_id=pf.FACILITY_ID where oi1.order_id=oh.ORDER_ID and oi1.ship_group_seq_id=oisg.ship_group_seq_id and ((ifnull(pf1.last_inventory_count,0)-ifnull(pf1.MINIMUM_STOCK,0)) < oi1.quantity-ifnull(oi1.cancel_quantity,0) or pf1.FACILITY_ID is null) AND ifnull(pf.ALLOW_BROKERING,'Y') = 'Y' group by oi1.ORDER_ID,pf1.FACILITY_ID),'Y') as rank_by_order_at_facility,<#-- revised -->
           <#if !splitGroupItem>
           ifnull((select distinct 'N' from order_item_group_assoc oiga1 inner join order_item_group oig1 on oiga1.order_id = oig1.order_id and oig1.order_item_group_type_id = "BROKERING_ITEM_GRP" inner join order_item oi1 on oiga1.ORDER_ID = oi1.ORDER_ID and oiga1.ORDER_ITEM_SEQ_ID = oi1.ORDER_ITEM_SEQ_ID left join product_facility pf1 on oi1.product_id=pf1.product_id and pf1.facility_id=pf.FACILITY_ID
@@ -126,9 +126,7 @@ x.*
           <#if invenoryGroupFiter?has_content>inner join (select fg.FACILITY_GROUP_TYPE_ID,fgrm.FACILITY_ID, fgrm.FACILITY_GROUP_ID,fgrm.SEQUENCE_NUM from facility_group_member fgrm inner join facility_group fg on fgrm.FACILITY_GROUP_ID=fg.FACILITY_GROUP_ID and fg.FACILITY_GROUP_TYPE_ID='BROKERING_GROUP' and (fgrm.THRU_DATE > now() or fgrm.THRU_DATE is null)) fgm on f.FACILITY_ID=fgm.FACILITY_ID</#if>
           where oh.ORDER_ID='${orderId!"<orderId>"}' and oi.SHIP_GROUP_SEQ_ID = '${shipGroupSeqId!"<shipGroupSeqId>"}' <#if orderItemSeqId?has_content> and oi.order_Item_Seq_Id = '${orderItemSeqId}'</#if>
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
-          <#if !ignoreFacilityOrderLimit>
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
-          </#if>
           <#if invenoryGroupFiter?has_content>AND fgm.FACILITY_GROUP_ID <@buildSqlCondition value=invenoryGroupFiter /></#if> <#-- NEW facility group ids need to be passed for the groups on which routing is expected to be performed -->
           having
           <#if distance?has_content>distance <@buildSqlCondition value=distance /> and </#if>
