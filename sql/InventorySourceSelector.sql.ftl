@@ -112,7 +112,7 @@ x.*
           left join facility f on pf.facility_id=f.facility_id
           left join (select foc1.facility_id,foc1.entry_date,foc1.last_order_count from facility_order_count foc1
           inner join (select facility_id,max(entry_date) as entry_date from facility_order_count group by facility_id) foc2 on foc2.facility_id=foc1.facility_id and foc2.entry_date=foc1.entry_date
-          ) foc on pf.facility_id=foc.facility_id and foc.entry_date = DATE(CONVERT_TZ(UTC_TIMESTAMP,'+00:00' , ifnull('America/New_York', '+00:00')))
+          ) foc on pf.facility_id=foc.facility_id and foc.entry_date = DATE(CONVERT_TZ(UTC_TIMESTAMP,'+00:00' , '${brokeringOffset!"+00:00"}'))
           left join facility_contact_mech_purpose fcmp on fcmp.facility_id=f.facility_id and fcmp.contact_mech_purpose_type_id='PRIMARY_LOCATION' and (fcmp.thru_date is null or fcmp.thru_date >= now())
           inner join postal_address fpa on fpa.contact_mech_id=fcmp.contact_mech_id
           left join (SELECT PFI.FACILITY_ID, sum(ifnull(PFI.LAST_INVENTORY_COUNT, 0)) AS inventoryForAllocation, count(PFI.PRODUCT_ID) as PRODUCT_COUNT FROM PRODUCT_FACILITY PFI WHERE ifnull(PFI.LAST_INVENTORY_COUNT, 0) > ifnull(PFI.MINIMUM_STOCK,0)
