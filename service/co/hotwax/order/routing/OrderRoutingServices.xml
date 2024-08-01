@@ -140,6 +140,7 @@
                         In this scenario, there is no direct way to identify if the service returned an error.
                         As we want to log the hasError status at the OrderRoutingRun level, to address this we are calling service in script tag
                     */
+
                     try {
                         def orderRoutingResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRouting")
                                 .requireNewTransaction(true)
@@ -172,7 +173,7 @@
                                 endDate:ec.user.nowTimestamp, orderItemCount: attemptedItemCount, brokeredItemCount: brokeredItemCount]"
                         out-map="routingRunResult"/>
             </iterate>
-            <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${attemptedItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
+            <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${groupItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
         </actions>
     </service>
 
@@ -383,6 +384,7 @@
             <order-map-list list="sortFields">
                 <order-by field-name="sequenceNum"/>
             </order-map-list>
+            <set field="brokeringOffset" from="ZonedDateTime.now().getOffset()"/>
             <set field="productStore" from="ec.entity.getEntityDefinition('org.apache.ofbiz.product.store.ProductStore')"/>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
@@ -866,6 +868,7 @@
             <order-map-list list="sortFields">
                 <order-by field-name="sequenceNum"/>
             </order-map-list>
+            <set field="brokeringOffset" from="ZonedDateTime.now().getOffset()"/>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
             <set field="suggestedFulfillmentLocations" from="[]"/>
