@@ -415,7 +415,7 @@
                 })
                 })
                 } catch (Exception e) {
-                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e}")
+                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getCause()}")
                 }
             </script>
         </actions>

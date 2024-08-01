@@ -8,8 +8,9 @@
 <#assign splitOrderItemGroup = inventoryFilterMap.get("splitOrderItemGroup")! />
 <#assign ignoreFacilityOrderLimit = false />
 <#assign ignoreFacilityOrderLimitCond = inventoryFilterMap.get("ignoreFacilityOrderLimit")! />
-<#if (ignoreFacilityOrderLimitCond?has_content && ignoreFacilityOrderLimitCond.fieldValue?has_content)>
-  <#assign ignoreFacilityOrderLimit = ignoreFacilityOrderLimitCond.getBoolean(fieldValue) />
+<#if ignoreFacilityOrderLimitCond?has_content && ignoreFacilityOrderLimitCond.fieldValue?has_content &&
+    ('Y'?lower_case == (ignoreFacilityOrderLimitCond.fieldValue)?lower_case || "true"?lower_case == (ignoreFacilityOrderLimitCond.fieldValue)?lower_case)>
+  <#assign ignoreFacilityOrderLimit = true />
 </#if>
 <#assign splitGroupItem = true />
 <#if (splitOrderItemGroup?has_content && "N" == splitOrderItemGroup.fieldValue!) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
