@@ -1,43 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://moqui.org/xsd/service-definition-3.xsd">
 
-    <service verb="run" noun="OmsApi" type="interface">
-        <in-parameters>
-            <parameter name="token"/>
-            <parameter name="omsBaseUrl"/>
-        </in-parameters>
-    </service>
-    <service  verb="run" noun="OmsFacilityAllocation" type="remote-rest" location="${omsBaseUrl}/api/service/orderFulfillmentAllocation?token=${token}" method="post" transaction-timeout="3600">
-        <implements service="co.hotwax.order.routing.InventoryReservationServices.run#OmsApi"/>
+    <service  verb="run" noun="FacilityAllocation" type="oms-rest" location="service/orderFulfillmentAllocation" method="post" transaction-timeout="120">
         <in-parameters>
             <parameter name="facilityAllocation" type="List"/>
             <parameter name="orderId"/>
         </in-parameters>
-    </service>
-    <service verb="run" noun="FacilityAllocation" transaction-timeout="3600">
-        <in-parameters>
-            <parameter name="facilityAllocation" type="List" required="true"/>
-            <parameter name="orderId" required="true"/>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="result"/>
-        </out-parameters>
-        <actions>
-            <!-- In case of schedule job run no user logged in, use system user to get the token-->
-            <set field="userName" from="ec.user.username" default-value="${System.getProperty('default.brokering.user')}"/>
-            <script>
-                omsBaseUrl = co.hotwax.util.MaargUtil.getOmsInstanceUrl(ec.ecfi);
-                token = co.hotwax.util.MaargUtil.getOmsJwtToken(ec.ecfi, userName);
-            </script>
-            <if condition="!token">
-                <return error="true" message="Unable to generate oms token, check JWT configuration"/>
-            </if>
-            <if condition="!omsBaseUrl">
-                <return error="true" message="OMS base url not found"/>
-            </if>
-            <service-call name="co.hotwax.order.routing.InventoryReservationServices.run#OmsFacilityAllocation" transaction-timeout="3600"
-                           in-map="[orderId: orderId, token: token, facilityAllocation: facilityAllocation]" transaction="force-new"
-                           out-map="result"/>
-        </actions>
     </service>
 </services>

@@ -542,7 +542,7 @@
                 <script>
                     try {
                         outResult = ec.service.sync().name("co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation")
-                                .requireNewTransaction(true).transactionTimeout(3600)
+                                .requireNewTransaction(true).transactionTimeout(120)
                                 .parameters([orderId: orderId, facilityAllocation: facilityAllocation])
                                 .call()
                         if (ec.message.hasError()) {
