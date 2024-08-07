@@ -521,7 +521,7 @@
                             }
                             if (!clearAutoCancelDate &amp;&amp; actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
                                 comments += "Set the auto cancel date to ${actionMap.get('ORA_AUTO_CANCEL_DAYS')} days from now."
-                                autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DAYS') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                                autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DAYS') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
                             } else if (clearAutoCancelDate) {
                                 comments += "Clear the auto cancel date."
                             }
