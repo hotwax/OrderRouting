@@ -147,8 +147,8 @@
                                 .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId,
                                         routingRunId: routingRunResult.routingRunId])
                                 .call()
-                        attemptedItemCount = orderRoutingResult.attemptedItemCount
-                        brokeredItemCount = orderRoutingResult.brokeredItemCount
+                        attemptedItemCount = orderRoutingResult.attemptedItemCount?:0
+                        brokeredItemCount = orderRoutingResult.brokeredItemCount?:0
                         groupItemCount += attemptedItemCount
                         groupBrokeredItemCount +=brokeredItemCount
                     } catch (Throwable e) {
