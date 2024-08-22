@@ -475,9 +475,11 @@
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
                         // SQL will not return results if items are not available at a single location.
                         // Additional check to ensure all items are available at a single location.
-                        if (!(suggestedFacilityIds.size() == 1)) {
-                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
-                            ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
+                        if (suggestedFacilityIds.size() == 1) {
+                            comments = "${orderRoutingGroup.groupName} : Inventory found at single location for ${routingRule.ruleName}"
+                        } else {
+                            comments = "${orderRoutingGroup.groupName} : Inventory not found at single location for ${routingRule.ruleName}."
+                            ec.logger.info("Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}");
                             suggestedFulfillmentLocations = []
                         }
                     }
@@ -491,7 +493,6 @@
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
-                            comments = "${orderRoutingGroup.groupName} : Inventory found at single location for ${routingRule.ruleName}"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
                             facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId,
