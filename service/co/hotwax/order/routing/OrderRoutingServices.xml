@@ -469,7 +469,7 @@
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
                     facilityAllocation = [];
-                    def comments='';
+                    def comments="${orderRoutingGroup.groupName} : Inventory found for ${routingRule.ruleName}.";
                     def routingRuleName = "${orderRoutingGroup.groupName} : ${orderRouting.routingName} : ${routingRule.ruleName}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
@@ -664,7 +664,7 @@
                 <return message="Order routing group schedule has been created successfully."/>
             <else>
                 <service-call name="update#moqui.service.job.ServiceJob" in-map="context + [jobName: serviceJob.jobName]" out-map="context"/>
-                <return message="Order routing group schedule has been updated successfully."/>
+                <return message="Order routing group ${orderRoutingGroup.groupName?:routingGroupId} schedule has been updated successfully."/>
             </else>
             </if>
         </actions>
