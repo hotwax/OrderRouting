@@ -3,16 +3,9 @@
 
     <service verb="check" noun="OmsConnection">
         <actions>
-            <script>
-                omsBaseUrl = co.hotwax.util.MaargUtil.getOmsInstanceUrl(ec.ecfi);
-            </script>
+            <set field="omsBaseUrl" from="co.hotwax.util.MaargUtil.getOmsInstanceUrl(ec.ecfi)"/>
             <if condition="!omsBaseUrl">
-                <entity-find-one entity-name="moqui.service.message.SystemMessageRemote" value-field="omsSystemMessageRemote">
-                    <field-map field-name="systemMessageRemoteId" value="HC_OMS_CONFIG"/>
-                </entity-find-one>
-                <if condition="!omsSystemMessageRemote || !omsSystemMessageRemote.remotePublicKey">
-                    <return error="true" message="OMS token not configured." />
-                </if>
+                <return error="true" message="OMS instance not configured." />
             </if>
         </actions>
     </service>

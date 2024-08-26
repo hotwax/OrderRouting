@@ -147,8 +147,8 @@
                                 .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId,
                                         routingRunId: routingRunResult.routingRunId])
                                 .call()
-                        attemptedItemCount = orderRoutingResult.attemptedItemCount
-                        brokeredItemCount = orderRoutingResult.brokeredItemCount
+                        attemptedItemCount = orderRoutingResult.attemptedItemCount?:0
+                        brokeredItemCount = orderRoutingResult.brokeredItemCount?:0
                         groupItemCount += attemptedItemCount
                         groupBrokeredItemCount +=brokeredItemCount
                     } catch (Throwable e) {
@@ -415,7 +415,7 @@
                 })
                 })
                 } catch (Exception e) {
-                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e}")
+                    ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getCause()}")
                 }
             </script>
         </actions>
@@ -475,9 +475,11 @@
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
                         // SQL will not return results if items are not available at a single location.
                         // Additional check to ensure all items are available at a single location.
-                        if (!(suggestedFacilityIds.size() == 1)) {
-                            comments = "${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}] : Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}]."
-                            ec.logger.log(ec.logger.DEBUG_INT, "Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}", null);
+                        if (suggestedFacilityIds.size() == 1) {
+                            comments = "${orderRoutingGroup.groupName} : Inventory found at a single location for ${routingRule.ruleName}"
+                        } else {
+                            comments = "${orderRoutingGroup.groupName} : Inventory not found at a single location for ${routingRule.ruleName}."
+                            ec.logger.info("Inventory not found at single location for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}");
                             suggestedFulfillmentLocations = []
                         }
                     }
@@ -491,7 +493,6 @@
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
-                            comments = "${orderRoutingGroup.groupName} : Inventory found at single location for ${routingRule.ruleName}"
                             filterMapList(facilityItems, ["facilityId":facilityId], false)
                             def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
                             facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId,
@@ -504,13 +505,15 @@
                         if (!changeReasonEnumId) {
                             changeReasonEnumId = "UNFILLABLE";
                         }
-                        if (suggestedFulfillmentLocations) {
-                            comments = "${orderRoutingGroup.groupName}: Inventory not found for ${routingRule.ruleName}."
+                        if (!suggestedFulfillmentLocations) {
+                            comments = "${orderRoutingGroup.groupName}: No inventory found for ${routingRule.ruleName}."
+                        } else {
+                            comments = "${orderRoutingGroup.groupName}: Partially available item inventory found for ${routingRule.ruleName}."
                         }
                         // If unfillable items are found, check for actions.
                         if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
                             queue = actionMap.get('ORA_MV_TO_QUEUE');
-                            comments += "Unfillalbe items moved to ${queue}."
+                            comments += "Unfillable items moved to ${queue}."
                             // If the action is to move to a queue, then there is no need to run the next rule, as all unfillable items will be moved to the queue.
                             runNextRule = false
                         }
@@ -520,10 +523,10 @@
                                 queue = orderItemShipGroup.facilityId
                             }
                             if (!clearAutoCancelDate &amp;&amp; actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
-                                comments += "Set the auto cancel date to ${actionMap.get('ORA_AUTO_CANCEL_DAYS')} days from now."
+                                comments += "Set the auto-cancel date to ${actionMap.get('ORA_AUTO_CANCEL_DAYS')} days from today."
                                 autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DAYS') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
                             } else if (clearAutoCancelDate) {
-                                comments += "Clear the auto cancel date."
+                                comments += "Clear the auto-cancel date."
                             }
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
@@ -542,7 +545,7 @@
                 <script>
                     try {
                         outResult = ec.service.sync().name("co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation")
-                                .requireNewTransaction(true).transactionTimeout(3600)
+                                .requireNewTransaction(true).transactionTimeout(120)
                                 .parameters([orderId: orderId, facilityAllocation: facilityAllocation])
                                 .call()
                         if (ec.message.hasError()) {

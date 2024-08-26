@@ -6,6 +6,12 @@
 <#assign brokeringSafetyStock = inventoryFilterMap.get("brokeringSafetyStock")! />
 <#assign distance = inventoryFilterMap.get("distance")! />
 <#assign splitOrderItemGroup = inventoryFilterMap.get("splitOrderItemGroup")! />
+<#assign ignoreFacilityOrderLimit = false />
+<#assign ignoreFacilityOrderLimitCond = inventoryFilterMap.get("ignoreFacilityOrderLimit")! />
+<#if ignoreFacilityOrderLimitCond?has_content && ignoreFacilityOrderLimitCond.fieldValue?has_content &&
+    ('Y'?lower_case == (ignoreFacilityOrderLimitCond.fieldValue)?lower_case || "true"?lower_case == (ignoreFacilityOrderLimitCond.fieldValue)?lower_case)>
+  <#assign ignoreFacilityOrderLimit = true />
+</#if>
 <#assign splitGroupItem = true />
 <#if (splitOrderItemGroup?has_content && "N" == splitOrderItemGroup.fieldValue!) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
   <#assign splitGroupItem = false />
@@ -35,7 +41,7 @@ from (select
           @rn := @rn+1 as row_num,
 case when locate(concat(x.facility_id,"-",x.product_id),@fpuim) = 0 then x.total_inv else substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) end as unalloc_inv,ifnull(x.last_order_count,0) +1 as u,
 @rtd :=case
-when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
+when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))</#if>) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
 (case when @oh !=x.ORDER_ID then (case when x.total_inv < x.item_qty then round(x.total_inv,0) else round(x.item_qty,0) end )
 when @oh=x.order_id and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)),@ps)=0 and locate(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@ps)= 0 and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@s)=0 then (case when x.total_inv >= x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) then x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) else x.total_inv end)
 when @oh=x.order_id and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.item_qty,0)),@ps) !=0 and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@s)=0 then (case when x.total_inv >= x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) then x.item_qty - substring_index(substring_index(@ps,concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":"),-1),",",1) else x.total_inv end)
@@ -55,9 +61,9 @@ when find_in_set(concat(x.facility_id,"-",x.order_id),@fom)= 0 then (case when @
 when find_in_set(concat(x.facility_id,"-",x.order_id),@fom) != 0 then @fom end
 as facility_order_map,
 ifnull(x.last_order_count,0)+round((char_length(@fom) - char_length(REPLACE(@fom,x.FACILITY_ID,'')))/char_length(x.FACILITY_ID)) as allocated_ord_cnt,
-case when ((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null) then 'N' else 'Y' end as facility_exhausted,
+<#if !ignoreFacilityOrderLimit>case when ((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null) then 'N' else 'Y' end <#else>'N'</#if> as facility_exhausted,
 @ps := case
-when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
+when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))</#if>) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
 (case
 when @oh !=x.ORDER_ID then (case when x.total_inv < x.item_qty then concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID,":",round(x.total_inv,0)) else 0 end)
 when @oh=x.order_id and find_in_set(concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID),@s) !=0 then @ps
@@ -67,7 +73,7 @@ else @ps end)
 else @ps end
 as partial_alloc_item,
 @s := case
-when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
+when (locate(concat(x.facility_id,"-",x.product_id),@fpuim)= 0 <#if !ignoreFacilityOrderLimit>and (((ifnull(x.last_order_count,0) +1 < x.maximum_order_limit) OR x.maximum_order_limit is null))</#if>) or (locate(concat(x.facility_id,"-",x.product_id),@fpuim) != 0 and substring_index(substring_index(@fpuim,concat(x.facility_id,"-",x.product_id,":"),-1),",",1) > 0) then
 (case
 when @oh != x.order_id and x.total_inv < x.item_qty then 0
 when @oh != x.order_id and x.total_inv >= x.item_qty then concat(x.order_id,"-",x.ORDER_ITEM_SEQ_ID)
@@ -110,7 +116,7 @@ x.*
           inner join postal_address opa on opa.contact_mech_id=oisg.contact_mech_id
           left join product_facility pf on oi.product_id=pf.product_id and (ifnull(pf.LAST_INVENTORY_COUNT,0)-ifnull(pf.MINIMUM_STOCK,0)) > 0 and ifnull(pf.ALLOW_BROKERING,'Y') = 'Y'
           left join facility f on pf.facility_id=f.facility_id
-          left join (select foc1.facility_id,foc1.entry_date,foc1.last_order_count from facility_order_count foc1
+          left join (select foc1.facility_id,foc1.entry_date,<#if !ignoreFacilityOrderLimit>foc1.last_order_count<#else> NULL as last_order_count</#if> from facility_order_count foc1
           inner join (select facility_id,max(entry_date) as entry_date from facility_order_count group by facility_id) foc2 on foc2.facility_id=foc1.facility_id and foc2.entry_date=foc1.entry_date
           ) foc on pf.facility_id=foc.facility_id and foc.entry_date = DATE(CONVERT_TZ(UTC_TIMESTAMP,'+00:00' , '${brokeringOffset!"+00:00"}'))
           left join facility_contact_mech_purpose fcmp on fcmp.facility_id=f.facility_id and fcmp.contact_mech_purpose_type_id='PRIMARY_LOCATION' and (fcmp.thru_date is null or fcmp.thru_date >= now())
