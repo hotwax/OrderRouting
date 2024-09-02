@@ -57,7 +57,8 @@
                 <return error="true" message="Order routing group not found for routingGroupId [${routingGroupId}]."/>
             </if>
             <if condition="!orderRoutingGroup.jobName">
-                <return error="true" message="Scheduler not configured for order routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
+                <service-call name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule" in-map="[routingGroupId: routingGroupId]" transaction="force-new"/>
+                <script>orderRoutingGroup.refresh()</script>
             </if>
             <script>
                 jobRunId = ec.service.job(orderRoutingGroup.jobName).run()
