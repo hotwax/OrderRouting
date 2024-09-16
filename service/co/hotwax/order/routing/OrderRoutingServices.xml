@@ -25,13 +25,13 @@
         <in-parameters><parameter name="daysToKeep" type="Integer" default="60"/></in-parameters>
         <out-parameters><parameter name="recordsRemoved" type="Long"/></out-parameters>
         <actions>
-            <script>
+            <script><![CDATA[
                 import org.moqui.context.ExecutionContext
                 import org.moqui.entity.EntityCondition
                 Calendar basisCal = ec.user.getCalendarSafe()
                 basisCal.add(Calendar.DAY_OF_YEAR, (int) - daysToKeep)
                 basisTimestamp = new Timestamp(basisCal.getTimeInMillis())
-            </script>
+            ]]></script>
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
                 <econdition field-name="startDate" operator="less-equals" from="basisTimestamp"/>
                 <use-iterator/>
@@ -154,7 +154,7 @@
                         out-map="routingRunResult"/>
                 <set field="attemptedItemCount" value="0" type="Long"/>
                 <set field="brokeredItemCount" value="0" type="Long"/>
-                <script>
+                <script><![CDATA[
                    /*
                         Calling a service in a script with ignore-error="true".
                         In this scenario, there is no direct way to identify if the service returned an error.
@@ -182,11 +182,11 @@
                     } else {
                         routingResult = ec.message.getMessagesString()
                     }
-                    if (routingResult &amp;&amp; routingResult.length() &gt; 255) {
+                    if (routingResult && routingResult.length() &gt; 255) {
                         routingResult = routingResult.substring(0, 255)
                     }
                     ec.message.clearAll();
-                </script>
+                ]]></script>
 
                 <service-call name="update#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                         in-map="[routingRunId:routingRunResult.routingRunId,hasError:hasError, routingResult:routingResult,
@@ -409,7 +409,7 @@
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
             <set field="suggestedFulfillmentLocations" from="[]"/>
-            <script>
+            <script><![CDATA[
                 try {
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
@@ -437,7 +437,7 @@
                 } catch (Exception e) {
                     ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getCause()}")
                 }
-            </script>
+            ]]></script>
         </actions>
     </service>
 
@@ -480,7 +480,7 @@
                     <econdition field-name="actionValue"  operator="is-not-null"/>
                 </econditions>
             </entity-find>
-                <script>
+                <script><![CDATA[
                     import java.time.format.DateTimeFormatter;
                     import java.time.ZonedDateTime
                     import java.util.stream.Collectors;
@@ -536,7 +536,7 @@
                             if (!queue) {
                                 queue = orderItemShipGroup.facilityId
                             }
-                            if (!clearAutoCancelDate &amp;&amp; actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
+                            if (!clearAutoCancelDate && actionMap.get('ORA_AUTO_CANCEL_DAYS') != null) {
                                 comments += "Set the auto-cancel date to ${actionMap.get('ORA_AUTO_CANCEL_DAYS')} days from today."
                                 autoCancelDate = ZonedDateTime.now().plusDays(actionMap.get('ORA_AUTO_CANCEL_DAYS') as Long).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
                             } else if (clearAutoCancelDate) {
@@ -553,10 +553,10 @@
                         //If all items allocated no need to run next rule
                         runNextRule = false
                     }
-                </script>
+                ]]></script>
             <if condition="facilityAllocation">
                 <log message="Facility allocation for order Id [${orderId}:${shipGroupSeqId}${orderItemSeqId?':' + orderItemSeqId :''}]: ${facilityAllocation}, applied under the '${routingRule.ruleName} [${routingRule.routingRuleId}]' routing rule."/>
-                <script>
+                <script><![CDATA[
                     try {
                         outResult = ec.service.sync().name("co.hotwax.order.routing.InventoryReservationServices.run#FacilityAllocation")
                                 .requireNewTransaction(true).transactionTimeout(120)
@@ -572,7 +572,7 @@
                         ec.message.clearErrors()
                         ec.message.clearAll()
                     }
-                </script>
+                ]]></script>
                 <log message="Facility allocation result: ${outResult}"/>
             <else>
                 <log message="No facility allocation found for orderId [${orderId}] for routing rule ${routingRule.ruleName} [${routingRule.routingRuleId}}"/>
@@ -603,7 +603,7 @@
                 <field-map field-name="jobName" from="orderRoutingGroup.jobName"/>
             </entity-find-one>
             <if condition="serviceJob">
-                <script>
+                <script><![CDATA[
                     schedule = serviceJob.getMap()
                     try {
                     schedule.cronDescription = co.hotwax.util.MaargUtil.getCronDescription(schedule.cronExpression, ec.user.getLocale())
@@ -616,7 +616,7 @@
                         ec.logger.error("Error getting cron description: ${e.getMessage()}")
                         schedule.cronDescription = e.getMessage()
                     }
-                </script>
+                ]]></script>
             </if>
         </actions>
     </service>
@@ -641,7 +641,7 @@
             </if>
             <if condition="cronExpression">
                 <!--validate cron expression -->
-                <script>
+                <script><![CDATA[
                     try {
                         cron = org.moqui.impl.service.ScheduledJobRunner.getCron(cronExpression)
                         cron.validate()
@@ -650,7 +650,7 @@
                         ec.message.addError("Invalid cron expression 2: ${e.getMessage()}")
                         return
                     }
-                </script>
+                ]]></script>
             </if>
             <if condition="orderRoutingGroup.jobName">
                 <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
@@ -889,7 +889,7 @@
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
             <set field="suggestedFulfillmentLocations" from="[]"/>
-            <script>
+            <script><![CDATA[
                 try {
                     Writer writer = new StringWriter()
                     ec.resourceFacade.template(templateLoc, writer)
@@ -897,7 +897,7 @@
                 } catch (Exception e) {
                     ec.logger.error("Error executing order routing rule ${orderRoutingRule.ruleName} [${routingRuleId}] : ${e.getMessage()}")
                 }
-            </script>
+            ]]></script>
         </actions>
     </service>
 </services>

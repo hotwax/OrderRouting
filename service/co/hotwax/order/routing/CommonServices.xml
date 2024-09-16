@@ -53,11 +53,11 @@
                 <set field="sequenceNum" from="orderRoutingGroups?(orderRoutingGroups.first().sequenceNum +1 ): 1"/>
             </if>
             <set field="newRoutingGroup" from="orderRoutingGroup.getValueMap()" />
-            <script>
+            <script><![CDATA[
                 newRoutingGroup.remove("routingGroupId");
                 newRoutingGroup.remove("jobName");
                 newRoutingGroup.remove("lastUpdatedStamp");
-            </script>
+            ]]></script>
             <set field="newRoutingGroup.groupName" from="newGroupName" default-value="copy of ${orderRoutingGroup.groupName}"/>
             <set field="newRoutingGroup.sequenceNum" from="sequenceNum"/>
             <set field="newRoutingGroup.createdByUser" from="ec.user.getUsername()"/>
@@ -109,10 +109,10 @@
                 <set field="sequenceNum" from="orderRoutings?(orderRoutings.first().sequenceNum +1): 1"/>
             </if>
             <set field="newOrderRouting" from="orderRouting.getValueMap()" />
-            <script>
+            <script><![CDATA[
                 newOrderRouting.remove("orderRoutingId");
                 newOrderRouting.remove("lastUpdatedStamp");
-            </script>
+            ]]></script>
             <set field="newOrderRouting.statusId" value="ROUTING_DRAFT"/>
             <set field="newOrderRouting.routingGroupId" from="newRoutingGroupId"/>
             <set field="newOrderRouting.routingName" from="newRoutingName" default-value="${orderRouting.routingName}"/>
@@ -130,10 +130,10 @@
                 <set field="newOrderFilterCondition" from="orderFilterCondition.getValueMap()" />
                 <set field="newOrderFilterCondition.orderRoutingId" from="newOrderRoutingId"/>
                 <set field="newOrderFilterCondition.createdDate" from="ec.user.nowTimestamp"/>
-                <script>
+                <script><![CDATA[
                     newOrderFilterCondition.remove("conditionSeqId");
                     newOrderFilterCondition.remove("lastUpdatedStamp");
-                </script>
+                ]]></script>
                 <service-call name="create#co.hotwax.order.routing.OrderFilterCondition" in-map="newOrderFilterCondition"/>
             </iterate>
 
