@@ -508,7 +508,7 @@
                         }
                     }
                     //prepare map for brokered items
-                    def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [], metShipmentThreshold = true;
+                    def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [], metShipmentThreshold = true, orderAdjustments = null ;
                     if (suggestedFulfillmentLocations) {
                         brokeredItemCount = suggestedFulfillmentLocations.size();
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
@@ -518,7 +518,7 @@
                             checkShipmentThreshold = true
                         }
                         if (checkShipmentThreshold) {
-                            def orderAdjustments = ec.entity.find("org.apache.ofbiz.order.order.OrderAdjustment")
+                            orderAdjustments = ec.entity.find("org.apache.ofbiz.order.order.OrderAdjustment")
                                     .condition("orderId", orderId)
                                     .condition("orderItemSeqId", EntityCondition.NOT_EQUAL, "_NA_").list();
                             if (unfillableItems) {
@@ -958,7 +958,7 @@
                     <field-map field-name="orderItemSeqId" from="orderItem.orderItemSeqId"/>
                 </filter-map-list>
                 <script>
-                    def adjAmount = orderAdjustments?orderAdjustments.collect { adj -> adj.amount ?: 0 }.sum(): 0.0;
+                    def adjAmount = itemAdjustments?itemAdjustments.collect { adj -> adj.amount ?: 0 }.sum(): 0.0;
                 </script>
                 <set field="subTotal" from="subTotal+ itemAmount + adjAmount"/>
             </iterate>
