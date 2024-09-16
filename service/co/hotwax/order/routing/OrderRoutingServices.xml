@@ -513,10 +513,13 @@
                         brokeredItemCount = suggestedFulfillmentLocations.size();
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         if (shipmentThreshold > 0) {
+                            def orderAdjustments = ec.entity.find("org.apache.ofbiz.order.order.OrderAdjustment")
+                                    .condition("orderId", orderId)
+                                    .condition("orderItemSeqId", EntityCondition.NOT_EQUAL, "_NA_").list();
                             unfillableItems = orderItems.stream().filter(i -> !brokeredItemsSeqIds.contains(i.orderItemSeqId)).collect(Collectors.toList())
                             if (unfillableItems) {
                                 def result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
-                                    .parameters([orderItems: unfillableItems, orderAdjustments: []]).call()
+                                    .parameters([orderItems: unfillableItems, orderAdjustments: orderAdjustments]).call()
                                 if (shipmentThreshold > result?.subTotal) {
                                     metShipmentThreshold = false;
                                 }
@@ -528,7 +531,7 @@
                                     def items = facilityBrokeredItems.orderItemSeqId
                                     facilityItems = orderItems.stream().filter(i -> items.contains(i.orderItemSeqId)).collect(Collectors.toList())
                                     result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
-                                        .parameters([orderItems: facilityItems, orderAdjustments: []]) .call()
+                                        .parameters([orderItems: facilityItems, orderAdjustments: orderAdjustments]) .call()
                                     if (shipmentThreshold > result?.subTotal) {
                                         metShipmentThreshold = false;
                                     }
@@ -555,10 +558,12 @@
 
                     def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
                     if (unfillableItemSeqIds) {
+                        if (!comments) {
                         if (!suggestedFulfillmentLocations) {
                             comments = "${orderRoutingGroup.groupName}: No inventory found for ${routingRule.ruleName}."
                         } else {
                             comments = "${orderRoutingGroup.groupName}: Partially available item inventory found for ${routingRule.ruleName}."
+                        }
                         }
                         // If unfillable items are found, check for actions.
                         if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
