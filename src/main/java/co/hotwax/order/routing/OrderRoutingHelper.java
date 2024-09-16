@@ -18,11 +18,9 @@
 */
 package co.hotwax.order.routing;
 import org.moqui.entity.EntityCondition;
-import org.moqui.impl.context.ExecutionContextFactoryImpl;
 import org.moqui.impl.entity.EntityConditionFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.moqui.entity.EntityValue;
 
 import javax.cache.Cache;
 import java.util.Arrays;
