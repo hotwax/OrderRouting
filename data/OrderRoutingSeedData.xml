@@ -60,6 +60,7 @@
     <moqui.basic.Enumeration enumId="IIP_MSMNT_SYSTEM" description="Systems of measurement" sequenceNum="5" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="measurementSystem"/>
     <moqui.basic.Enumeration enumId="IIP_SPLIT_ITEM_GROUP" description="Split order item group" sequenceNum="6" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="splitOrderItemGroup"/>
     <moqui.basic.Enumeration enumId="IFP_IGNORE_ORD_FAC_LIMIT" description="Turn off the Facility order limit check" sequenceNum="7" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="ignoreFacilityOrderLimit"/>
+    <moqui.basic.Enumeration enumId="IFP_SHIP_THREHOLD" description="Shipment threshold check" sequenceNum="8" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="shipmentThreshold"/>
 
     <moqui.basic.EnumerationType enumTypeId="ORD_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
     <moqui.basic.Enumeration enumId="OSP_SHIP_BY" description="Ship by" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipBeforeDate"/><!-- OrderItem.shipBeforeDate -->
