@@ -514,7 +514,7 @@
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         def checkShipmentThreshold = false;
                         def unfillableItems = orderItems.stream().filter(i -> !brokeredItemsSeqIds.contains(i.orderItemSeqId)).collect(Collectors.toList())
-                        if (shipmentThreshold > 0 && !(suggestedFacilityIds.size() == 1 || unfillableItems)) {
+                        if (shipmentThreshold > 0 && !(suggestedFacilityIds.size() == 1 && !unfillableItems)) {
                             checkShipmentThreshold = true
                         }
                         if (checkShipmentThreshold) {
@@ -549,8 +549,8 @@
                         }
                         }
                         if (!metShipmentThreshold) {
-                            comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for ${routingRule.ruleName}."
-                            ec.logger.info("Shipment threshold condition not met for ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId} and metShipmentThreshold ${metShipmentThreshold}");
+                            comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for rule ${routingRule.ruleName}."
+                            ec.logger.info("Shipment threshold condition not met for rule ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId} and metShipmentThreshold ${metShipmentThreshold}");
                             facilityAllocation = []
                             brokeredItemsSeqIds = [];
                             brokeredItemCount = 0;
