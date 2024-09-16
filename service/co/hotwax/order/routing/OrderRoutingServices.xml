@@ -455,7 +455,7 @@
             <parameter name="orderItemSeqId"/>
             <parameter name="changeReasonEnumId"/>
             <parameter name="routingRunId"/>
-            <parameter name="shipmentThreshold" type="Integer"/>
+            <parameter name="shipmentThreshold" type="BigDecimal"/>
             <parameter name="routingRuleId" required="true"/>
             <parameter name="suggestedFulfillmentLocations" type="List"/>
         </in-parameters>
