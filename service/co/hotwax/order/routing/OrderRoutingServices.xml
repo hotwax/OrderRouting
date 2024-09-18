@@ -45,6 +45,14 @@
         </actions>
     </service>
     <service verb="scheduleNow" noun="OrderRoutingGroup">
+        <description>
+            This service schedules the routing process for an Order Routing Group.
+            If the routing group schedule is not configured, the service will first create a schedule with a "pause" status (i.e., pause = "Y"),
+            then service will trigger the framework to schedule the order routing group for immediate processing.
+            The service utilizes the ScheduleJob functionality to initiate the process.
+            Parameters for this execution are retrieved from the ServiceJobParameter.
+            It's important to note that this service is designed to handle Order Routing Groups and not intended for scheduling individual orders.
+        </description>
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
         </in-parameters>
@@ -56,6 +64,7 @@
             <if condition="!orderRoutingGroup">
                 <return error="true" message="Order routing group not found for routingGroupId [${routingGroupId}]."/>
             </if>
+            <!-- If the OrderRoutingGroup is not scheduled, schedule it first before running the routing process -->
             <if condition="!orderRoutingGroup.jobName">
                 <service-call name="co.hotwax.order.routing.OrderRoutingServices.store#OrderRoutingGroupSchedule" in-map="[routingGroupId: routingGroupId]" transaction="force-new"/>
                 <script>orderRoutingGroup.refresh()</script>
@@ -72,7 +81,7 @@
              semaphore="wait" semaphore-parameter="productStoreId" semaphore-timeout="3600" semaphore-sleep="60"
              semaphore-ignore="7200" semaphore-name="OrderRoutingGroup">
         <description>
-            The action initiates the processing or execution sequence for an Order Routing Group within the system.
+            The action initiates the processing or execution sequence for an Order Routing within the system.
             This procedure is crucial for managing and directing orders through the appropriate fulfillment pathways based on predefined criteria and rules set within the Order Routing Group.
             This service is designed to retrieve active order routings for a specified OrderRoutingGroup based on their sequence number.
             It aims to prioritize and organize order processing efficiently, ensuring that orders are routed and fulfilled according to pre-established sequences that optimize logistics, delivery times, and resource allocation.
@@ -94,9 +103,7 @@
             -->
         </in-parameters>
         <actions>
-            <!--
-                validate the routing group and product store association
-            -->
+            <!-- validate the routing group and product store association -->
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
 
             <if condition="!orderRoutingGroup">
@@ -301,6 +308,7 @@
                     })
                 })
                 Writer writer = new StringWriter()
+                //queryCount field used in template, if it set true template return count only
                 queryCount = false;
                 ec.resourceFacade.template(templateLoc, writer)
                 //ec.logger.info("Eligible orders sql: ${writer}")
@@ -313,6 +321,16 @@
                 if (selectOrderItemSeqId) {
                     fieldList.add('orderItemSeqId')
                 }
+                /*  The ec.entityFacade.sqlFind method is used to execute custom SQL queries,
+                    but it requires that an entity exists in the system so that field mappings can be retrieved.
+                    We are utilizing the framework's capabilities to obtain an iterator over the list of entities
+                    that match the SQL query generated from a template.
+
+                    Since we are only retrieving a limited set of fields related to OrderItem in the result set,
+                    it is necessary to define an entity in the system that corresponds to these fields.
+                    This entity allows us to map the results from the SQL query to the corresponding fields in the system.
+                */
+
                 try (eli = ec.entityFacade.sqlFind(writer.toString(), null, "co.hotwax.order.OrderItemsQueue", fieldList)) {
                     EntityValue nextValue
                     while ((nextValue = (EntityValue) eli.next()) != null) {
@@ -329,6 +347,7 @@
                                             orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId, orderItemSeqId: orderItemSeqId])
                                     .requireNewTransaction(true)
                                     .call()
+
                             if (!ec.message.hasError()) {
                                 shipmentThresholds = ec.entity.find("co.hotwax.order.routing.OrderRoutingRuleInvCond")
                                     .condition(["routingRuleId": routingRule.routingRuleId, "fieldName": "shipmentThreshold"]).list()
@@ -343,12 +362,24 @@
                                     ec.message.clearAll()
                                 }
                                 brokeredItemCount += actionResult?.brokeredItemCount ?: 0
+                                /*
+                                    If runNextRule is false, do not execute the next rule.
+                                    The order routing rule result will return the next rule to execute.
+                                    However, if all items are either brokered or moved to a queue based on the configured action,
+                                    there is no need to execute the next rule.
+                                */
                                 if (!actionResult?.runNextRule) {
                                     /* If an order is routed to a facility, all subsequent order routing rule executions should be excluded */
                                     break
                                 }
                             } else {
                                 ec.logger.warn("Ignoring order routing rule errors " + ec.message.getErrorsString())
+                                /*
+                                    Clearing the message after processing, as it may cause an error if not reset.
+                                    If the error message is not cleared, it may interfere with the execution of the next rule,
+                                    resulting in failure of subsequent logic.
+                                    Therefore, we ensure the error message is cleared to allow proper execution of the next rule.
+                                */
                                 ec.message.clearAll()
                             }
                         }
@@ -396,10 +427,15 @@
                     inventoryFilterMap.put(filterCondition.fieldName, filterCondition)
                 </script>
             </iterate>
+            <!--
+                Conversion factors for distance measurements from meters:
+                1 meter = 0.001 kilometers (to convert meters to kilometers, multiply by 0.001).
+                1 meter = 0.000621371 miles (to convert meters to miles, multiply by 0.000621371).
+            -->
             <set field="conversionFactor" value="0.000621371"/>
             <set field="measurementSystem" from="inventoryFilterMap?.measurementSystem?.fieldValue" default-value="IMPERIAL"/>
             <if condition="measurementSystem.equals('METRIC')">
-                <set field="conversionFactor" value="0.0001"/>
+                <set field="conversionFactor" value="0.001"/>
             </if>
             <filter-map-list list="inventoryConditions" to-list="sortFields">
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
@@ -408,6 +444,7 @@
                 <order-by field-name="sequenceNum"/>
             </order-map-list>
             <set field="brokeringOffset" from="ZonedDateTime.now().getOffset()"/>
+            <!--  We have to get the ofbiz group name, used ProductStore entity to get the OFBiz group name-->
             <set field="productStore" from="ec.entity.getEntityDefinition('org.apache.ofbiz.product.store.ProductStore')"/>
             <set field="inventorySortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
             <set field="templateLoc" value="component://order-routing/sql/InventorySourceSelector.sql.ftl"/>
@@ -417,7 +454,6 @@
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
                 //ec.logger.info("======writer==${writer}==")
-                //java.sql.Connection con = ec.getEntity().getConnection(productStore.getEntityGroupName())
                 ec.getEntity().getConnection(productStore.getEntityGroupName()).withCloseable ({ java.sql.Connection con ->
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
