@@ -450,7 +450,7 @@
                 try {
                 Writer writer = new StringWriter()
                 ec.resourceFacade.template(templateLoc, writer)
-                //ec.logger.info("======writer==${writer}==")
+                //ec.logger.info("======writer==${writer}==")ec.logger.info("======writer==${writer}==")
                 ec.getEntity().getConnection(productStore.getEntityGroupName()).withCloseable ({ java.sql.Connection con ->
                 con.createStatement().withCloseable({ statement ->
                     statement.executeQuery(writer.toString()).withCloseable({resultSet ->
@@ -528,8 +528,6 @@
                 <field-map field-name="fieldName" value="brokerIfAllItemsAvailable"/>
             </filter-map-list>
             <set field="brokerIfAllItemsAvailable" from="brokerIfAllItemsAvailableCond[0]?.getBoolean('fieldValue')" default-value="false" type="Boolean"/>
-            <log message="===brokerIfAllItemsAvailable==${brokerIfAllItemsAvailable}=="/>
-            <log message="===shipmentThreshold==${shipmentThreshold}=="/>
             <script><![CDATA[
                     import java.time.format.DateTimeFormatter;
                     import java.time.ZonedDateTime
