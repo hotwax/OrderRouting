@@ -189,7 +189,7 @@
                     } else {
                         routingResult = ec.message.getMessagesString()
                     }
-                    if (routingResult && routingResult.length() &gt; 255) {
+                    if (routingResult && routingResult.length() > 255) {
                         routingResult = routingResult.substring(0, 255)
                     }
                     ec.message.clearAll();
