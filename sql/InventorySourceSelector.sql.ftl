@@ -6,17 +6,9 @@
 <#assign brokeringSafetyStock = inventoryFilterMap.get("brokeringSafetyStock")! />
 <#assign distance = inventoryFilterMap.get("distance")! />
 <#assign splitOrderItemGroup = inventoryFilterMap.get("splitOrderItemGroup")! />
-<#assign ignoreFacilityOrderLimit = false />
 <#assign ignoreFacilityOrderLimitCond = inventoryFilterMap.get("ignoreFacilityOrderLimit")! />
-<#if ignoreFacilityOrderLimitCond?has_content && ignoreFacilityOrderLimitCond.fieldValue?has_content &&
-    ('Y'?lower_case == (ignoreFacilityOrderLimitCond.fieldValue)?lower_case || "true"?lower_case == (ignoreFacilityOrderLimitCond.fieldValue)?lower_case)>
-  <#assign ignoreFacilityOrderLimit = true />
-</#if>
-<#assign splitGroupItem = true />
-<#if splitOrderItemGroup?has_content && splitOrderItemGroup.fieldValue?has_content
-  && ("N"?lower_case == splitOrderItemGroup.fieldValue?lower_case || "flase"?lower_case == splitOrderItemGroup.fieldValue?lower_case) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
-  <#assign splitGroupItem = false />
-</#if>
+<#assign ignoreFacilityOrderLimit = Static["org.moqui.util.ObjectUtilities"].basicConvert((ignoreFacilityOrderLimitCond.fieldValue)!'false', 'Boolean') />
+<#assign splitGroupItem = Static["org.moqui.util.ObjectUtilities"].basicConvert((splitOrderItemGroup.fieldValue)!'true', 'Boolean') />
 
 select
     y.ORDER_ID,
