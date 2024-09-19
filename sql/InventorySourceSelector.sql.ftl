@@ -13,7 +13,8 @@
   <#assign ignoreFacilityOrderLimit = true />
 </#if>
 <#assign splitGroupItem = true />
-<#if (splitOrderItemGroup?has_content && "N" == splitOrderItemGroup.fieldValue!) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
+<#if splitOrderItemGroup?has_content && splitOrderItemGroup.fieldValue?has_content
+  && ("N"?lower_case == splitOrderItemGroup.fieldValue?lower_case || "flase"?lower_case == splitOrderItemGroup.fieldValue?lower_case) && "ORA_MULTI" == orderRoutingRule.assignmentEnumId!>
   <#assign splitGroupItem = false />
 </#if>
 
