@@ -349,12 +349,9 @@
                                     .call()
 
                             if (!ec.message.hasError()) {
-                                shipmentThresholds = ec.entity.find("co.hotwax.order.routing.OrderRoutingRuleInvCond")
-                                    .condition(["routingRuleId": routingRule.routingRuleId, "fieldName": "shipmentThreshold"]).list()
-                                shipmentThreshold = shipmentThresholds[0]?.fieldValue
                                 actionResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.eval#OrderRoutingActions")
                                         .parameters([orderId: nextValue.orderId, shipGroupSeqId: nextValue.shipGroupSeqId,orderItemSeqId: orderItemSeqId, changeReasonEnumId: changeReasonEnumId,
-                                                routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations, routingRunId: routingRunId, shipmentThreshold: shipmentThreshold])
+                                                routingRuleId: routingRule.routingRuleId, suggestedFulfillmentLocations: ruleResult.suggestedFulfillmentLocations, routingRunId: routingRunId])
                                         .requireNewTransaction(true)
                                         .call()
                                 if (ec.message.hasError()) {
@@ -491,7 +488,6 @@
             <parameter name="orderItemSeqId"/>
             <parameter name="changeReasonEnumId"/>
             <parameter name="routingRunId"/>
-            <parameter name="shipmentThreshold" type="BigDecimal"/>
             <parameter name="routingRuleId" required="true"/>
             <parameter name="suggestedFulfillmentLocations" type="List"/>
         </in-parameters>
@@ -520,7 +516,19 @@
                     <econdition field-name="actionValue"  operator="is-not-null"/>
                 </econditions>
             </entity-find>
-                <script><![CDATA[
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="extraConditions" cache="true">
+                <econdition field-name="routingRuleId" from="routingRuleId"/>
+                <order-by field-name="sequenceNum"/>
+            </entity-find>
+            <filter-map-list list="extraConditions" to-list="shipmentThresholds">
+                <field-map field-name="fieldName" value="shipmentThreshold"/>
+            </filter-map-list>
+            <set field="shipmentThreshold" from="shipmentThresholds[0].fieldValue" type="BigDecimal"/>
+            <filter-map-list list="extraConditions" to-list="brokerIfAllItemsAvailableCond">
+                <field-map field-name="fieldName" value="brokerIfAllItemsAvailable"/>
+            </filter-map-list>
+            <set field="brokerIfAllItemsAvailable" from="brokerIfAllItemsAvailableCond[0]?.getBoolean('fieldValue')" default-value="false" type="Boolean"/>
+            <script><![CDATA[
                     import java.time.format.DateTimeFormatter;
                     import java.time.ZonedDateTime
                     import java.util.stream.Collectors;
@@ -544,13 +552,19 @@
                         }
                     }
                     //prepare map for brokered items
-                    def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [], metShipmentThreshold = true, orderAdjustments = null ;
+                    def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [], allocateFacilityToItems = true, orderAdjustments = null ;
                     if (suggestedFulfillmentLocations) {
                         brokeredItemCount = suggestedFulfillmentLocations.size();
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         def checkShipmentThreshold = false;
                         def unfillableItems = orderItems.stream().filter(i -> !brokeredItemsSeqIds.contains(i.orderItemSeqId)).collect(Collectors.toList())
-                        if (shipmentThreshold > 0 && !(suggestedFacilityIds.size() == 1 && !unfillableItems)) {
+
+                        if (brokerIfAllItemsAvailable && unfillableItems) {
+                            allocateFacilityToItems = false;
+                            comments = "${orderRoutingGroup.groupName} : Inventory is not available for all items for rule ${routingRule.ruleName}."
+                            ec.logger.info("Inventory is not available for all items condition not met for rule ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId}");
+                        }
+                        if (allocateFacilityToItems && shipmentThreshold > 0 && !(suggestedFacilityIds.size() == 1 && !unfillableItems)) {
                             checkShipmentThreshold = true
                         }
                         if (checkShipmentThreshold) {
@@ -561,11 +575,11 @@
                                 def result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
                                     .parameters([orderItems: unfillableItems, orderAdjustments: orderAdjustments]).call()
                                 if (shipmentThreshold > result?.subTotal) {
-                                    metShipmentThreshold = false;
+                                    allocateFacilityToItems = false;
                                 }
                             }
                         }
-                        if (metShipmentThreshold) {
+                        if (allocateFacilityToItems) {
                             brokeredItemCount = suggestedFulfillmentLocations.size();
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
@@ -576,17 +590,19 @@
                                 result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
                                     .parameters([orderItems: brokeredItems, orderAdjustments: orderAdjustments]) .call()
                                 if (shipmentThreshold > result?.subTotal) {
-                                    metShipmentThreshold = false;
+                                    allocateFacilityToItems = false;
                                 }
                             }
                             facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
                                     routingRunId: routingRunId])
                         }
-                        }
-                        if (!metShipmentThreshold) {
+                        if (allocateFacilityToItems) {
                             comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for rule ${routingRule.ruleName}."
                             ec.logger.info("Shipment threshold condition not met for rule ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId} and metShipmentThreshold ${metShipmentThreshold}");
+                        }
+                        }
+                        if (!allocateFacilityToItems) {
                             facilityAllocation = []
                             brokeredItemsSeqIds = [];
                             brokeredItemCount = 0;
