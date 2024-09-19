@@ -533,6 +533,7 @@
                     import java.time.ZonedDateTime
                     import java.util.stream.Collectors;
                     import org.moqui.entity.EntityCondition
+
                     // If a single assignment is preferred, then SQL will return a result only if all the ship group items are available at a single location.
                     def actionMap = ruleActions.collectEntries { [it.actionTypeEnumId, it.actionValue] }
 
@@ -540,6 +541,7 @@
                     def comments="${orderRoutingGroup.groupName} : Inventory found for ${routingRule.ruleName}.";
                     def routingRuleName = "${orderRoutingGroup.groupName} : ${orderRouting.routingName} : ${routingRule.ruleName}]"
                     def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
+
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
                         // SQL will not return results if items are not available at a single location.
                         // Additional check to ensure all items are available at a single location.
@@ -551,6 +553,7 @@
                             suggestedFulfillmentLocations = []
                         }
                     }
+
                     //prepare map for brokered items
                     def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [], allocateFacilityToItems = true, orderAdjustments = null ;
                     if (suggestedFulfillmentLocations) {
@@ -573,7 +576,7 @@
                                     .condition("orderItemSeqId", EntityCondition.NOT_EQUAL, "_NA_").list();
                             if (unfillableItems) {
                                 def result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
-                                    .parameters([orderItems: unfillableItems, orderAdjustments: orderAdjustments]).call()
+                                        .parameters([orderItems: unfillableItems, orderAdjustments: orderAdjustments]).call()
                                 if (shipmentThreshold > result?.subTotal) {
                                     allocateFacilityToItems = false;
                                 }
@@ -581,26 +584,26 @@
                         }
                         if (allocateFacilityToItems) {
                             brokeredItemCount = suggestedFulfillmentLocations.size();
-                        suggestedFacilityIds.each { facilityId->
-                            def facilityItems = suggestedFulfillmentLocations.collect()
-                            filterMapList(facilityItems, ["facilityId":facilityId], false)
-                            def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
-                            if (checkShipmentThreshold) {
-                                def brokeredItems = orderItems.stream().filter(i -> (items.orderItemSeqId).contains(i.orderItemSeqId)).collect(Collectors.toList())
-                                result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
-                                    .parameters([orderItems: brokeredItems, orderAdjustments: orderAdjustments]) .call()
-                                if (shipmentThreshold > result?.subTotal) {
-                                    allocateFacilityToItems = false;
+                            suggestedFacilityIds.each { facilityId->
+                                def facilityItems = suggestedFulfillmentLocations.collect()
+                                filterMapList(facilityItems, ["facilityId":facilityId], false)
+                                def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
+                                if (checkShipmentThreshold) {
+                                    def brokeredItems = orderItems.stream().filter(i -> (items.orderItemSeqId).contains(i.orderItemSeqId)).collect(Collectors.toList())
+                                    result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
+                                            .parameters([orderItems: brokeredItems, orderAdjustments: orderAdjustments]) .call()
+                                    if (shipmentThreshold > result?.subTotal) {
+                                        allocateFacilityToItems = false;
+                                    }
                                 }
+                                facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
+                                        routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
+                                        routingRunId: routingRunId])
                             }
-                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
-                                    routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
-                                    routingRunId: routingRunId])
-                        }
-                        if (allocateFacilityToItems) {
-                            comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for rule ${routingRule.ruleName}."
-                            ec.logger.info("Shipment threshold condition not met for rule ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId} and metShipmentThreshold ${metShipmentThreshold}");
-                        }
+                            if (allocateFacilityToItems) {
+                                comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for rule ${routingRule.ruleName}."
+                                ec.logger.info("Shipment threshold condition not met for rule ${routingRule.ruleName} [${routingRule.routingRuleId}] for orderId ${orderId} and shipGroupSeqId ${shipGroupSeqId} and metShipmentThreshold ${metShipmentThreshold}");
+                            }
                         }
                         if (!allocateFacilityToItems) {
                             facilityAllocation = []
@@ -612,13 +615,13 @@
                     def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
                     if (unfillableItemSeqIds) {
                         if (!comments) {
-                        if (!suggestedFulfillmentLocations) {
-                            comments = "${orderRoutingGroup.groupName}: No inventory found for ${routingRule.ruleName}."
-                        } else {
-                            comments = "${orderRoutingGroup.groupName}: Partially available item inventory found for ${routingRule.ruleName}."
+                            if (!suggestedFulfillmentLocations) {
+                                comments = "${orderRoutingGroup.groupName}: No inventory found for ${routingRule.ruleName}."
+                            } else {
+                                comments = "${orderRoutingGroup.groupName}: Partially available item inventory found for ${routingRule.ruleName}."
+                            }
                         }
-                        }
-                        // If unfillable items are found, check for actions.
+                        // If unfillable items found, check for actions.
                         if (actionMap.get('ORA_MV_TO_QUEUE') != null) {
                             queue = actionMap.get('ORA_MV_TO_QUEUE');
                             comments += "Unfillable items moved to ${queue}."
@@ -700,12 +703,12 @@
                 <script><![CDATA[
                     schedule = serviceJob.getMap()
                     try {
-                    schedule.cronDescription = co.hotwax.util.MaargUtil.getCronDescription(schedule.cronExpression, ec.user.getLocale())
-                    nextExecutionTime = co.hotwax.util.MaargUtil.getNextExecutionTime(serviceJob?.cronExpression, TimeZone.getDefault())
-                    if (nextExecutionTime != null) {
-                        schedule.nextExecutionDateTime = nextExecutionTime.toInstant().toEpochMilli()
-                    }
-                    schedule.executionTimeZone = TimeZone.getDefault().getID()
+                        schedule.cronDescription = co.hotwax.util.MaargUtil.getCronDescription(schedule.cronExpression, ec.user.getLocale())
+                        nextExecutionTime = co.hotwax.util.MaargUtil.getNextExecutionTime(serviceJob?.cronExpression, TimeZone.getDefault())
+                        if (nextExecutionTime != null) {
+                            schedule.nextExecutionDateTime = nextExecutionTime.toInstant().toEpochMilli()
+                        }
+                        schedule.executionTimeZone = TimeZone.getDefault().getID()
                     } catch (Exception e) {
                         ec.logger.error("Error getting cron description: ${e.getMessage()}")
                         schedule.cronDescription = e.getMessage()
@@ -826,7 +829,7 @@
                         <set field="selectOrderItemSeqId" value="true" type="Boolean"/>
                         <script>
                             promisedDatetime = java.time.ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long)
-                            .with(java.time.LocalTime.MAX).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+                                    .with(java.time.LocalTime.MAX).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
                         </script>
                         <set field="orderFilterConditions" from="orderFilterConditions + [fieldName: 'promisedDatetime', operator: filterCondition.operator, fieldValue: promisedDatetime]"/>
                     </if>
@@ -913,7 +916,7 @@
                         <set field="selectOrderItemSeqId" value="true" type="Boolean"/>
                         <script>
                             promisedDatetime = java.time.ZonedDateTime.now().plusDays(filterCondition.fieldValue as Long)
-                            .with(java.time.LocalTime.MAX).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+                                    .with(java.time.LocalTime.MAX).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
                         </script>
                         <set field="orderFilterConditions" from="orderFilterConditions + [fieldName: 'promisedDatetime', operator: filterCondition.operator, fieldValue: promisedDatetime]"/>
                     </if>
@@ -1015,6 +1018,5 @@
                 <set field="subTotal" from="subTotal+ itemAmount + adjAmount"/>
             </iterate>
         </actions>
-
     </service>
 </services>
