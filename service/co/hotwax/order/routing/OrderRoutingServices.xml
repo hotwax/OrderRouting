@@ -523,7 +523,7 @@
             <filter-map-list list="extraConditions" to-list="shipmentThresholds">
                 <field-map field-name="fieldName" value="shipmentThreshold"/>
             </filter-map-list>
-            <set field="shipmentThreshold" from="shipmentThresholds[0].fieldValue" type="BigDecimal"/>
+            <set field="shipmentThreshold" from="shipmentThresholds[0]?.fieldValue" type="BigDecimal" default-value="0"/>
             <filter-map-list list="extraConditions" to-list="brokerIfAllItemsAvailableCond">
                 <field-map field-name="fieldName" value="brokerIfAllItemsAvailable"/>
             </filter-map-list>
