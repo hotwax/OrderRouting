@@ -149,7 +149,7 @@
                 <order-by field-name="sequenceNum"/>
             </entity-find>
             <if condition="!orderRoutings">
-                <return type="warning" message="No order routing configuration found for the specified routing group ${orderRoutingGroup.groupName} [${routingGroupId}]."/>
+                <return type="warning" message="No order routing configuration found for the specified routing group ${orderRoutingGroup.groupName?:''} [${routingGroupId}]."/>
             </if>
             <set field="groupItemCount" value="0" type="Long"/>
             <set field="groupBrokeredItemCount"  value="0" type="Long"/>
