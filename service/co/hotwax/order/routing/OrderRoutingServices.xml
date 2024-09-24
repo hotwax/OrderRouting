@@ -527,7 +527,7 @@
             <filter-map-list list="extraConditions" to-list="brokerIfAllItemsAvailableCond">
                 <field-map field-name="fieldName" value="brokerIfAllItemsAvailable"/>
             </filter-map-list>
-            <set field="brokerIfAllItemsAvailable" from="brokerIfAllItemsAvailableCond[0]?.getBoolean('fieldValue')" default-value="false" type="Boolean"/>
+            <set field="brokerIfAllItemsAvailable" from="brokerIfAllItemsAvailableCond[0]?.fieldValue" default-value="false" type="Boolean"/>
             <script><![CDATA[
                     import java.time.format.DateTimeFormatter;
                     import java.time.ZonedDateTime
