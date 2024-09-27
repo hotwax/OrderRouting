@@ -619,7 +619,7 @@
                                 }
                                 facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
                                         routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
-                                        routingRunId: routingRunId, suggestedShipMethod: suggestedShipMethod])
+                                        routingRunId: routingRunId, suggestedShipMethodTypeId: suggestedShipMethod])
                             }
                             if (allocateFacilityToItems) {
                                 comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for rule ${routingRule.ruleName}."
