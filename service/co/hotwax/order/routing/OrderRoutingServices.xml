@@ -527,6 +527,11 @@
             <filter-map-list list="extraConditions" to-list="brokerIfAllItemsAvailableCond">
                 <field-map field-name="fieldName" value="brokerIfAllItemsAvailable"/>
             </filter-map-list>
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRuleInvCond" list="measurementSystems">
+                <econdition field-name="routingRuleId" from="routingRuleId"/>
+                <econdition field-name="fieldName" value="measurementSystem"/>
+            </entity-find>
+            <set field="measurementSystem" from="measurementSystems?measurementSystems[0]: [:]"/>
             <set field="brokerIfAllItemsAvailable" from="brokerIfAllItemsAvailableCond[0]?.fieldValue" default-value="false" type="Boolean"/>
             <script><![CDATA[
                     import java.time.format.DateTimeFormatter;
@@ -591,14 +596,30 @@
                                 if (checkShipmentThreshold) {
                                     def brokeredItems = orderItems.stream().filter(i -> (items.orderItemSeqId).contains(i.orderItemSeqId)).collect(Collectors.toList())
                                     result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
-                                            .parameters([orderItems: brokeredItems, orderAdjustments: orderAdjustments]) .call()
+                                            .parameters([orderItems: brokeredItems, orderAdjustments: orderAdjustments])
+                                            .call()
                                     if (shipmentThreshold > result?.subTotal) {
                                         allocateFacilityToItems = false;
                                     }
                                 }
+
+                                def suggestedShipMethod;
+                                if (orderItemShipGroup.shipmentMethodTypeId) {
+                                    def methodResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.get#SuggestedShippingMethod")
+                                        .parameters([suggestedFulfillmentLocations: facilityItems, orderShipmentMethodTypeId: orderItemShipGroup.shipmentMethodTypeId, measurementSystem: measurementSystem?.fieldValue])
+                                        .call()
+                                        if (ec.message.hasError()) {
+                                            ec.logger.warn("Ignoring suggested ship method errors for ${routingRule.ruleName} [${routingRule.routingRuleId}] " + ec.message.getErrorsString())
+                                            ec.message.clearErrors()
+                                            ec.message.clearAll()
+                                        } else {
+                                            def suggestedShipMethods = methodResult?.suggestedShipMethods
+                                            suggestedShipMethod = suggestedShipMethods?.get(facilityId);
+                                        }
+                                }
                                 facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
                                         routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
-                                        routingRunId: routingRunId])
+                                        routingRunId: routingRunId, suggestedShipMethod: suggestedShipMethod])
                             }
                             if (allocateFacilityToItems) {
                                 comments = "${orderRoutingGroup.groupName} : Shipment threshold not met for rule ${routingRule.ruleName}."
@@ -1017,6 +1038,73 @@
                 </script>
                 <set field="subTotal" from="subTotal+ itemAmount + adjAmount"/>
             </iterate>
+        </actions>
+    </service>
+    <service verb="get" noun="SuggestedShippingMethod">
+        <in-parameters>
+            <parameter name="measurementSystem" default-value="IMPERIAL"/>
+            <parameter name="orderShipmentMethodTypeId" required="true"/>
+            <parameter name="suggestedFulfillmentLocations" type="List"></parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="suggestedShipMethods" type="Map" required="true"/>
+        </out-parameters>
+        <actions>
+            <set field="suggestedShipMethods" from="[:]"/>
+            <entity-find-one entity-name="org.apache.ofbiz.shipment.shipment.ShipmentMethodType" value-field="shipmentMethodType" cache="true">
+                <field-map field-name="shipmentMethodTypeId" from="orderShipmentMethodTypeId"/>
+            </entity-find-one>
+            <if condition="!shipmentMethodType">
+                <return message="No shipment method type found for ${orderShipmentMethodTypeId}"/>
+            </if>
+
+            <set field="shipmentMethodsTypeIds" from="[orderShipmentMethodTypeId]" />
+            <if condition="shipmentMethodType.parentTypeId">
+                <set field="shipmentMethodsTypeIds" from="shipmentMethodsTypeIds + shipmentMethodType.parentTypeId"/>
+            </if>
+            <if condition="'IMPERIAL'.equalsIgnoreCase(measurementSystem)">
+                <set field="nextDaySLA" value="230" type="Long"/>
+                <set field="secondDaySLA" value="500" type="Long"/>
+                <set field="thirdDaySLA" value="650" type="Long"/>
+            <else>
+                <set field="nextDaySLA" value="370" type="Long"/>
+                <set field="secondDaySLA" value="805" type="Long"/>
+                <set field="thirdDaySLA" value="1050" type="Long"/>
+            </else>
+            </if>
+            <script><![CDATA[
+                def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
+                suggestedFacilityIds.each { facilityId ->
+                    // Filter facility items for the current facilityId
+                    def facilityItems = suggestedFulfillmentLocations.collect()
+                    filterMapList(suggestedFulfillmentLocations.collect(), ["facilityId": facilityId], false)
+
+                    def item = facilityItems ? facilityItems[0] : null
+                    if (item?.distance) {
+                        def distance = basicConvert(item.distance, 'BigDecimal')
+                        // Determine the suggested shipping method based on distance and available shipment types
+                        def shippingMethod;
+
+                        switch (true) {
+                            case shipmentMethodsTypeIds.contains("NEXT_DAY"):
+                                shippingMethod = (distance <= nextDaySLA) ? 'STANDARD' : 'NEXT_DAY'
+                                break
+                            case shipmentMethodsTypeIds.contains("SECOND_DAY"):
+                                shippingMethod = (distance <= secondDaySLA) ? 'STANDARD' : 'SECOND_DAY'
+                                break
+                            case shipmentMethodsTypeIds.contains("THIRD_DAY"):
+                                shippingMethod = (distance <= thirdDaySLA) ? 'STANDARD' : 'THIRD_DAY'
+                                break
+                            default:
+                                shippingMethod = (distance != 0) ? 'STANDARD': null;
+                                break
+                        }
+                        // Store the suggested shipping method for the facility
+                        suggestedShipMethods.put(facilityId, shippingMethod)
+                    }
+                }
+            ]]></script>
+
         </actions>
     </service>
 </services>
