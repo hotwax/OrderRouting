@@ -496,11 +496,15 @@
                     facilityAllocation = [];
                     def comments="${orderRoutingGroup.groupName} : Inventory found for ${routingRule.ruleName}.";
                     def routingRuleName = "${orderRoutingGroup.groupName} : ${orderRouting.routingName} : ${routingRule.ruleName}]"
-                    def suggestedFacilityIds = suggestedFulfillmentLocations.facilityId as Set
+                    def suggestedFacilityIds = suggestedFulfillmentLocations?.facilityId as Set
                     if (!routingRule.assignmentEnumId || 'ORA_SINGLE'.equals(routingRule.assignmentEnumId)) {
                         // SQL will not return results if items are not available at a single location.
                         // Additional check to ensure all items are available at a single location.
-                        if (suggestedFacilityIds.size() == 1) {
+                        boolean allItemsRouted = orderItems?.every { orderItem ->
+                            def routedItem = suggestedFulfillmentLocations?.find { it.orderId == orderItem.orderId &amp;&amp; it.orderItemSeqId == orderItem.orderItemSeqId }
+                            return routedItem &amp;&amp; routedItem.routedItemQty == orderItem.quantity
+                        }
+                        if (allItemsRouted &amp;&amp; suggestedFacilityIds.size() == 1) {
                             comments = "${orderRoutingGroup.groupName} : Inventory found at a single location for ${routingRule.ruleName}"
                         } else {
                             comments = "${orderRoutingGroup.groupName} : Inventory not found at a single location for ${routingRule.ruleName}."
