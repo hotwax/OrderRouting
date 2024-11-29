@@ -241,7 +241,16 @@
                 <service-call name="update#moqui.service.job.ServiceJob" in-map="[jobName: orderRoutingGroup.jobName, thruDate: ec.user.nowTimestamp, paused: 'Y']" disable-authz="true"/>
             </if>
             <script>
-                orderRoutingGroup.deleteWithCascade(null , ['co.hotwax.order.routing.OrderRouting', 'co.hotwax.order.routing.OrderFilterCondition', 'co.hotwax.order.routing.OrderRoutingRule', 'co.hotwax.order.routing.OrderRoutingRuleInvCond', 'co.hotwax.order.routing.OrderRoutingRuleAction'] as Set)
+                def relations = [
+                    'co.hotwax.order.routing.OrderRouting',
+                    'co.hotwax.order.routing.OrderFilterCondition',
+                    'co.hotwax.order.routing.OrderRoutingRule',
+                    'co.hotwax.order.routing.OrderRoutingRuleInvCond',
+                    'co.hotwax.order.routing.OrderRoutingRuleAction'
+                    'co.hotwax.order.routing.OrderRoutingBatch'
+                    'co.hotwax.order.routing.OrderRoutingRun'
+                ] as Set
+                orderRoutingGroup.deleteWithCascade(null , relations)
             </script>
             <return message="Order routing group ${orderRoutingGroup.groupName?:''} [${routingGroupId}] delete successfully."/>
         </actions>

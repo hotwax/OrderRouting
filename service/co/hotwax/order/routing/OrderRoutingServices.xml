@@ -154,10 +154,14 @@
             <set field="groupItemCount" value="0" type="Long"/>
             <set field="groupBrokeredItemCount"  value="0" type="Long"/>
             <log message="Started order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group."/>
+            <service-call name="create#co.hotwax.order.routing.OrderRoutingBatch" transaction="force-new" ignore-error="true"
+                          in-map="[routingGroupId:routingGroupId, startDate:ec.user.nowTimestamp, userId:ec.user.username]"
+                          out-map="routingBatchResult"/>
+            <set field="routingBatchId" from="routingBatchResult.routingBatchId"/>
             <iterate list="orderRoutings" entry="orderRouting">
                 <service-call name="create#co.hotwax.order.routing.OrderRoutingRun" transaction="force-new" ignore-error="true"
                         in-map="[routingGroupId:routingGroupId, orderRoutingId: orderRouting.orderRoutingId,
-                                productStoreId: productStoreId, startDate:ec.user.nowTimestamp]"
+                                productStoreId: productStoreId, startDate:ec.user.nowTimestamp, routingBatchId: routingBatchId]"
                         out-map="routingRunResult"/>
                 <set field="attemptedItemCount" value="0" type="Long"/>
                 <set field="brokeredItemCount" value="0" type="Long"/>
@@ -200,6 +204,9 @@
                                 endDate:ec.user.nowTimestamp, orderItemCount: attemptedItemCount, brokeredItemCount: brokeredItemCount]"
                         out-map="routingRunResult"/>
             </iterate>
+
+            <service-call name="update#co.hotwax.order.routing.OrderRoutingBatch" transaction="force-new" ignore-error="true"
+                          in-map="[routingBatchId:routingBatchId, endDate:ec.user.nowTimestamp, orderItemCount: groupItemCount, brokeredItemCount: groupBrokeredItemCount]"/>
             <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${groupItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
         </actions>
     </service>
