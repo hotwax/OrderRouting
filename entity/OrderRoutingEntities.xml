@@ -178,6 +178,7 @@ under the License.
         <field name="routingRunId" type="id" is-pk="true"><description>Unique identifier for the routing run.</description></field>
         <field name="orderRoutingId" type="id"><description>Unique identifier for the order routing.</description></field>
         <field name="routingGroupId" type="id"><description>Unique identifier for the order routing group.</description></field>
+        <field name="routingBatchId" type="id"><description>Distinguishes between different routing runs initiated as part of batch processing.</description></field>
         <field name="productStoreId" type="id"><description>Unique identifier for the product store.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
         <field name="hasError" type="text-indicator"><description>Indicator for the presence of errors.</description></field>
@@ -186,10 +187,34 @@ under the License.
         <field name="routingResult" type="text-long"><description>Result or outcome of the routing run.</description></field>
         <field name="orderItemCount" type="number-integer"><description>Store the attempted order item count.</description></field>
         <field name="brokeredItemCount" type="number-integer"><description>Store the brokered order item count.</description></field>
+        <relationship type="one" related="co.hotwax.order.routing.OrderRoutingBatch" fk-name="ORR_ROU_BATCH" short-alias="batch">
+            <key-map field-name="routingBatchId"/>
+        </relationship>
+        <relationship type="one" related="co.hotwax.order.routing.OrderRoutingGroup" fk-name="ORR_ROU_GRP" short-alias="group">
+            <key-map field-name="routingBatchId"/>
+        </relationship>
         <index name="IDX_ORRN_ROUTE">
             <index-field name="routingGroupId"/>
             <index-field name="orderRoutingId"/>
         </index>
+        <index name="IDX_ORR_PROD_STORE">
+            <index-field name="productStoreId"/>
+        </index>
+    </entity>
+    <entity entity-name="OrderRoutingBatch" package="co.hotwax.order.routing" short-alias="routingBatches">
+        <description>
+            The OrderRoutingBatch entity represents a batch processing unit for order routing in the system.
+            This entity is designed to group and manage routing runs triggered as part of batch operations.</description>
+        <field name="routingBatchId" type="id" is-pk="true"><description>Unique identifier for the routing run.</description></field>
+        <field name="routingGroupId" type="id"><description>Unique identifier for the routing run.</description></field>
+        <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
+        <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
+        <field name="orderItemCount" type="number-integer"><description>Store the attempted order item count.</description></field>
+        <field name="brokeredItemCount" type="number-integer"><description>Store the brokered order item count.</description></field>
+        <relationship type="one" fk-name="ORB_ROU_GRP" related="co.hotwax.order.routing.OrderRoutingGroup" short-alias="group">
+            <key-map field-name="routingGroupId"/>
+        </relationship>
     </entity>
 </entities>
 
