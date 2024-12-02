@@ -788,10 +788,12 @@
             </if>
             <set field="description" value="Service job for order routing group ${orderRoutingGroup.groupName} [${orderRoutingGroup.routingGroupId}]"/>
             <set field="serviceName" value="co.hotwax.order.routing.OrderRoutingServices.run#OrderRoutingGroup"/>
+            <!-- Default transaction timeout for service job is 1800 (30 min) seconds, overriding it and set the timeout to 3600 (1 hour) -->
             <if condition="!serviceJob">
                 <if condition="!paused">
                     <set field="paused" value="N"/>
                 </if>
+                <set field="transactionTimeout" from="transactionTimeout" default-value="3600"/>
                 <set field="jobName" value="Order_Routing_Group_${orderRoutingGroup.routingGroupId}"/>
                 <service-call name="create#moqui.service.job.ServiceJob" in-map="context + [jobName: jobName]" out-map="context"/>
                 <!-- Set the JobName in orderRoutingGroup entity -->
