@@ -191,7 +191,7 @@ under the License.
             <key-map field-name="routingBatchId"/>
         </relationship>
         <relationship type="one" related="co.hotwax.order.routing.OrderRoutingGroup" fk-name="ORR_ROU_GRP" short-alias="group">
-            <key-map field-name="routingBatchId"/>
+            <key-map field-name="routingGroupId"/>
         </relationship>
         <index name="IDX_ORRN_ROUTE">
             <index-field name="routingGroupId"/>
