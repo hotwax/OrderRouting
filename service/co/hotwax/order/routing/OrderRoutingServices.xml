@@ -88,6 +88,8 @@
         </description>
         <in-parameters>
             <parameter name="routingGroupId" required="true"/>
+            <parameter name="orderRoutingId"/>
+            <parameter name="routingRuleId"/>
             <parameter name="productStoreId" required="true"/>
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
@@ -140,9 +142,13 @@
                                     routingResult:'Start a new force order routing run, bringing the current routing run to an end',
                                     endDate:ec.user.nowTimestamp]" out-map="routingRunResult"/>
             </if>
+            <if condition="orderRoutingId">
+                <log level="warn" message="Order routing group ${orderRoutingGroup.groupName} [${routingGroupId}] for order routing id ${orderRoutingId} and routing rule ${routingRuleId}"/>
+            </if>
             <!-- Get the all active routing for order routing group -->
             <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="orderRoutings">
                 <econditions>
+                    <econdition field-name="orderRoutingId" ignore-if-empty="true"/>
                     <econdition field-name="routingGroupId" from="routingGroupId"/>
                     <econdition field-name="statusId" value="ROUTING_ACTIVE"/>
                 </econditions>
@@ -176,7 +182,7 @@
                         def orderRoutingResult = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.run#OrderRouting")
                                 .requireNewTransaction(true)
                                 .parameters([orderRoutingId: orderRouting.orderRoutingId, orderId: orderId, shipGroupSeqId: shipGroupSeqId,
-                                        routingRunId: routingRunResult.routingRunId])
+                                        routingRunId: routingRunResult.routingRunId, routingRuleId: routingRuleId])
                                 .call()
                         attemptedItemCount = orderRoutingResult.attemptedItemCount?:0
                         brokeredItemCount = orderRoutingResult.brokeredItemCount?:0
