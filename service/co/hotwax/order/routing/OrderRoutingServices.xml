@@ -148,7 +148,7 @@
             <!-- Get the all active routing for order routing group -->
             <entity-find entity-name="co.hotwax.order.routing.OrderRouting" list="orderRoutings">
                 <econditions>
-                    <econdition field-name="orderRoutingId" ignore-if-empty="true"/>
+                    <econdition field-name="orderRoutingId" from="orderRoutingId" ignore-if-empty="true"/>
                     <econdition field-name="routingGroupId" from="routingGroupId"/>
                     <econdition field-name="statusId" value="ROUTING_ACTIVE"/>
                 </econditions>
