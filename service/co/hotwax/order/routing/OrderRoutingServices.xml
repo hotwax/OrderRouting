@@ -129,6 +129,7 @@
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
                 <econditions>
+                    <econdition field-name="routingGroupId" from="routingGroupId"/>
                     <econdition field-name="productStoreId" from="orderRoutingGroup.productStoreId"/>
                     <econdition field-name="endDate" from="null"/>
                 </econditions>

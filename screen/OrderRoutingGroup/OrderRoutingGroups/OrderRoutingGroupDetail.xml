@@ -51,6 +51,10 @@
         <service-call name="co.hotwax.order.routing.CommonServices.clone#OrderRoutingGroup"/>
         <default-response url="." parameter-map="[routingGroupId:newRoutingGroupId]"/>
     </transition>
+    <transition name="deleteOrderRoutingGroup">
+        <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRoutingGroup"/>
+        <default-response url="../OrderRoutingGroupList"/>
+    </transition>
     <transition name="deleteOrderRouting">
         <service-call name="co.hotwax.order.routing.CommonServices.delete#OrderRouting"/>
         <default-response url="."/>
@@ -76,6 +80,9 @@
                     <box-header title="Order Routing Group"/>
                     <box-toolbar>
                         <link url="cloneOrderRoutingGroup" text="Clone" confirmation="Are you sure to clone ${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}?">
+                            <parameter name="routingGroupId" from="orderRoutingGroup.routingGroupId"/>
+                        </link>
+                        <link url="deleteOrderRoutingGroup" text="Delete" confirmation="Are you sure to delete ${orderRoutingGroup.groupName?:orderRoutingGroup.routingGroupId}?" condition="ec.user.hasPermission('DELETE_ORDER_ROUTE')">
                             <parameter name="routingGroupId" from="orderRoutingGroup.routingGroupId"/>
                         </link>
                     </box-toolbar>

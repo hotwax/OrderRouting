@@ -27,8 +27,7 @@
     <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
     <transition name="orderRouting"><default-response url="../../OrderRoutingGroups/OrderRouting/OrderRoutingDetail"/></transition>
     <widgets>
-        <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true"
-                header-dialog="true">
+        <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true" header-dialog="true">
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="orderRoutingRuns">
                 <search-form-inputs default-order-by="-startDate"/>
                 <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
@@ -80,16 +79,20 @@
                     <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
                 </default-field>
             </field>
-            <field name="hasError"><default-field><display/></default-field></field>
+            <field name="hasError">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true"><option key="N"/><option key="Y"/></drop-down>
+                </header-field>
+                <default-field><display/></default-field></field>
             <field name="routingResult">
                 <default-field><display/></default-field>
             </field>
             <field name="startDate">
-                <header-field show-order-by="true"></header-field>
+                <header-field show-order-by="true"><date-period/></header-field>
                 <default-field><display/></default-field>
             </field>
             <field name="endDate">
-                <header-field show-order-by="true"></header-field>
+                <header-field show-order-by="true"><date-period/></header-field>
                 <default-field><display/></default-field>
             </field>
             <field name="executionTime">
