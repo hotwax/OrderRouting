@@ -147,6 +147,9 @@
             <resource name="orderCount">
                 <method type="get"><service name="co.hotwax.order.routing.OrderRoutingServices.get#RoutingOrderCount"/></method>
             </resource>
+            <resource name="run" description="Invoke the order routing run. The endpoint is created for run a single order routing.">
+                <method type="post"><service name="co.hotwax.order.routing.OrderRoutingServices.run#OrderRouting"/></method>
+            </resource>
         </id>
     </resource>
     <resource name="rules">

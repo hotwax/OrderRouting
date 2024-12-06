@@ -219,6 +219,9 @@
         </description>
         <in-parameters>
             <parameter name="orderRoutingId" required="true"/>
+            <parameter name="routingRuleId">
+                <description>Optional parameters, used when the user wants to run order routing with a specific order routing rule.</description>
+            </parameter>
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
             <parameter name="changeReasonEnumId"/>
@@ -253,15 +256,19 @@
                 <field-map field-name="conditionTypeEnumId" value="ENTCT_SORT_BY"/>
             </filter-map-list>
             <set field="orderSortByList" from="sortFields != null ? sortFields.fieldName:[]" type="List"/>
+            <if condition="routingRuleId">
+                <log level="warn" message="Running order routing ${orderRouting.routingName} [${orderRoutingId}] for specific rule ${routingRuleId}"/>
+            </if>
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRule" list="orderRoutingRules">
                 <econditions>
+                    <econdition field-name="routingRuleId" from="routingRuleId" ignore-if-empty="true" or-null="true"/>
                     <econdition field-name="orderRoutingId" from="orderRoutingId"/>
                     <econdition field-name="statusId" value="RULE_ACTIVE"/>
                 </econditions>
                 <order-by field-name="sequenceNum"/>
             </entity-find>
             <if condition="!orderRoutingRules">
-                <return error="true" message="No routing rule setup for order routing ${orderRouting.routingName} [${orderRoutingId}]"/>
+                <return error="true" message="No active routing rule found for order routing '${orderRouting.routingName}' [${orderRoutingId}]."/>
             </if>
 
             <set field="orderTypeId" value="SALES_ORDER"/>
