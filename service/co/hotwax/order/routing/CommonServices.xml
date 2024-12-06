@@ -246,8 +246,8 @@
                     'co.hotwax.order.routing.OrderFilterCondition',
                     'co.hotwax.order.routing.OrderRoutingRule',
                     'co.hotwax.order.routing.OrderRoutingRuleInvCond',
-                    'co.hotwax.order.routing.OrderRoutingRuleAction'
-                    'co.hotwax.order.routing.OrderRoutingBatch'
+                    'co.hotwax.order.routing.OrderRoutingRuleAction',
+                    'co.hotwax.order.routing.OrderRoutingBatch',
                     'co.hotwax.order.routing.OrderRoutingRun'
                 ] as Set
                 orderRoutingGroup.deleteWithCascade(null , relations)
