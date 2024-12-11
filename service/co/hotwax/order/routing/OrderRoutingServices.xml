@@ -516,9 +516,6 @@
                     def queue = null, autoCancelDate = null, brokeredItemsSeqIds = [] ;
                     if (suggestedFulfillmentLocations) {
                         brokeredItemCount = suggestedFulfillmentLocations.size();
-                        if (!changeReasonEnumId) {
-                            changeReasonEnumId = "BROKERED";
-                        }
                         brokeredItemsSeqIds = suggestedFulfillmentLocations.orderItemSeqId;
                         suggestedFacilityIds.each { facilityId->
                             def facilityItems = suggestedFulfillmentLocations.collect()
@@ -538,16 +535,13 @@
                                     suggestedShipMethod = suggestedShipMethods?.get(facilityId);
                                 }
                             }
-                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId,
+                            facilityAllocation.add([facilityId:facilityId, items: items, comments: comments, routingRule: routingRuleName, changeReasonEnumId: changeReasonEnumId?:"BROKERED",
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
                                     routingRunId: routingRunId, suggestedShipMethodTypeId: suggestedShipMethod])
                         }
                     }
                     def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
                     if (unfillableItemSeqIds) {
-                        if (!changeReasonEnumId) {
-                            changeReasonEnumId = "UNFILLABLE";
-                        }
                         if (!suggestedFulfillmentLocations) {
                             comments = "${orderRoutingGroup.groupName}: No inventory found for ${routingRule.ruleName}."
                         } else {
@@ -573,7 +567,7 @@
                             }
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
-                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId,
+                            facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId?:"UNFILLABLE",
                                     items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
                                     routingRunId: routingRunId])
