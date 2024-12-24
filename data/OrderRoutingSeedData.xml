@@ -86,8 +86,8 @@
     <moqui.basic.Enumeration enumId="ORA_NEXT_RULE" description="Move to next Rule" sequenceNum="20" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="NEXT_RULE"/>
     <moqui.basic.Enumeration enumId="ORA_MV_TO_QUEUE" description="Move to queue" sequenceNum="25" enumTypeId="ORDER_RULE_ACT_TYPE" enumCode="MOVE_TO_QUEUE"/>
 
-    <moqui.basic.StatusType statusTypeId="ROUTING_STATUS" description="Routing Status" hasTable="N"/>
-    <moqui.basic.StatusType statusTypeId="ORDER_ROUTING_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Status" hasTable="N"/>
+    <moqui.basic.StatusType statusTypeId="ROUTING_STATUS" description="Routing Status"/>
+    <moqui.basic.StatusType statusTypeId="ORDER_ROUTING_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Status"/>
     <moqui.basic.StatusItem statusId="ROUTING_DRAFT" description="Draft" sequenceNum="01" statusCode="DRAFT" statusTypeId="ORDER_ROUTING_STATUS"/>
     <moqui.basic.StatusItem statusId="ROUTING_ACTIVE" description="Active" sequenceNum="02" statusCode="ACTIVE" statusTypeId="ORDER_ROUTING_STATUS"/>
     <moqui.basic.StatusItem statusId="ROUTING_ARCHIVED" description="Archived" sequenceNum="02" statusCode="ARCHIVED" statusTypeId="ORDER_ROUTING_STATUS"/>
@@ -99,7 +99,7 @@
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ARCHIVED" toStatusId="ROUTING_DRAFT" transitionName="Draft"/>
     <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="ROUTING_ARCHIVED" toStatusId="ROUTING_ACTIVE" transitionName="Active"/>
 
-    <moqui.basic.StatusType statusTypeId="ORD_ROUT_RULE_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Rule Status" hasTable="N"/>
+    <moqui.basic.StatusType statusTypeId="ORD_ROUT_RULE_STATUS" parentTypeId="ROUTING_STATUS" description="Order Routing Rule Status"/>
     <moqui.basic.StatusItem statusId="RULE_DRAFT" description="Draft" sequenceNum="01" statusCode="DRAFT" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <moqui.basic.StatusItem statusId="RULE_ACTIVE" description="Active" sequenceNum="02" statusCode="ACTIVE" statusTypeId="ORD_ROUT_RULE_STATUS"/>
     <moqui.basic.StatusItem statusId="RULE_ARCHIVED" description="Archived" sequenceNum="02" statusCode="ARCHIVED" statusTypeId="ORD_ROUT_RULE_STATUS"/>
