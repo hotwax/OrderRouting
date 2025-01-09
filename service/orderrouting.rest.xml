@@ -176,4 +176,13 @@
             </resource>
         </id>
     </resource>
+    <resource name="orders">
+        <id name="orderId">
+            <resource name="reject">
+                <method type="post">
+                    <service name="co.hotwax.order.routing.OrderRoutingServices.reject#OrderItems"/>
+                </method>
+            </resource>
+        </id>
+    </resource>
 </resource>

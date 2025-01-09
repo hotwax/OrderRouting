@@ -1134,4 +1134,63 @@
 
         </actions>
     </service>
+
+    <!-- FIXME: This service should be part of oms -->
+    <service  verb="reject" noun="OrderItems">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="notify" type="Boolean" default-value="false">
+                <description>If set to true, an email notification will be sent on rejection, provided it is configured.</description>
+            </parameter>
+            <parameter name="items" type="List" required="true">
+                <parameter name="item" type="Map">
+                <description>A map containing details of the items to be rejected or moved.</description>
+                <parameter name="facilityId">
+                    <description>The facility ID of the order item's ship group.</description>
+                </parameter>
+                <parameter name="shipmentMethodTypeId">
+                    <description>The shipment method of the order item's ship group.</description>
+                </parameter>
+                <parameter name="quantity" default-value="1">
+                    <description>The quantity of the order item to be rejected. Defaults to 1.</description>
+                </parameter>
+                <parameter name="orderItemSeqId">
+                    <description>The sequence ID of the order item.</description>
+                </parameter>
+                <parameter name="toFacilityId">
+                    <description>The destination facility ID where the item will be moved after rejection.</description>
+                </parameter>
+                <parameter name="recordVariance">
+                    <description>Set to true if a variance record needs to be created.</description>
+                </parameter>
+                <parameter name="rejectReason">
+                    <description>The reason for rejecting the item.</description>
+                </parameter>
+            </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="rejectedItemsList" type="List">
+                <parameter name="rejectedItem" type="Map">
+                    <parameter name="orderId"/>
+                    <parameter name="orderItemSeqId"/>
+                    <parameter name="shipGroupSeqId"/>
+                    <parameter name="shipmentMethodTypeId"/>
+                    <parameter name="quantity"/>
+                </parameter>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <set field="payload" from="[orderId: orderId]"/>
+            <set field="rejectedItems" from="[]"/>
+            <iterate list="items" entry="item">
+                <set field="item.orderId" from="orderId"/>
+                <set field="item.naFacilityId" from="item.toFacilityId"/>
+            </iterate>
+            <set field="payload" from="payload + [items: items, notify: notify] "/>
+
+            <service-call name="co.hotwax.order.routing.InventoryReservationServices.reject#OmsOrderItems" in-map="[payload: payload]" out-map="outResult"/>
+            <set field="rejectedItemsList" from="outResult.rejectedItemsList"/>
+        </actions>
+    </service>
 </services>
