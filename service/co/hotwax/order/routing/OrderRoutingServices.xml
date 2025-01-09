@@ -1200,20 +1200,26 @@
             <parameter name="orderId" required="true"/>
         </in-parameters>
         <out-parameters>
-            <auto-parameters entity-name="co.hotwax.facility.OrderFacilityChange"/>
+            <parameter name="routingHistoryList" type="List">
+                <auto-parameters entity-name="co.hotwax.facility.OrderFacilityChange"/>
+            </parameter>
         </out-parameters>
         <actions>
-            <entity-find entity-name="co.hotwax.facility.OrderFacilityChange" list="routingHistoryList">
+            <entity-find entity-name="co.hotwax.order.routing.OrderFacilityChangeRecent" list="ofcList">
                 <econdition field-name="orderId" from="orderId"/>
-                <order-by field-name="-changeDatetime"/>
+                <select-field field-name="orderId,orderItemSeqId,changeDatetime"/>
             </entity-find>
-            <set field="routingRecentHistory" from="routingHistoryList?routingHistoryList[0]:null"/>
-            <if condition="routingRecentHistory">
-                <script>context.putAll(routingRecentHistory)</script>
-            <else>
-                <return message="Routing history not found for order ${orderId}"/>
-            </else>
-            </if>
+            <set field="routingHistoryList" from="[]"/>
+            <iterate list="ofcList" entry="ofc">
+                <entity-find entity-name="co.hotwax.facility.OrderFacilityChange" list="facilityChangeList">
+                    <econdition field-name="orderId" from="ofc.orderId"/>
+                    <econdition field-name="orderItemSeqId" from="ofc.orderItemSeqId"/>
+                    <econdition field-name="changeDatetime" from="ofc.changeDatetime"/>
+                </entity-find>
+                <if condition="facilityChangeList">
+                    <set field="routingHistoryList" from="routingHistoryList + facilityChangeList"/>
+                </if>
+            </iterate>
         </actions>
     </service>
 </services>
