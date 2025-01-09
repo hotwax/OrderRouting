@@ -1193,4 +1193,27 @@
             <set field="rejectedItemsList" from="outResult.rejectedItemsList"/>
         </actions>
     </service>
+    <!-- Added a service instead of using a REST entity, as we need to fetch only recent record.
+        We cannot pass the limit in a REST entity query, and setting the page limit would apply globally by default. -->
+    <service  verb="get" noun="RecentRoutingHistory">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters entity-name="co.hotwax.facility.OrderFacilityChange"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="co.hotwax.facility.OrderFacilityChange" list="routingHistoryList">
+                <econdition field-name="orderId" from="orderId"/>
+                <order-by field-name="-changeDatetime"/>
+            </entity-find>
+            <set field="routingRecentHistory" from="routingHistoryList?routingHistoryList[0]:null"/>
+            <if condition="routingRecentHistory">
+                <script>context.putAll(routingRecentHistory)</script>
+            <else>
+                <return message="Routing history not found for order ${orderId}"/>
+            </else>
+            </if>
+        </actions>
+    </service>
 </services>

@@ -183,6 +183,13 @@
                     <service name="co.hotwax.order.routing.OrderRoutingServices.reject#OrderItems"/>
                 </method>
             </resource>
+            <resource name="routing-history">
+                <resource name="recent">
+                    <method type="get">
+                        <service name="co.hotwax.order.routing.OrderRoutingServices.get#RecentRoutingHistory"/>
+                    </method>
+                </resource>
+            </resource>
         </id>
     </resource>
 </resource>
