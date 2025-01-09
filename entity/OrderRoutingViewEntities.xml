@@ -140,4 +140,13 @@ under the License.
         </alias-all>
         <alias-all entity-alias="SJR"/>
     </view-entity>
+    <view-entity entity-name="OrderFacilityChangeRecent" package="co.hotwax.order.routing">
+        <member-entity entity-alias="ofc" entity-name="co.hotwax.facility.OrderFacilityChange" />
+        <alias-all entity-alias="ofc">
+            <exclude field="changeDatetime"/>
+        </alias-all>
+        <!-- Aggregation Field -->
+        <alias name="changeDatetime" function="max" field="changeDatetime" entity-alias="ofc"/>
+    </view-entity>
+
 </entities>
