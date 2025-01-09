@@ -26,4 +26,35 @@
             <parameter name="orderId"/>
         </in-parameters>
     </service>
+    <service  verb="reject" noun="OmsOrderItems" type="oms-rest" location="service/rejectOrderItems" method="post" transaction-timeout="120">
+        <in-parameters>
+            <parameter name="payload" type="Map" required="true">
+                <parameter name="orderId" required="true"/>
+                <parameter name="notify"/>
+                <parameter name="items" type="List">
+                    <parameter name="item" type="Map">
+                        <parameter name="facilityId"/>
+                        <parameter name="shipmentMethodTypeId"/>
+                        <parameter name="orderId"/>
+                        <parameter name="quantity"/>
+                        <parameter name="orderItemSeqId"/>
+                        <parameter name="naFacilityId"/>
+                        <parameter name="recordVariance"/>
+                        <parameter name="rejectReason"/>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="rejectedItemsList" type="List">
+                <parameter name="rejectedItem" type="Map">
+                    <parameter name="orderId"/>
+                    <parameter name="orderItemSeqId"/>
+                    <parameter name="shipGroupSeqId"/>
+                    <parameter name="shipmentMethodTypeId"/>
+                    <parameter name="quantity"/>
+                </parameter>
+            </parameter>
+        </out-parameters>
+    </service>
 </services>
