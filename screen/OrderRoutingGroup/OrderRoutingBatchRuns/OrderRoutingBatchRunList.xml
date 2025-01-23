@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-include="false" standalone="true" default-menu-title="Batch Runs">
+
+    <parameter name="routingGroupId"/>
+    <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
+    <transition name="routingRunList"><default-response url="../../OrderRoutingRuns/OrderRoutingRunList"/></transition>
+    <transition name="serviceJobDetail">
+        <default-response url="//system/ServiceJob/Jobs/ServiceJobDetail"/></transition>
+    <transition name="userAccountDetail"><default-response url="//system/Security/UserAccount/UserAccountDetail"/></transition>
+    <widgets>
+        <form-list name="JobRunList" list="jobRunList" skip-form="true" header-dialog="true">
+            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroupBatchRun" list="jobRunList">
+                <search-form-inputs default-order-by="-startTime"/>
+                <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
+                <select-field field-name="groupName,errors,messages"/>
+            </entity-find>
+            <field name="routingBatchId"><header-field show-order-by="true" title="Batch"><text-find size="10" hide-options="true"/></header-field>
+                <default-field>
+                    <link url="routingRunList" text="${routingBatchId}" link-type="anchor" parameter-map="[routingBatchId:routingBatchId]" url-noparam="false"/>
+                </default-field></field>
+
+            <field name="routingGroupId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${routingGroupId}" text="${groupName?:routingGroupId} [${routingGroupId}]">
+                            <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field><link url="orderRoutingGroup" text="${groupName?:routingGroupId}" link-type="anchor" parameter-map="[routingGroupId: routingGroupId]"/></default-field>
+            </field>
+            <field name="productStoreId">
+                <header-field show-order-by="true">
+                    <drop-down allow-empty="true" allow-multiple="true">
+                        <entity-options key="${productStoreId}" text="${storeName?:productStoreId} [${productStoreId}]">
+                            <entity-find entity-name="org.apache.ofbiz.product.store.ProductStore" cache="true"/>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field>
+                    <display-entity entity-name="org.apache.ofbiz.product.store.ProductStore" text="${storeName} [${productStoreId}]"/>
+                </default-field>
+            </field>
+            <field name="jobName">
+                <header-field show-order-by="case-insensitive">
+                    <drop-down allow-empty="true">
+                        <entity-options key="${jobName}" text="${jobName}">
+                            <entity-find entity-name="moqui.service.job.ServiceJob" limit="200" cache="true">
+                                <order-by field-name="jobName"/></entity-find>
+                        </entity-options>
+                    </drop-down>
+                </header-field>
+                <default-field><link url="serviceJobDetail" text="${jobName}" link-type="anchor" url-type="screen"/></default-field>
+            </field>
+            <field name="createdByUserId"><header-field title="User"><text-find size="10" hide-options="true"/></header-field><default-field>
+                <display-entity entity-name="moqui.security.UserAccount" text="${username} - ${userFullName}" key-field-name="userId"/>
+                <link url="userAccountDetail" text="${userId}" link-type="anchor" condition="createdByUserId"/>
+            </default-field></field>
+
+            <field name="startDate">
+                <header-field show-order-by="true"><date-period/></header-field>
+                <default-field><display format="yyyy-MM-dd HH:mm:ss"/></default-field>
+            </field>
+            <field name="endDate">
+                <header-field show-order-by="true"><date-period/></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="executionTime">
+                <conditional-field condition="endDate &amp;&amp; startDate">
+                    <display text="${(groovy.time.TimeCategory.minus(endDate, startDate))}"/>
+                </conditional-field>
+            </field>
+            <field name="orderItemCount">
+                <header-field show-order-by="true"/>
+                <default-field><display/></default-field>
+            </field>
+            <field name="brokeredItemCount">
+                <header-field show-order-by="true"/>
+                <default-field><display/></default-field>
+            </field>
+            <field name="findButton">
+                <header-field title="Find"><submit/></header-field><default-field>
+                <display text=" "/></default-field>
+            </field>
+        </form-list>
+    </widgets>
+</screen>
