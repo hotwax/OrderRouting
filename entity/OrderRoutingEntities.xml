@@ -220,7 +220,7 @@ under the License.
         <field name="routingBatchId" type="id" is-pk="true"><description>Unique identifier for the routing run.</description></field>
         <field name="routingGroupId" type="id"><description>Unique identifier for the routing run.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
-        <field name="userId" type="id"><description>User login ID of the creator.</description></field>
+        <field name="createdByUserId" type="id"><description>User login ID of the creator.</description></field>
         <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
         <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
         <field name="orderItemCount" type="number-integer"><description>Store the attempted order item count.</description></field>
@@ -228,6 +228,8 @@ under the License.
         <relationship type="one" fk-name="ORB_ROU_GRP" related="co.hotwax.order.routing.OrderRoutingGroup" short-alias="group">
             <key-map field-name="routingGroupId"/>
         </relationship>
+        <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
+            <key-map field-name="createdByUserId" related="userId"/></relationship>
     </entity>
 </entities>
 
