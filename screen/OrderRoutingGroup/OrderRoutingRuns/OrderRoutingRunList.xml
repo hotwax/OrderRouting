@@ -42,7 +42,11 @@
                 </entity-find-one>
             </row-actions>
             <field name="routingRunId">
-                <header-field show-order-by="true"/>
+                <header-field show-order-by="true"><text-find/></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="routingBatchId">
+                <header-field show-order-by="true"><text-find/></header-field>
                 <default-field><display/></default-field>
             </field>
             <field name="routingGroupId">
