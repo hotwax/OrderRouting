@@ -27,6 +27,7 @@ under the License.
         <field name="sequenceNum" type="number-integer" enable-audit-log="true"><description>Sequence number for ordering.</description></field>
         <field name="jobName" type="text-medium"><description>moqui.service.job.Service reference</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the routing group.</description></field>
+        <field name="createdByUserId" type="id"/>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator</description></field>
         <field name="createdDate" type="date-time"><description>Date and time when the routing group was created</description></field>
         <field name="lastModifiedDate" type="date-time"><description>Date and time when the routing group was updated</description></field>
@@ -36,6 +37,8 @@ under the License.
             <key-map field-name="routingGroupId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRun" short-alias="runs">
             <key-map field-name="routingGroupId"/></relationship>
+        <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
+            <key-map field-name="createdByUserId" related="userId"/></relationship>
         <master>
             <detail relationship="routings"/>
         </master>
@@ -67,6 +70,7 @@ under the License.
         <field name="sequenceNum" type="number-integer" enable-audit-log="true"><description>Sequence number for ordering.</description></field>
         <field name="description" type="text-long"><description>Description or additional information about the order routing.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="createdByUserId" type="id"/>
         <field name="createdDate" type="date-time"><description>Date and time when the order routing was created.</description></field>
         <relationship type="one" fk-name="OR_STATUS" related="moqui.basic.StatusItem" short-alias="status">
             <key-map field-name="statusId"/>
@@ -80,6 +84,8 @@ under the License.
             <key-map field-name="orderRoutingId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRun" short-alias="runs">
             <key-map field-name="orderRoutingId"/></relationship>
+        <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
+            <key-map field-name="createdByUserId" related="userId"/></relationship>
         <master>
             <detail relationship="orderFilters"><detail relationship="conditionType"/> </detail>
             <detail relationship="rules"><detail relationship="assignment"/></detail>
@@ -116,6 +122,7 @@ under the License.
 <!--        <field name="fulfillEntireShipGroup" type="text-indicator"><description>Indicator for fulfilling the entire ship group.</description></field>-->
         <field name="createdDate" type="date-time"><description>Date and time when the routing rule was created.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="createdByUserId" type="id"/>
         <relationship type="one" fk-name="ORO_STATUS" related="moqui.basic.StatusItem" short-alias="status">
             <key-map field-name="statusId"/>
         </relationship>
@@ -129,6 +136,8 @@ under the License.
             <key-map field-name="routingRuleId"/></relationship>
         <relationship type="many" related="co.hotwax.order.routing.OrderRoutingRuleAction" short-alias="actions">
             <key-map field-name="routingRuleId"/></relationship>
+        <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
+            <key-map field-name="createdByUserId" related="userId"/></relationship>
         <master>
             <detail relationship="inventoryFilters"><detail relationship="conditionType"/></detail>
             <detail relationship="actions"><detail relationship="actionType"/></detail>
@@ -181,6 +190,7 @@ under the License.
         <field name="routingBatchId" type="id"><description>Distinguishes between different routing runs initiated as part of batch processing.</description></field>
         <field name="productStoreId" type="id"><description>Unique identifier for the product store.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="createdByUserId" type="id"/>
         <field name="hasError" type="text-indicator"><description>Indicator for the presence of errors.</description></field>
         <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
         <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
@@ -193,6 +203,8 @@ under the License.
         <relationship type="one" related="co.hotwax.order.routing.OrderRoutingGroup" fk-name="ORR_ROU_GRP" short-alias="group">
             <key-map field-name="routingGroupId"/>
         </relationship>
+        <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
+            <key-map field-name="createdByUserId" related="userId"/></relationship>
         <index name="IDX_ORRN_ROUTE">
             <index-field name="routingGroupId"/>
             <index-field name="orderRoutingId"/>
@@ -208,6 +220,7 @@ under the License.
         <field name="routingBatchId" type="id" is-pk="true"><description>Unique identifier for the routing run.</description></field>
         <field name="routingGroupId" type="id"><description>Unique identifier for the routing run.</description></field>
         <field name="createdByUser" type="id-long"><description>User login ID of the creator.</description></field>
+        <field name="createdByUserId" type="id"><description>User login ID of the creator.</description></field>
         <field name="startDate" type="date-time"><description>Start date of the routing run.</description></field>
         <field name="endDate" type="date-time"><description>End date of the routing run.</description></field>
         <field name="orderItemCount" type="number-integer"><description>Store the attempted order item count.</description></field>
@@ -215,6 +228,8 @@ under the License.
         <relationship type="one" fk-name="ORB_ROU_GRP" related="co.hotwax.order.routing.OrderRoutingGroup" short-alias="group">
             <key-map field-name="routingGroupId"/>
         </relationship>
+        <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
+            <key-map field-name="createdByUserId" related="userId"/></relationship>
     </entity>
 </entities>
 

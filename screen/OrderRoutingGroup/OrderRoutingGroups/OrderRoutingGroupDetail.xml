@@ -104,6 +104,7 @@
                                 </default-field>
                             </field>
                             <field name="createdByUser"><default-field><display/></default-field></field>
+                            <field name="createdByUserId"><default-field><hidden default-value="${ec.user.getUserId()}"/></default-field></field>
                             <field name="createdDate"><default-field><display/></default-field></field>
                             <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
                         </form-single>

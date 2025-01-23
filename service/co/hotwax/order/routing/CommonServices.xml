@@ -61,6 +61,7 @@
             <set field="newRoutingGroup.groupName" from="newGroupName" default-value="copy of ${orderRoutingGroup.groupName}"/>
             <set field="newRoutingGroup.sequenceNum" from="sequenceNum"/>
             <set field="newRoutingGroup.createdByUser" from="ec.user.getUsername()"/>
+            <set field="newRoutingGroup.createdByUserId" from="ec.user.getUserId()"/>
             <set field="newRoutingGroup.createdDate" from="ec.user.nowTimestamp"/>
             <set field="newRoutingGroup.lastModifiedDate" from="ec.user.nowTimestamp"/>
             <service-call name="create#co.hotwax.order.routing.OrderRoutingGroup" in-map="newRoutingGroup" out-map="resultMap"/>
@@ -119,6 +120,7 @@
             <set field="newOrderRouting.sequenceNum" from="sequenceNum"/>
             <set field="newOrderRouting.createdDate" from="ec.user.nowTimestamp"/>
             <set field="newOrderRouting.createdByUser" from="ec.user.getUsername()"/>
+            <set field="newOrderRouting.createdByUserId" from="ec.user.getUserId()"/>
             <service-call name="create#co.hotwax.order.routing.OrderRouting" in-map="newOrderRouting" out-map="resultMap"/>
             <set field="newOrderRoutingId" from="resultMap.orderRoutingId"/>
 
@@ -187,6 +189,7 @@
             <set field="newOrderRoutingRule.sequenceNum" from="sequenceNum"/>
             <set field="newOrderRoutingRule.createdDate" from="ec.user.nowTimestamp"/>
             <set field="newOrderRoutingRule.createdByUser" from="ec.user.getUsername()"/>
+            <set field="newOrderRoutingRule.createdByUserId" from="ec.user.getUserId()"/>
             <service-call name="create#co.hotwax.order.routing.OrderRoutingRule" in-map="newOrderRoutingRule" out-map="resultMap"/>
             <set field="newRoutingRuleId" from="resultMap.routingRuleId"/>
             <!-- clone#OrderRoutingRuleInvCond -->

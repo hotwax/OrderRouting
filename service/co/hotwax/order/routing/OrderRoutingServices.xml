@@ -124,7 +124,7 @@
                 <return error="true" message="ProductStore ${orderRoutingGroup.productStoreId} not found."/>
             </if>
             <if condition="productStore.enableBrokering == 'N'">
-                <return message="Routing is disabled for productStore ${productStore.storeName} [${orderRoutingGroup.productStoreId}]. "/>
+                <return message="Routing is disabled for Product Store ${productStore.storeName} [${orderRoutingGroup.productStoreId}]. "/>
             </if>
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
@@ -162,7 +162,7 @@
             <set field="groupBrokeredItemCount"  value="0" type="Long"/>
             <log message="Started order routing for ${orderRoutingGroup.groupName} [${routingGroupId}] routing group."/>
             <service-call name="create#co.hotwax.order.routing.OrderRoutingBatch" transaction="force-new" ignore-error="true"
-                          in-map="[routingGroupId:routingGroupId, startDate:ec.user.nowTimestamp, userId:ec.user.username]"
+                          in-map="[routingGroupId:routingGroupId, startDate:ec.user.nowTimestamp, createdByUserId:ec.user.userId]"
                           out-map="routingBatchResult"/>
             <set field="routingBatchId" from="routingBatchResult.routingBatchId"/>
             <iterate list="orderRoutings" entry="orderRouting">
