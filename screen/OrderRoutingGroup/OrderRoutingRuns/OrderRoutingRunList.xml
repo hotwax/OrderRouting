@@ -25,6 +25,7 @@
     <parameter name="routingGroupId"/>
     <parameter name="orderRoutingId"/>
     <transition name="orderRoutingGroup"><default-response url="../../OrderRoutingGroups/OrderRoutingGroupDetail"/></transition>
+    <transition name="orderRoutingBatch"><default-response url="../../OrderRoutingBatchRuns/OrderRoutingBatchRunList"/></transition>
     <transition name="orderRouting"><default-response url="../../OrderRoutingGroups/OrderRouting/OrderRoutingDetail"/></transition>
     <widgets>
         <form-list name="OrderRoutingRunList" list="orderRoutingRuns" list-entry="orderRoutingRun" skip-form="true" header-dialog="true">
@@ -42,8 +43,14 @@
                 </entity-find-one>
             </row-actions>
             <field name="routingRunId">
-                <header-field show-order-by="true"/>
+                <header-field show-order-by="true"><text-find/></header-field>
                 <default-field><display/></default-field>
+            </field>
+            <field name="routingBatchId">
+                <header-field show-order-by="true"><text-find/></header-field>
+                <default-field>
+                    <link url="orderRoutingBatch" link-type="anchor" text="${routingBatchId}" parameter-map="[routingBatchId:routingBatchId]"/>
+                </default-field>
             </field>
             <field name="routingGroupId">
                 <header-field show-order-by="true">

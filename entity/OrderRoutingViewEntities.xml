@@ -140,6 +140,16 @@ under the License.
         </alias-all>
         <alias-all entity-alias="SJR"/>
     </view-entity>
+    <view-entity entity-name="OrderRoutingGroupBatchRun" package="co.hotwax.order.routing">
+        <member-entity entity-alias="ORGRP" entity-name="co.hotwax.order.routing.OrderRoutingGroup"/>
+        <member-entity entity-alias="ORB" entity-name="co.hotwax.order.routing.OrderRoutingBatch" join-from-alias="ORGRP">
+            <key-map field-name="routingGroupId"/>
+        </member-entity>
+        <alias-all entity-alias="ORGRP">
+            <exclude field="createdByUserId"/>
+        </alias-all>
+        <alias-all entity-alias="ORB"/>
+    </view-entity>
     <view-entity entity-name="OrderFacilityChangeRecent" package="co.hotwax.order.routing">
         <member-entity entity-alias="ofc" entity-name="co.hotwax.facility.OrderFacilityChange" />
         <alias-all entity-alias="ofc">
