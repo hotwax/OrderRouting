@@ -30,7 +30,7 @@
     <widgets>
         <form-list name="JobRunList" list="jobRunList" skip-form="true" header-dialog="true">
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroupBatchRun" list="jobRunList">
-                <search-form-inputs default-order-by="-startTime"/>
+                <search-form-inputs default-order-by="-startDate"/>
                 <econdition field-name="routingGroupId" from="routingGroupId" ignore-if-empty="true"/>
                 <select-field field-name="groupName,errors,messages"/>
             </entity-find>
