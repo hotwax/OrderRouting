@@ -52,7 +52,6 @@
         <form-list name="OrderRoutingGroupList" list="orderRoutingGroups" skip-form="true" show-page-size="true"  header-dialog="true" >
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingGroup" list="orderRoutingGroups">
                 <search-form-inputs default-order-by="^sequenceNum, createdDate"/>
-                <order-by field-name="^sequenceNum, createdDate"/>
             </entity-find>
             <row-actions>
                 <entity-find-one entity-name="moqui.service.job.ServiceJob" value-field="serviceJob">
