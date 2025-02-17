@@ -104,6 +104,10 @@
             This approach aligns with the established design principles within the framework and ensures a more streamlined and maintainable solution.
             -->
         </in-parameters>
+        <out-parameters>
+            <parameter name="attemptedItemCount" type="Long"/>
+            <parameter name="brokeredItemCount" type="Long"/>
+        </out-parameters>
         <actions>
             <!-- validate the routing group and product store association -->
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
