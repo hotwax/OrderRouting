@@ -104,6 +104,10 @@
             This approach aligns with the established design principles within the framework and ensures a more streamlined and maintainable solution.
             -->
         </in-parameters>
+        <out-parameters>
+            <parameter name="attemptedItemCount" type="Long"/>
+            <parameter name="brokeredItemCount" type="Long"/>
+        </out-parameters>
         <actions>
             <!-- validate the routing group and product store association -->
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
@@ -214,6 +218,8 @@
 
             <service-call name="update#co.hotwax.order.routing.OrderRoutingBatch" transaction="force-new" ignore-error="true"
                           in-map="[routingBatchId:routingBatchId, endDate:ec.user.nowTimestamp, orderItemCount: groupItemCount, brokeredItemCount: groupBrokeredItemCount]"/>
+            <set field="attemptedItemCount" from="groupItemCount"/>
+            <set field="brokeredItemCount" from="groupBrokeredItemCount"/>
             <message type="success">Finished order routing for the ${orderRoutingGroup.groupName} routing group with an attempted order item count of ${groupItemCount} and a brokered item count of ${groupBrokeredItemCount}</message>
         </actions>
     </service>
