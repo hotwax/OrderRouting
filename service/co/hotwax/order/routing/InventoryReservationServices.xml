@@ -20,6 +20,7 @@
 
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://moqui.org/xsd/service-definition-3.xsd">
 
+    <!-- Deprecated service, use co.hotwax.oms.order.OrderReservationServices.process#OrderFacilityAllocation -->
     <service  verb="run" noun="FacilityAllocation" type="oms-rest" location="service/orderFulfillmentAllocation" method="post" transaction-timeout="120">
         <in-parameters>
             <parameter name="facilityAllocation" type="List"/>
