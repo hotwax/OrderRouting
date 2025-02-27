@@ -22,4 +22,5 @@
         name="order-routing" version="1.6.2">
     <!-- no dependencies -->
     <depends-on name="maarg-util"/>
+    <depends-on name="oms" version="v1.1.0"/>
 </component>
