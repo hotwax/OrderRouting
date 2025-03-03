@@ -136,7 +136,10 @@ under the License.
         <alias-all entity-alias="ORGRP">
             <exclude field="createdByUserId"/>
         </alias-all>
-        <alias-all entity-alias="ORB"/>
+        <alias-all entity-alias="ORB">
+            <exclude field="createdByUser"/>
+        </alias-all>
+        <alias entity-alias="ORB" name="batchCreatedByUser" field="createdByUser"/>
     </view-entity>
     <view-entity entity-name="OrderFacilityChangeRecent" package="co.hotwax.order.routing">
         <member-entity entity-alias="ofc" entity-name="co.hotwax.facility.OrderFacilityChange" />

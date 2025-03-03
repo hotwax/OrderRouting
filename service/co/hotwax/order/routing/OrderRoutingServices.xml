@@ -707,7 +707,7 @@
                 <log message="Facility allocation for order Id [${orderId}:${shipGroupSeqId}${orderItemSeqId?':' + orderItemSeqId :''}]: ${facilityAllocation}, applied under the '${routingRule.ruleName} [${routingRule.routingRuleId}]' routing rule."/>
                 <script><![CDATA[
                     try {
-                        outResult = ec.service.sync().name("co.hotwax.oms.order.OrderReservationServices.process#OrderFacilityAllocation")
+                        outResult = ec.service.sync().name("co.hotwax.oms.impl.OrderReservationServices.process#OrderFacilityAllocation")
                                 .requireNewTransaction(true).transactionTimeout(120)
                                 .parameters([orderId: orderId, facilityAllocation: facilityAllocation])
                                 .call()
