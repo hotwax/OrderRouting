@@ -623,7 +623,7 @@
                             suggestedFacilityIds.each { facilityId->
                                 def facilityItems = suggestedFulfillmentLocations.collect()
                                 filterMapList(facilityItems, ["facilityId":facilityId], false)
-                                def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId] }
+                                def items = facilityItems.collect { [orderItemSeqId: it.orderItemSeqId, quantity: it.itemQty] }
                                 if (checkShipmentThreshold) {
                                     def brokeredItems = orderItems.stream().filter(i -> (items.orderItemSeqId).contains(i.orderItemSeqId)).collect(Collectors.toList())
                                     result = ec.service.sync().name("co.hotwax.order.routing.OrderRoutingServices.calculate#ItemSubtotal")
@@ -663,9 +663,9 @@
                             brokeredItemCount = 0;
                         }
                     }
-
-                    def unfillableItemSeqIds = orderItems.orderItemSeqId.stream().filter(i -> !brokeredItemsSeqIds.contains(i)).collect(Collectors.toList())
-                    if (unfillableItemSeqIds) {
+                    def unfillableItems = orderItems.stream().filter { i -> !brokeredItemsSeqIds.contains(i.orderItemSeqId) }
+                                .map { i -> [orderItemSeqId: i.orderItemSeqId, quantity: i.quantity] }.collect(Collectors.toList())
+                    if (unfillableItems) {
                         if (!comments) {
                             if (!suggestedFulfillmentLocations) {
                                 comments = "${orderRoutingGroup.groupName}: No inventory found for ${routingRule.ruleName}."
@@ -694,7 +694,7 @@
                         }
                         if (queue || autoCancelDate || clearAutoCancelDate) {
                             facilityAllocation.add([facilityId: queue, comments: comments, routingRule:routingRuleName, changeReasonEnumId:changeReasonEnumId?:"UNFILLABLE",
-                                    items: unfillableItemSeqIds.collect { [orderItemSeqId: it, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
+                                    items: unfillableItems.collect { [orderItemSeqId: it.orderItemSeqId,quantity: it.quantity, autoCancelDate: autoCancelDate, clearAutoCancelDate: clearAutoCancelDate]},
                                     routingGroupId: orderRoutingGroup.routingGroupId, orderRoutingId:orderRouting.orderRoutingId, routingRuleId:routingRule.routingRuleId,
                                     routingRunId: routingRunId])
                         }
