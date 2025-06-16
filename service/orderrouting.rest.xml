@@ -41,6 +41,14 @@
              -->
             <method type="get"><entity name="org.apache.ofbiz.product.store.ProductStore" operation="list"/></method>
         </resource>
+        <resource name="session">
+            <method type="post"><entity name="co.hotwax.order.routing.UserSession" operation="create"/></method>
+            <method type="get"><entity name="co.hotwax.order.routing.UserSession" operation="list"/></method>
+            <id name="userId">
+                <method type="put"><entity name="co.hotwax.order.routing.UserSession" operation="update"/></method>
+                <method type="get"><entity name="co.hotwax.order.routing.UserSession" operation="one"/></method>
+            </id>
+        </resource>
     </resource>
     <resource name="productStores">
         <id name="productStoreId">
