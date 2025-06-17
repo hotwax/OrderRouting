@@ -239,12 +239,12 @@ under the License.
         </description>
         <field name="sessionId" type="id" is-pk="true"><description>Unique identifier for the user session.</description></field>
         <field name="userId" type="id"><description>Unique identifier for user.</description></field>
-        <field name="type" type="id-long"><description>Type for the session</description></field>
+        <field name="sessionTypeEnumId" type="id-long"><description>Type of the session</description></field>
         <field name="fromDate" type="date-time"><description>Start date of the user session.</description></field>
         <field name="thruDate" type="date-time"><description>End date of the user session.</description></field>
         <field name="comment" type="text-long"><description>Additional information for the user session.</description></field>
         <relationship type="one" fk-name="USER_SESSION_ENUM" title="Type" related="moqui.basic.Enumeration" short-alias="type">
-            <key-map field-name="type" related="enumId"/>
+            <key-map field-name="sessionTypeEnumId" related="enumId"/>
         </relationship>
         <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
             <key-map field-name="userId" related="userId"/>
