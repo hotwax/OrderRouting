@@ -235,7 +235,8 @@ under the License.
     <entity entity-name="UserSession" package="co.hotwax.order.routing" short-alias="userSessions">
         <description>
             The UserSession entity represents the users session for specific type.
-            This entity is designed to manage user sessions so that system know may users have their sessions active and using what functionality.</description>
+            This entity is designed to manage user sessions so that system know may users have their sessions active and using what functionality.
+        </description>
         <field name="sessionId" type="id" is-pk="true"><description>Unique identifier for the user session.</description></field>
         <field name="userId" type="id"><description>Unique identifier for user.</description></field>
         <field name="type" type="id-long"><description>Type for the session</description></field>
@@ -246,7 +247,7 @@ under the License.
             <key-map field-name="type" related="enumId"/>
         </relationship>
         <relationship type="one-nofk" related="moqui.security.UserAccount" short-alias="user">
-            <key-map field-name="createdByUserId" related="userId"/>
+            <key-map field-name="userId" related="userId"/>
         </relationship>
     </entity>
 </entities>

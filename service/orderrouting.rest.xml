@@ -44,9 +44,8 @@
         <resource name="session">
             <method type="post"><entity name="co.hotwax.order.routing.UserSession" operation="create"/></method>
             <method type="get"><entity name="co.hotwax.order.routing.UserSession" operation="list"/></method>
-            <id name="userId">
+            <id name="sessionId">
                 <method type="put"><entity name="co.hotwax.order.routing.UserSession" operation="update"/></method>
-                <method type="get"><entity name="co.hotwax.order.routing.UserSession" operation="one"/></method>
             </id>
         </resource>
     </resource>
