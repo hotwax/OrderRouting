@@ -94,6 +94,11 @@
             <parameter name="orderId"/>
             <parameter name="shipGroupSeqId"/>
             <parameter name="changeReasonEnumId"/>
+            <parameter name="testDriveSessionId">
+                <description>
+                    For test drive mode, if the productStore has brokering disabled (enableBrokering is set to "N") and a valid testDriveSessionId is provided, the brokering group will be executed.
+                </description>
+            </parameter>
             <!--
             In order to leverage the Service semaphore capabilities provided by the framework, we have chosen to include productStoreId as an input parameter.
             While productStoreId already exists in the OrderRoutingGroup entity,
@@ -109,7 +114,7 @@
             <parameter name="brokeredItemCount" type="Long"/>
         </out-parameters>
         <actions>
-            <!-- validate the routing group and product store association -->
+            <!-- validate the routing group and productStore association -->
             <entity-find-one entity-name="co.hotwax.order.routing.OrderRoutingGroup" value-field="orderRoutingGroup"/>
 
             <if condition="!orderRoutingGroup">
@@ -128,7 +133,20 @@
                 <return error="true" message="ProductStore ${orderRoutingGroup.productStoreId} not found."/>
             </if>
             <if condition="productStore.enableBrokering == 'N'">
-                <return message="Routing is disabled for Product Store ${productStore.storeName} [${orderRoutingGroup.productStoreId}]. "/>
+                <if condition="testDriveSessionId">
+                    <entity-find-one entity-name="co.hotwax.user.UserSession" value-field="userSession">
+                        <field-map field-name="userSessionId" from="testDriveSessionId"/>
+                    </entity-find-one>
+                    <if condition="userSession &amp;&amp; userSession.productStoreId == productStore.productStoreId">
+                        <log level="warn" message="Running routing group ${orderRoutingGroup.groupName} [${routingGroupId}] for test drive session ${testDriveSessionId}${orderId ? ' for order id ' + orderId : ''} "/>
+                        <else>
+                            <return error="true" message="Test derive ${testDriveSessionId} is not associated with productStore ${productStore.storeName} [${productStore.productStoreId}]."/>
+                        </else>
+                    </if>
+                    <else>
+                        <return message="Routing is disabled for ProductStore ${productStore.storeName} [${orderRoutingGroup.productStoreId}]. "/>
+                    </else>
+                </if>
             </if>
 
             <entity-find entity-name="co.hotwax.order.routing.OrderRoutingRun" list="routingRuns">
