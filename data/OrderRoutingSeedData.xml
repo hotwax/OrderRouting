@@ -126,4 +126,8 @@
                                   serviceName="co.hotwax.order.routing.OrderRoutingServices.clean#OrderRoutingRun" cronExpression="0 0 2 * * ?" paused="N">
         <parameters parameterName="daysToKeep" parameterValue="30"/>
     </moqui.service.job.ServiceJob>
+
+
+    <moqui.basic.EnumerationType enumTypeId="USER_SESSION" description="User session"/>
+    <moqui.basic.Enumeration enumId="ROUTING_TEST_DRIVE" description="Routing Test drive" sequenceNum="45" enumTypeId="USER_SESSION"/>
 </entity-facade-xml>
