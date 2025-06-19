@@ -232,7 +232,7 @@ under the License.
             <key-map field-name="createdByUserId" related="userId"/></relationship>
     </entity>
 
-    <entity entity-name="UserSession" package="co.hotwax.order.routing" short-alias="userSessions">
+    <entity entity-name="UserSession" package="co.hotwax.user" short-alias="userSessions">
         <description>
             The UserSession entity represents the users session for specific type.
             This entity is designed to manage user sessions so that system know how may users have their sessions active and using what functionality.
