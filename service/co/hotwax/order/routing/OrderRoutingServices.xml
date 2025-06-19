@@ -133,6 +133,12 @@
                 <return error="true" message="ProductStore ${orderRoutingGroup.productStoreId} not found."/>
             </if>
             <if condition="productStore.enableBrokering == 'N'">
+                <!--
+                    Allow routing in test drive mode even if brokering is disabled for the productStore.
+                    This is permitted only if a valid testDriveSessionId is provided and the session is
+                    associated with the same productStore. Otherwise, routing is blocked as expected.
+                -->
+
                 <if condition="testDriveSessionId">
                     <entity-find-one entity-name="co.hotwax.user.UserSession" value-field="userSession">
                         <field-map field-name="userSessionId" from="testDriveSessionId"/>
