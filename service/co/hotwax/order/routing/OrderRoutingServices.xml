@@ -43,10 +43,10 @@
                     <econdition field-name="routingBatchId" from="routingBatch.routingBatchId"/>
                     <use-iterator/>
                 </entity-find>
-            <iterate list="routingRuns" entry="routingRun">
-                <service-call name="delete#co.hotwax.order.routing.OrderRoutingRun" in-map="[routingRunId:routingRun.routingRunId]" transaction="force-new" ignore-error="true"/>
-                <script>recordsRemoved++</script>
-            </iterate>
+                <iterate list="routingRuns" entry="routingRun">
+                    <service-call name="delete#co.hotwax.order.routing.OrderRoutingRun" in-map="[routingRunId:routingRun.routingRunId]" transaction="force-new" ignore-error="true"/>
+                    <script>recordsRemoved++</script>
+                </iterate>
                 <service-call name="delete#co.hotwax.order.routing.OrderRoutingBatch" in-map="[routingBatchId:routingBatch.routingBatchId]" transaction="force-new" ignore-error="true"/>
             </iterate>
             <log message="Removed ${recordsRemoved} OrderRoutingRun records."/>
