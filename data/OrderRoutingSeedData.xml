@@ -62,6 +62,7 @@
     <moqui.basic.Enumeration enumId="IFP_IGNORE_ORD_FAC_LIMIT" description="Override facility order limit" sequenceNum="7" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="ignoreFacilityOrderLimit"/>
     <moqui.basic.Enumeration enumId="IFP_SHIP_THREHOLD" description="Shipment threshold value check" sequenceNum="8" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="shipmentThreshold"/>
     <moqui.basic.Enumeration enumId="IFP_ALL_ITEM_AVAIL_COND" description="All items available anywhere" sequenceNum="9" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="brokerIfAllItemsAvailable"/>
+<!--    <moqui.basic.Enumeration enumId="IIP_BROKEN_STYLE" description="Broken Sty;e" sequenceNum="7" enumTypeId="INV_FILTER_PRM_TYPE" enumCode="brokenStyle"/>-->
 
     <moqui.basic.EnumerationType enumTypeId="ORD_SORT_PARAM_TYPE" description="Determine the order by parameter considered in a condition" parentTypeId="ORDER_ROUTING"/>
     <moqui.basic.Enumeration enumId="OSP_SHIP_BY" description="Ship by" sequenceNum="5" enumTypeId="ORD_SORT_PARAM_TYPE" enumCode="shipBeforeDate"/><!-- OrderItem.shipBeforeDate -->
@@ -74,6 +75,7 @@
     <moqui.basic.Enumeration enumId="ISP_PROXIMITY" description="Proximity" sequenceNum="5" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="distance"/>
     <moqui.basic.Enumeration enumId="ISP_INV_BAL" description="Inventory balance" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="inventoryForAllocation"/>
     <moqui.basic.Enumeration enumId="ISP_CUST_SEQ" description="Custom sequence" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="facilitySequence"/> <!-- FacilityGroupMember.sequenceNum -->
+    <moqui.basic.Enumeration enumId="ISP_BRK_STYLE" description="Broken style" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="brokenStyle"/><!-- Facilities having Incomplete Assortment -->
 
     <moqui.basic.EnumerationType enumTypeId="ORD_ROU_ASSIGN_TYPE" description="Determine the assignment type in the context of routing (single/multi)" parentTypeId="ORDER_ROUTING"/>
     <moqui.basic.Enumeration enumId="ORA_SINGLE" description="Single" sequenceNum="5" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="SINGLE"/>
@@ -116,10 +118,6 @@
         <!-- Full permissions for the ADMIN user group -->
         <authz artifactAuthzId="ORDER_ROUTING_API_ADMIN" userGroupId="ADMIN" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
     </artifactGroups>
-    <!-- TODO: Will improve this configuration -->
-    <moqui.service.message.SystemMessageRemote systemMessageRemoteId="HC_OMS_CONFIG"
-                                               description="HotWax OMS server JWT token"
-                                               remotePublicKey=""/>
 
     <!-- Service job data to purge order routing runs data older than 30 days -->
     <moqui.service.job.ServiceJob jobName="clean_Routing_Runs" description="Clean Order Routing runs"

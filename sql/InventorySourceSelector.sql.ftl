@@ -6,6 +6,7 @@
 <#assign brokeringSafetyStock = inventoryFilterMap.get("brokeringSafetyStock")! />
 <#assign distance = inventoryFilterMap.get("distance")! />
 <#assign splitOrderItemGroup = inventoryFilterMap.get("splitOrderItemGroup")! />
+<#assign brokenStyle = (inventorySortByList?has_content && inventorySortByList?is_sequence && inventorySortByList?contains("brokenStyle"))!false />
 <#assign ignoreFacilityOrderLimitCond = inventoryFilterMap.get("ignoreFacilityOrderLimit")! />
 <#assign ignoreFacilityOrderLimit = Static["org.moqui.util.ObjectUtilities"].basicConvert((ignoreFacilityOrderLimitCond.fieldValue)!'false', 'Boolean') />
 <#assign splitGroupItem = Static["org.moqui.util.ObjectUtilities"].basicConvert((splitOrderItemGroup.fieldValue)!'true', 'Boolean') />
@@ -25,6 +26,10 @@ select
     y.rank_by_order_at_facility as RANK_BY_ORDER_AT_FACILITY,
     y.rank_by_item_cnt AS RANK_BY_ITEM_CNT,
     y.FACILITY_EXHAUSTED,
+    <#if brokenStyle?has_content>
+    y.incomplete_assortment as INCOMPLETE_ASSORTMENT,
+    y.avl_var_cnt as AVAILABLE_VARIANT_COUNT,
+    </#if>
     y.total_inv as LAST_INVENTORY_COUNT,
     y.inventoryForAllocation as INVENTORY_FOR_ALLOCATION,
     ifnull(y.ALLOW_BROKERING, 'Y') as ALLOW_BROKERING,
@@ -98,6 +103,10 @@ x.*
           ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id and (ifnull(pf2.LAST_INVENTORY_COUNT,0)-ifnull(pf2.MINIMUM_STOCK,0)) > 0 and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' where oi2.order_id=oh.ORDER_ID and oi2.ship_group_seq_id=oisg.ship_group_seq_id and pf2.facility_id=pf.facility_id and (ifnull(pf2.last_inventory_count,0)-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID = 'ITEM_APPROVED' group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt,
           ifnull((select count(oi2.order_item_seq_id) from order_item oi2 inner join product_facility pf2 on oi2.product_id=pf2.product_id <#if brokeringSafetyStock?has_content> and (ifnull(pf2.LAST_INVENTORY_COUNT,0)-ifnull(pf2.MINIMUM_STOCK,0)) <@buildSqlCondition value=brokeringSafetyStock /> </#if> and ifnull(pf2.ALLOW_BROKERING,'Y') = 'Y' where oi2.order_id=oh.ORDER_ID and oi2.ship_group_seq_id=oisg.ship_group_seq_id and pf2.facility_id=pf.facility_id and (ifnull(pf2.last_inventory_count,0)-ifnull(pf2.MINIMUM_STOCK,0)) >= oi2.quantity-ifnull(oi2.cancel_quantity,0) and oi2.STATUS_ID = 'ITEM_APPROVED' group by oi2.ORDER_ID,pf2.FACILITY_ID),0) as rank_by_item_cnt_above_threshold,
           ifnull((select 'Y' from order_item oi3 where oi3.order_id=oi.ORDER_ID and oi3.order_item_seq_id=oi.order_item_seq_id <#if brokeringSafetyStock?has_content> and (ifnull(pf.last_inventory_count,0)-ifnull(pf.MINIMUM_STOCK,0)) <@buildSqlCondition value=brokeringSafetyStock /> </#if> and (ifnull(pf.last_inventory_count,0)-ifnull(pf.MINIMUM_STOCK,0)) >= oi3.quantity-ifnull(oi3.cancel_quantity,0) and oi3.STATUS_ID = 'ITEM_APPROVED'),'N') as item_at_facility_above_threshold
+          <#if brokenStyle?has_content>
+          ,ifnull((select bs.broken from (select sv.facility_id,sv.style_product_id,sv.var_cnt,sum(case when ifnull(sv.var_inv,0) > 0 then 1 else 0 end) as avl_var_cnt, case when sv.var_cnt > sum(case when ifnull(sv.var_inv,0) > 0 then 1 else 0 end) then 'Y' else 'N' end as broken from (select pa1.PRODUCT_ID as style_product_id,pa1.PRODUCT_ID_TO as var_product_id,pf3.PRODUCT_ID,pf3.FACILITY_ID,pf3.LAST_INVENTORY_COUNT,pf3.MINIMUM_STOCK, (select count(product_id_to) from product_assoc where product_id=pa1.product_id and product_assoc_type_id='PRODUCT_VARIANT' and (pa1.thru_date is null or pa1.thru_date >= now()) group by product_id) as var_cnt, ifnull(pf3.last_inventory_count,0)-ifnull(pf3.MINIMUM_STOCK,0) - 3 as var_inv from product_assoc pa1 left join product_facility pf3 on pa1.PRODUCT_ID_TO=pf3.PRODUCT_ID where pa1.PRODUCT_ASSOC_TYPE_ID='PRODUCT_VARIANT' and pa1.THRU_DATE is null and pa1.PRODUCT_ID=pa.product_id and pf3.FACILITY_ID=pf.facility_id) as sv group by sv.style_product_id) as bs limit 1), 'N') as incomplete_assortment, <#-- NEW flag to show facilties having Incomplete Assortment for the style of the product -->
+          ifnull((select bs.avl_var_cnt from (select sv.facility_id,sv.style_product_id,sv.var_cnt,sum(case when ifnull(sv.var_inv,0) > 0 then 1 else 0 end) as avl_var_cnt, case when sv.var_cnt > sum(case when ifnull(sv.var_inv,0) > 0 then 1 else 0 end) then 'Y' else 'N' end as broken from (select pa1.PRODUCT_ID as style_product_id,pa1.PRODUCT_ID_TO as var_product_id,pf3.PRODUCT_ID,pf3.FACILITY_ID,pf3.LAST_INVENTORY_COUNT,pf3.MINIMUM_STOCK, (select count(product_id_to) from product_assoc where product_id=pa1.product_id and product_assoc_type_id='PRODUCT_VARIANT' and (pa1.thru_date is null or pa1.thru_date >= now()) group by product_id) as var_cnt, ifnull(pf3.last_inventory_count,0)-ifnull(pf3.MINIMUM_STOCK,0) - 3 as var_inv from product_assoc pa1 left join product_facility pf3 on pa1.PRODUCT_ID_TO=pf3.PRODUCT_ID where pa1.PRODUCT_ASSOC_TYPE_ID='PRODUCT_VARIANT' and pa1.THRU_DATE is null and pa1.PRODUCT_ID=pa.product_id and pf3.FACILITY_ID=pf.facility_id) as sv group by sv.style_product_id) as bs limit 1), 'N') as avl_var_cnt <#-- NEW Condition to show available variant count at facilties having Incomplete Assortment for the style of the product -->
+          </#if>
           from order_header oh
           inner join order_item oi on oh.order_id=oi.order_id and oi.status_id = 'ITEM_APPROVED' and oh.STATUS_ID = 'ORDER_APPROVED'
           <#if !splitGroupItem>
@@ -118,6 +127,9 @@ x.*
           and ifnull(PFI.ALLOW_BROKERING,'Y') = 'Y' AND PFI.PRODUCT_ID in (SELECT OII.PRODUCT_ID FROM ORDER_ITEM OII WHERE OII.ORDER_ID='${orderId!"<orderId>"}' and OII.SHIP_GROUP_SEQ_ID = '${shipGroupSeqId!"<shipGroupSeqId>"}' <#if orderItemSeqId?has_content> AND OII.ORDER_ITEM_SEQ_ID='${orderItemSeqId}' </#if> and OII.STATUS_ID = 'ITEM_APPROVED') group by PFI.FACILITY_ID having inventoryForAllocation > 0 order by PRODUCT_COUNT DESC, inventoryForAllocation DESC) inv_count on pf.facility_id = inv_count.facility_id
           inner join product_store_facility psf on oh.product_store_id = psf.product_store_id and psf.facility_id = f.facility_id
           <#if invenoryGroupFiter?has_content>inner join (select fg.FACILITY_GROUP_TYPE_ID,fgrm.FACILITY_ID, fgrm.FACILITY_GROUP_ID,fgrm.SEQUENCE_NUM from facility_group_member fgrm inner join facility_group fg on fgrm.FACILITY_GROUP_ID=fg.FACILITY_GROUP_ID and fg.FACILITY_GROUP_TYPE_ID='BROKERING_GROUP' and (fgrm.THRU_DATE > now() or fgrm.THRU_DATE is null)) fgm on f.FACILITY_ID=fgm.FACILITY_ID</#if>
+          <#if brokenStyle?has_content>
+          left join product_assoc pa on oi.product_id=pa.product_id_to and pa.product_assoc_type_id='PRODUCT_VARIANT' and (pa.thru_date is null or pa.thru_date >= now()) <#-- NEW join to identify the product's style-->
+          </#if>
           where oh.ORDER_ID='${orderId!"<orderId>"}' and oi.SHIP_GROUP_SEQ_ID = '${shipGroupSeqId!"<shipGroupSeqId>"}' <#if orderItemSeqId?has_content> and oi.order_Item_Seq_Id = '${orderItemSeqId}'</#if>
           and f.FACILITY_ID not in (select distinct facility_id from excluded_order_facility where order_id=oi.order_id and order_item_seq_id=oi.order_item_seq_id and (thru_date is null or thru_date > now()) and facility_id IS NOT NULL)
           AND ((ifnull(foc.last_order_count,0) +1 < f.maximum_order_limit) OR f.maximum_order_limit is null)
@@ -133,14 +145,25 @@ x.*
             <#elseif 'ORA_MULTI' == orderRoutingRule.assignmentEnumId> rank_by_order_at_facility='Y' OR rank_by_order_at_facility='N'</#if>
           </#if>
           <#if !splitGroupItem> AND rank_by_order_item_grp_at_facility_threshold = 'Y' </#if><#-- NEW NEW for filtering item if its order item group's items are available at facility above threshold -->
+          <#if brokenStyle?has_content> AND incomplete_assortment='Y' </#if> <#-- NEW condition to filter facilties having incomplete assortment for the style of the product-->
           order by
+        <#assign includeFacilityIdAsSortBy = false/>
           <#if inventorySortByList?has_content>
-              <#list inventorySortByList as inventorySortBy>
-                  ${inventorySortBy!}<#sep>,
-              </#list>,
+            <#assign includeFacilityIdAsSortBy = (inventorySortByList?is_sequence && inventorySortByList?contains("facilitySequence"))!false />
+            <#list inventorySortByList as inventorySortBy>
+              <#if 'brokenStyle' == inventorySortBy>
+                  field(incomplete_assortment,'Y','N'), <#-- NEW to honor facilties having Incomplete Assortment ahead of those having full assortment -->
+                  case when incomplete_assortment='Y' then avl_var_cnt else NULL end ASC, <#-- NEW to sort Incomplete Assortment facilties with least inventory first-->
+                  case when incomplete_assortment='N' then avl_var_cnt else NULL end DESC <#-- NEW to sort Complete Assortment facilties with max inventory first-->
+              <#else>
+                ${inventorySortBy!}
+              </#if>
+              <#sep>,
+            </#list>,
           </#if>
           rank_by_item_cnt_above_threshold desc, <#-- NEW -->
-          availablity_pct DESC) as x
+          availablity_pct DESC
+          <#if !includeFacilityIdAsSortBy>,facility_id </#if> <#--Include facility_id as sort by to avoid random sorting after applying all criteria -->) as x
           cross join (select @rn:= 0,@r :=0,@oh :=0,@oi :=0, @f :=0,@ps :=0, @s :=0, @aq :=0,@rtd :=0,@fom :=0, @foc :=0, @fpuim :=0) as t
      ) as y
 where y.retained=1 and y.allocated_ord_qty <= y.ship_group_total_qty and y.facility_exhausted='N'
