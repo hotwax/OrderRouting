@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 
 public class OrderRoutingHelper {
     protected static final Logger logger = LoggerFactory.getLogger(OrderRoutingHelper.class);
-    protected static Cache<String, String> jwtCache;
     public static String makeSqlWhere(Map<String, Object> ev) {
         @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
         StringBuilder sql = new StringBuilder();
