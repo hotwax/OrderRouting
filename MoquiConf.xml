@@ -3,7 +3,7 @@
 <moqui-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-3.xsd">
     <default-property name="webapp_require_session_token" value="false"/>
     <screen-facade>
-        <screen location="component://oms/screen/Oms.xml" >
+        <screen location="component://oms/screen/Oms.xml">
             <subscreens-item name="OrderRouting" menu-title="Order Routing" menu-index="10" location="component://order-routing/screen/OrderRoutingGroup.xml" menu-include="true"/>
         </screen>
     </screen-facade>
