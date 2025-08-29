@@ -10,6 +10,10 @@ on:
         description: 'Source branch (e.g. main)'
         required: true
         default: main
+      pat:
+        description: 'GitHub Personal Access Token (with repo access)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -22,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.sourceBranch }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.event.inputs.pat }}
           fetch-depth: 0
 
       - name: Validate releaseNumber format
@@ -100,6 +104,11 @@ jobs:
           echo "VERSION file content:"
           cat VERSION
 
+      - name: Ensure remote uses PAT
+        run: |
+          git remote set-url origin "https://x-access-token:${{ github.event.inputs.pat }}@github.com/${{ github.repository }}.git"
+          git remote -v
+
       - name: Re-create empty upgrade/UpcomingRelease with OFBiz UpgradeData.xml
         if: env.is_ofbiz == 'true'
         shell: bash
@@ -133,4 +142,4 @@ jobs:
           name: ${{ env.tag_name }} (${{ env.release_date }})
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.event.inputs.pat }}
