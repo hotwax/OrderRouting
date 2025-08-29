@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="ext-upgrade">
+    <moqui.basic.Enumeration enumId="ISP_BRK_STYLE" description="Broken style" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="brokenStyle"/><!-- Facilities having Incomplete Assortment -->
+  </entity-facade-xml>
