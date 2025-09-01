@@ -33,7 +33,6 @@
 - pass the routinggroup, routing id and rule in oms api call - Done
 - add last modified date on order routing - Done
 
-
 - Routing engine Logging - https://github.com/hotwax/OrderRouting/issues/2
 - authorization permission setup
 - null last while order by find order condition
