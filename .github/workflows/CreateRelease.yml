@@ -151,3 +151,19 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ github.event.inputs.pat }}
+      - name: Notify Google Chat (success)
+        if: success()
+        env:
+          GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK" ]; then
+            echo "GCHAT_WEBHOOK not set — skipping Google Chat notification."
+            exit 0
+          fi
+          tag="${{ env.tag_name }}"
+          repo="${{ github.repository }}"
+          rel_url="${{ github.server_url }}/${{ github.repository }}/releases/tag/${tag}"
+          # Google Chat supports basic Markdown (like [text](url))
+          text="Release <${rel_url}|${tag}> published for \`${repo}\`"
+          payload=$(jq -n --arg t "$text" '{text:$t}')
+          curl -sS -X POST -H 'Content-Type: application/json' -d "$payload" "$GCHAT_WEBHOOK"
