@@ -71,18 +71,6 @@ under the License.
         <alias entity-alias="OI" name="orderItemSeqId"/>
         <alias entity-alias="OI" name="orderItemCount" field="orderItemSeqId" function="count"/>
     </view-entity>
-       <!-- moqui.basic.EnumerationAndType-->
-    <!--<view-entity entity-name="EnumerationAndType" package="co.hotwax.common.enum">
-        <member-entity entity-alias="ENUM" entity-name="org.apache.ofbiz.common.enum.Enumeration"/>
-        <member-entity entity-alias="TYPE" entity-name="org.apache.ofbiz.common.enum.EnumerationType" join-from-alias="ENUM" join-optional="true">
-            <key-map field-name="enumTypeId"/>
-        </member-entity>
-        <alias-all entity-alias="ENUM"/>
-        <alias-all entity-alias="TYPE">
-            <exclude field="description"/>
-        </alias-all>
-        <alias name="typeDescription" field="description" entity-alias="TYPE"/>
-    </view-entity>-->
     <view-entity entity-name="ProductStoreAndFacilityGroup" package="co.hotwax.facility">
         <member-entity entity-alias="PSFG" entity-name="co.hotwax.facility.ProductStoreFacilityGroup"/>
         <member-entity entity-alias="FG" entity-name="org.apache.ofbiz.product.facility.FacilityGroup" join-from-alias="PSFG">
