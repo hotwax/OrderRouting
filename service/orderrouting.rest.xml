@@ -33,7 +33,7 @@
             <method type="get"><service name="co.hotwax.util.UserServices.getUserProfile"/></method>
         </resource>
         <resource name="getAvailableTimeZones" description="Deprecated (since maarg 4.4.0): Use admin/user/getAvailableTimeZones">
-            <method type="get"><service name="co.hotwax.common.CommonServices.getAvailableTimeZones"/></method>
+            <method type="get"><service name="co.hotwax.util.UtilityServices.get#AvailableTimeZones"/></method>
         </resource>
         <resource name="productStore" description="Deprecated (since maarg 4.4.0): Use admin/user/productStore">
             <!--
@@ -82,7 +82,7 @@
         </id>
     </resource>
     <resource name="checkOmsConnection" description="Deprecated (since maarg 4.4.0): Use admin/oms/healthCheck">
-        <method type="get"><service name="co.hotwax.common.CommonServices.checkOmsConnection"/></method>
+        <method type="get"><service name="co.hotwax.util.UtilityServices.check#OmsConnection"/></method>
     </resource>
     <resource name="serviceJobRuns" description="Deprecated (since maarg 4.4.0): Use admin/serviceJobs">
         <id name="jobName"><!--admin/serviceJobs/jobName/runs -->
