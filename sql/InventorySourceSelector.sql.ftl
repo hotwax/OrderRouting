@@ -155,6 +155,8 @@ x.*
                   field(incomplete_assortment,'Y','N'), <#-- NEW to honor facilties having Incomplete Assortment ahead of those having full assortment -->
                   case when incomplete_assortment='Y' then avl_var_cnt else NULL end ASC, <#-- NEW to sort Incomplete Assortment facilties with least inventory first-->
                   case when incomplete_assortment='N' then avl_var_cnt else NULL end DESC <#-- NEW to sort Complete Assortment facilties with max inventory first-->
+              <#elseif 'salesVelocity' == inventorySortBy>
+                pf.SALES_VELOCITY is null asc,pf.SALES_VELOCITY desc,
               <#else>
                 ${inventorySortBy!}
               </#if>

@@ -76,6 +76,7 @@
     <moqui.basic.Enumeration enumId="ISP_INV_BAL" description="Inventory balance" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="inventoryForAllocation"/>
     <moqui.basic.Enumeration enumId="ISP_CUST_SEQ" description="Custom sequence" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="facilitySequence"/> <!-- FacilityGroupMember.sequenceNum -->
     <moqui.basic.Enumeration enumId="ISP_BRK_STYLE" description="Broken style" sequenceNum="15" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="brokenStyle"/><!-- Facilities having Incomplete Assortment -->
+    <moqui.basic.Enumeration enumId="ISP_SALES_VELOCITY" description="Sales Velocity" sequenceNum="16" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="salesVelocity"/>
 
     <moqui.basic.EnumerationType enumTypeId="ORD_ROU_ASSIGN_TYPE" description="Determine the assignment type in the context of routing (single/multi)" parentTypeId="ORDER_ROUTING"/>
     <moqui.basic.Enumeration enumId="ORA_SINGLE" description="Single" sequenceNum="5" enumTypeId="ORD_ROU_ASSIGN_TYPE" enumCode="SINGLE"/>
