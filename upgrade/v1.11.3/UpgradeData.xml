@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="ext-upgrade">
+    <moqui.basic.Enumeration enumId="ISP_SALES_VELOCITY" description="Sales Velocity" sequenceNum="16" enumTypeId="INV_SORT_PARAM_TYPE" enumCode="salesVelocity"/>
+</entity-facade-xml>
