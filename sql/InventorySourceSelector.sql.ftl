@@ -156,7 +156,7 @@ x.*
                   case when incomplete_assortment='Y' then avl_var_cnt else NULL end ASC, <#-- NEW to sort Incomplete Assortment facilties with least inventory first-->
                   case when incomplete_assortment='N' then avl_var_cnt else NULL end DESC <#-- NEW to sort Complete Assortment facilties with max inventory first-->
               <#elseif 'salesVelocity' == inventorySortBy>
-                pf.SALES_VELOCITY is null ASC,pf.SALES_VELOCITY DESC
+                pf.SALES_VELOCITY IS NULL ASC,pf.SALES_VELOCITY DESC
               <#else>
                 ${inventorySortBy!}
               </#if>
