@@ -201,4 +201,9 @@
             </resource>
         </id>
     </resource>
+    <resource name="categories">
+        <id name="productStoreId">
+            <method type="get"><entity name="co.hotwax.product.catalog.category.ProductStoreCatalogAndCategoryRollUp" operation="list"/></method>
+        </id>
+    </resource>
 </resource>
