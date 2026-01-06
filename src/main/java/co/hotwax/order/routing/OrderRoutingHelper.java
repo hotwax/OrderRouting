@@ -78,6 +78,7 @@ public class OrderRoutingHelper {
                 sql.append(" '" + value + "'");
             }
         }
+        System.out.println("========================sql========================"+sql.toString());
         return sql.toString();
     }
     static Object valueToCollection(Object value) {
